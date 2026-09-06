@@ -21,6 +21,7 @@ COLLISION_DEBUG.C
 #include "render/render_debug.h"
 #include "scenario/scenario.h"
 #include "tag_files/tag_groups.h"
+#include <game_globals.h>
 
 /* ---------- constants */
 
@@ -38,28 +39,6 @@ enum
 /* ---------- structures */
 
 /* ---------- prototypes */
-
-long local_player_get_player_index(short local_player_index);
-const char *material_get_name(short material_type);
-void render_debug_string(boolean immediate, const char *string);
-void render_debug_collision_surface(struct collision_bsp const *bsp, long surface_index, real_matrix4x3 const *matrix, real_argb_color const *color);
-void render_frustum_get_projection_bounds(struct render_frustum const *frustum, real_rectangle2d *projection_bounds);
-
-boolean collision_bsp_test_vector(
-	unsigned long flags,
-	struct collision_bsp const *bsp,
-	short breakable_surface_count,
-	byte const *breakable_surface_flags,
-	real_point3d const *point,
-	real_vector3d const *vector,
-	real maximum_t,
-	struct collision_bsp_test_vector_result *result);
-
-boolean collision_test_point(unsigned long flags, real_point3d const *point, long ignore_object_index);
-boolean collision_test_sphere(real_point3d const *center, real radius, long ignore_object_index);
-boolean collision_get_features_in_sphere(unsigned long flags, real_point3d const *center, real radius, real height, real width, long ignore_object_index, struct collision_feature_list *features);
-short collision_move_sphere(unsigned long flags, real_point3d const *old_position, real_vector3d const *old_velocity, real radius, long ignore_object_index, real_point3d *new_position, real_vector3d *new_velocity, short maximum_count, struct collision_plane *collisions);
-short collision_move_pill(unsigned long flags, real_point3d const *old_position, real_vector3d const *old_velocity, real height, real width, long ignore_object_index, real_point3d *new_position, real_vector3d *new_velocity, short maximum_count, struct collision_plane *collisions);
 
 /* ---------- globals */
 
@@ -93,28 +72,28 @@ boolean collision_debug_flag_ignore_invisible_surfaces = TRUE;
 boolean collision_debug_flag_structure = TRUE;
 boolean collision_debug_flag_media = TRUE;
 boolean collision_debug_flag_objects = TRUE;
-real collision_debug_length = 100.0f;
+real collision_debug_length = 100.f;
 long collision_debug_ignore_object_index = NONE;
 
 static real_vector3d collision_debug_spray_vectors[COLLISION_DEBUG_SPRAY_ROWS][COLLISION_DEBUG_SPRAY_COLUMNS] = { 0 };
 static real_point3d collision_debug_spray_points[COLLISION_DEBUG_SPRAY_ROWS][COLLISION_DEBUG_SPRAY_COLUMNS] = { 0 };
 static unsigned long collision_debug_spray_hits[BIT_VECTOR_SIZE_IN_LONGS(COLLISION_DEBUG_SPRAY_COUNT)] = { 0 };
 
-real collision_debug_width = 0.0f;
-real collision_debug_height = 0.0f;
+real collision_debug_width = 0.f;
+real collision_debug_height = 0.f;
 boolean collision_debug_phantom_bsp = FALSE;
 boolean collision_debug_phantom_bsp_found = FALSE;
 
 static const real_vector3d collision_debug_cube_vectors[8] =
 {
-	{ -1.0f, -1.0f, -1.0f },
-	{ -1.0f, -1.0f,  1.0f },
-	{ -1.0f,  1.0f, -1.0f },
-	{ -1.0f,  1.0f,  1.0f },
-	{  1.0f, -1.0f, -1.0f },
-	{  1.0f, -1.0f,  1.0f },
-	{  1.0f,  1.0f, -1.0f },
-	{  1.0f,  1.0f,  1.0f },
+	{ -1.f, -1.f, -1.f },
+	{ -1.f, -1.f,  1.f },
+	{ -1.f,  1.f, -1.f },
+	{ -1.f,  1.f,  1.f },
+	{  1.f, -1.f, -1.f },
+	{  1.f, -1.f,  1.f },
+	{  1.f,  1.f, -1.f },
+	{  1.f,  1.f,  1.f },
 };
 
 /* ---------- public code */
@@ -176,13 +155,13 @@ void collision_debug_render(void)
 	{
 		struct collision_bsp_test_vector_result result;
 
-		if (collision_bsp_test_vector(flags, global_collision_bsp_get(), 256, breakable_surface_flags_get(), &point, &vector, 1.0f, &result))
+		if (collision_bsp_test_vector(flags, global_collision_bsp_get(), 256, breakable_surface_flags_get(), &point, &vector, 1.f, &result))
 		{
 			real_point3d collision_point;
 			struct collision_feature_list features;
 
 			point_from_line3d(&point, &vector, result.t, &collision_point);
-			if (!collision_get_features_in_sphere(flags, &collision_point, 0.01f, 0.0f, 0.01f, ignore_object_index, &features))
+			if (!collision_get_features_in_sphere(flags, &collision_point, 0.01f, 0.f, 0.01f, ignore_object_index, &features))
 			{
 				collision_debug_phantom_bsp_found = TRUE;
 				collision_debug_phantom_bsp_point = collision_point;
@@ -198,9 +177,9 @@ void collision_debug_render(void)
 			real roll;
 			short index;
 
-			yaw = (real)fmod((real)game_time_get() * 1.0f * _pi / 30.0f, 2.0f * _pi);
-			pitch = (real)fmod((real)game_time_get() * -0.7f * _pi / 30.0f, 2.0f * _pi);
-			roll = (real)fmod((real)game_time_get() * 1.4f * _pi / 30.0f, 2.0f * _pi);
+			yaw = (real)fmod((real)game_time_get() * 1.f * _pi / 30.f, 2.f * _pi);
+			pitch = (real)fmod((real)game_time_get() * -0.7f * _pi / 30.f, 2.f * _pi);
+			roll = (real)fmod((real)game_time_get() * 1.4f * _pi / 30.f, 2.f * _pi);
 			render_debug_string_at_point(TRUE, &collision_debug_phantom_bsp_point, "phantom bsp", global_real_argb_pink);
 			matrix4x3_rotation_from_angles(&matrix, yaw, pitch, roll);
 
@@ -229,10 +208,10 @@ void collision_debug_render(void)
 
 	if (collision_debug)
 	{
-		if (collision_debug_length <= 0.0f)
+		if (collision_debug_length <= 0.f)
 		{
 			add_vectors3d((real_vector3d *)&point, &vector, (real_vector3d *)&point);
-			if (collision_debug_width <= 0.0f)
+			if (collision_debug_width <= 0.f)
 			{
 				if (collision_test_point(flags, &point, ignore_object_index))
 					render_debug_point(TRUE, &point, 0.1f, global_real_argb_red);
@@ -247,7 +226,7 @@ void collision_debug_render(void)
 					render_debug_sphere(TRUE, &point, collision_debug_width, global_real_argb_green);
 			}
 		}
-		else if (collision_debug_width <= 0.0f)
+		else if (collision_debug_width <= 0.f)
 		{
 			struct collision_result result;
 			if (collision_test_vector(flags, &point, &vector, ignore_object_index, &result))
@@ -291,7 +270,7 @@ void collision_debug_render(void)
 						TEST_FLAG(result.flags, 2) ? " climbable" : "",
 						TEST_FLAG(result.flags, 3) ? " breakable" : "",
 						material_get_name(result.material_type),
-						arccosine(result.plane.n.k) * 360.0f / (2.0f * _pi));
+						arccosine(result.plane.n.k) * 360.f / (2.f * _pi));
 					render_debug_string(TRUE, string);
 				}
 			}
@@ -313,12 +292,12 @@ void collision_debug_render(void)
 
 			old_position = point;
 			old_velocity = vector;
-			if (collision_debug_height <= 0.0f)
+			if (collision_debug_height <= 0.f)
 				count = collision_move_sphere(flags, &old_position, &old_velocity, collision_debug_width, ignore_object_index, &new_position, &new_velocity, MAXIMUM_COLLISION_DEBUG_MOVE_COLLISIONS, collisions);
 			else
 				count = collision_move_pill(flags, &old_position, &old_velocity, collision_debug_height, collision_debug_width, ignore_object_index, &new_position, &new_velocity, MAXIMUM_COLLISION_DEBUG_MOVE_COLLISIONS, collisions);
 
-			render_debug_vector(TRUE, &old_position, &old_velocity, 1.0f, global_real_argb_blue);
+			render_debug_vector(TRUE, &old_position, &old_velocity, 1.f, global_real_argb_blue);
 			match_assert("c:\\halo\\SOURCE\\physics\\collision_debug.c", 297, count<=14);
 
 			csmemmove(collisions + 1, collisions, sizeof(*collisions) * count);
@@ -336,18 +315,18 @@ void collision_debug_render(void)
 					render_debug_line(TRUE, &collisions[index - 1].point, &collisions[index].point, global_real_argb_red);
 				render_debug_vector(TRUE, &collisions[index].point, &collisions[index].plane.n, 0.125f, global_real_argb_red);
 			}
-			render_debug_vector(TRUE, &new_position, &new_velocity, 1.0f, global_real_argb_green);
+			render_debug_vector(TRUE, &new_position, &new_velocity, 1.f, global_real_argb_green);
 		}
 	}
 
 	if (collision_debug_spray)
 	{
-		if (collision_debug_length <= 0.0f)
+		if (collision_debug_length <= 0.f)
 		{
 			real_point3d center;
 			real_point3d spray_point;
 
-			point_from_line3d(&render.camera.position, &render.camera.forward, 2.0f, &center);
+			point_from_line3d(&render.camera.position, &render.camera.forward, 2.f, &center);
 			for (spray_point.z = center.z - 0.125f; spray_point.z <= center.z + 0.125f; spray_point.z += 0.0625f)
 			{
 				for (spray_point.y = center.y - 0.125f; spray_point.y <= center.y + 0.125f; spray_point.y += 0.0625f)
@@ -374,8 +353,8 @@ void collision_debug_render(void)
 					real_rectangle2d bounds;
 
 					render_frustum_get_projection_bounds(&render.frustum, &bounds);
-					set_real_vector3d(&column_step, (bounds.x1 - bounds.x0) * collision_debug_length / COLLISION_DEBUG_SPRAY_COLUMNS, 0.0f, 0.0f);
-					set_real_vector3d(&row_step, 0.0f, (bounds.y1 - bounds.y0) * collision_debug_length / COLLISION_DEBUG_SPRAY_ROWS, 0.0f);
+					set_real_vector3d(&column_step, (bounds.x1 - bounds.x0) * collision_debug_length / COLLISION_DEBUG_SPRAY_COLUMNS, 0.f, 0.f);
+					set_real_vector3d(&row_step, 0.f, (bounds.y1 - bounds.y0) * collision_debug_length / COLLISION_DEBUG_SPRAY_ROWS, 0.f);
 					set_real_vector3d(&upper_left, bounds.x0 * collision_debug_length, bounds.y0 * collision_debug_length, -collision_debug_length);
 				}
 
