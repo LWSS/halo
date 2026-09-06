@@ -172,14 +172,11 @@ void collision_debug_render(void)
 		{
 			real_matrix4x3 matrix;
 			real_point3d points[8];
-			real yaw;
-			real pitch;
-			real roll;
 			short index;
 
-			yaw = (real)fmod((real)game_time_get() * 1.f * _pi / 30.f, 2.f * _pi);
-			pitch = (real)fmod((real)game_time_get() * -0.7f * _pi / 30.f, 2.f * _pi);
-			roll = (real)fmod((real)game_time_get() * 1.4f * _pi / 30.f, 2.f * _pi);
+			real yaw = (real)fmod((real)game_time_get() * 1.f * _pi / 30.f, 2.f * _pi);
+			real pitch = (real)fmod((real)game_time_get() * -0.7f * _pi / 30.f, 2.f * _pi);
+			real roll = (real)fmod((real)game_time_get() * 1.4f * _pi / 30.f, 2.f * _pi);
 			render_debug_string_at_point(TRUE, &collision_debug_phantom_bsp_point, "phantom bsp", global_real_argb_pink);
 			matrix4x3_rotation_from_angles(&matrix, yaw, pitch, roll);
 
