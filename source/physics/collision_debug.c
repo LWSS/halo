@@ -75,9 +75,9 @@ boolean collision_debug_flag_objects = TRUE;
 real collision_debug_length = 100.f;
 long collision_debug_ignore_object_index = NONE;
 
-static real_vector3d collision_debug_spray_vectors[COLLISION_DEBUG_SPRAY_ROWS][COLLISION_DEBUG_SPRAY_COLUMNS] = { 0 };
-static real_point3d collision_debug_spray_points[COLLISION_DEBUG_SPRAY_ROWS][COLLISION_DEBUG_SPRAY_COLUMNS] = { 0 };
-static unsigned long collision_debug_spray_hits[BIT_VECTOR_SIZE_IN_LONGS(COLLISION_DEBUG_SPRAY_COUNT)] = { 0 };
+static real_vector3d collision_debug_spray_vectors[COLLISION_DEBUG_SPRAY_ROWS][COLLISION_DEBUG_SPRAY_COLUMNS];
+static real_point3d collision_debug_spray_points[COLLISION_DEBUG_SPRAY_ROWS][COLLISION_DEBUG_SPRAY_COLUMNS];
+static unsigned long collision_debug_spray_hits[BIT_VECTOR_SIZE_IN_LONGS(COLLISION_DEBUG_SPRAY_COUNT)];
 
 real collision_debug_width = 0.f;
 real collision_debug_height = 0.f;
@@ -110,7 +110,8 @@ void collision_debug_render(void)
 
 	if (collision_debug || collision_debug_spray || collision_debug_features || collision_debug_phantom_bsp)
 	{
-		flags = collision_debug_flag_front_facing_surfaces != FALSE;
+		flags = 0;
+		SET_FLAG(flags, _collision_test_front_facing_surfaces_bit, collision_debug_flag_front_facing_surfaces);
 		SET_FLAG(flags, _collision_test_back_facing_surfaces_bit, collision_debug_flag_back_facing_surfaces);
 		SET_FLAG(flags, _collision_test_ignore_two_sided_surfaces_bit, collision_debug_flag_ignore_two_sided_surfaces);
 		SET_FLAG(flags, _collision_test_ignore_invisible_surfaces_bit, collision_debug_flag_ignore_invisible_surfaces);
