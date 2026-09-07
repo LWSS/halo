@@ -20,7 +20,9 @@ COLLISION_USAGE.C
 
 enum
 {
-	NUMBER_OF_COLLISION_TIME_PERIODS = 3
+	NUMBER_OF_COLLISION_TIME_PERIODS = 3,
+
+	MAXIMUM_DISPLAYED_COLLISION_USERS = 6 // not original name
 };
 
 /* ---------- macros */
@@ -222,7 +224,7 @@ void collision_log_render(
 		{
 			boolean recorded = FALSE;
 			short time_period_index;
-			if (function_index < 3 || collision_log_extended)
+			if (function_index < _collision_function_vector_intersect_model  || collision_log_extended)
 			{
 				for (time_period_index = 0; time_period_index < NUMBER_OF_COLLISION_TIME_PERIODS; time_period_index++)
 				{
@@ -285,7 +287,8 @@ void collision_log_render(
 					else
 					{
 						short index;
-						for (index = 0; index < 6; index++)
+
+						for (index = 0; index < MAXIMUM_DISPLAYED_COLLISION_USERS; index++)
 						{
 							short user_index = overall_usage[index].user_type;
 							match_assert("c:\\halo\\SOURCE\\physics\\collision_usage.c", 342, (user_index >= 0) && (user_index < NUMBER_OF_COLLISION_USER_TYPES));
