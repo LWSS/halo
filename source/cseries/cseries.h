@@ -294,8 +294,6 @@ __inline long fast_ftol(
 	return result;
 }
 
-// cachebeta: 0x004C0FF0
-// Sapien: 0x0096AB50
 __inline long fast_ftol_C(
 	float x)
 {

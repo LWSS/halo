@@ -83,7 +83,6 @@ extern struct hud_globals_definition *hud_globals;
 
 /* ---------- public code */
 
-/* Original HUD stack sentinel helper; its out-of-line body is in HUD_DRAW.C. */
 __inline short check_stack_buffer(long const *buffer)
 {
 	short index;
