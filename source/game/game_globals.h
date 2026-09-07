@@ -163,6 +163,8 @@ struct game_globals
 
 /* ---------- prototypes/EXAMPLE.C */
 
+char const *material_get_name(short material_type);
+
 /* ---------- globals */
 
 /* ---------- public code */
