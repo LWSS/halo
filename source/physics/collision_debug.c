@@ -21,7 +21,7 @@ COLLISION_DEBUG.C
 #include "render/render_debug.h"
 #include "scenario/scenario.h"
 #include "tag_files/tag_groups.h"
-#include <game_globals.h>
+#include "game_globals.h"
 
 /* ---------- constants */
 
