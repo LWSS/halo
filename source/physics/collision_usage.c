@@ -219,7 +219,9 @@ void collision_log_render(
 				{
 					if (collision_usage_buffer[time_period_index].reset_upon_next_use &&
 						collision_usage_buffer[time_period_index].function[function_index].total_all_users.calls > 0)
+					{
 						recorded = TRUE;
+					}
 				}
 				if (recorded)
 				{
