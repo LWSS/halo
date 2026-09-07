@@ -3449,7 +3449,7 @@ boolean object_force_inside_bsp(
 	boolean result = FALSE;
 
 	match_assert("c:\\halo\\SOURCE\\objects\\objects.c", 2365, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
-	global_current_collision_users[global_current_collision_user_depth++] = 19;
+	global_current_collision_users[global_current_collision_user_depth++] = _collision_user_objects;
 	
 	if (collision_test_line(_collision_test_for_projectiles_flags, known_good_point, &object->object.position, NONE, &collision) ||
 		object->object.location.cluster_index==NONE)
