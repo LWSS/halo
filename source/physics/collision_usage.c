@@ -16,15 +16,6 @@ COLLISION_USAGE.C
 #include "interface.h"
 #include "draw_string.h"
 
-/* ---------- constants */
-
-enum
-{
-	NUMBER_OF_COLLISION_TIME_PERIODS = 3,
-};
-
-/* ---------- macros */
-
 /* ---------- structures */
 
 struct collision_log
