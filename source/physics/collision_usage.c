@@ -179,7 +179,7 @@ static void collision_log_format_usage(
 	{
 		__int64 frequency;
 		QueryPerformanceFrequency((PLARGE_INTEGER)&frequency);
-		sprintf(buffer, "%d/%.2f", usage->calls, (real)usage->elapsed_time * 1000.f / (real)frequency);
+		sprintf(buffer, "%d/%.2f", usage->calls, (real)usage->elapsed_time * MILLISECONDS_PER_SECOND / frequency);
 	}
 	else
 	{
