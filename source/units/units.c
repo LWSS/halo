@@ -2710,7 +2710,7 @@ static void unit_cause_continuous_melee_damage(
 		{
 			match_assert("c:\\halo\\SOURCE\\units\\units.c", 8941, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
 
-			global_current_collision_users[global_current_collision_user_depth++] = 8;
+			global_current_collision_users[global_current_collision_user_depth++] = _collision_user_melee;
 
 			if (collision_model_instance_new(&instance, unit->object.parent_object_index))
 			{
