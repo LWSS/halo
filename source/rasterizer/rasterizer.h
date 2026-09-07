@@ -150,7 +150,6 @@ struct rasterizer_globals_struct
 	rectangle2d frame_bounds;
 };
 
-
 extern struct rasterizer_globals_struct rasterizer_globals;
 
 extern real_argb_color *global_rasterizer_model_ambient_reflection_tint;
