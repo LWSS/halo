@@ -153,7 +153,6 @@ struct rasterizer_globals_struct
 
 extern struct rasterizer_globals_struct rasterizer_globals;
 
-
 extern real_argb_color *global_rasterizer_model_ambient_reflection_tint;
 
 /* comm. not sure where this should be */
