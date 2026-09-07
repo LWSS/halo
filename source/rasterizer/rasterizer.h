@@ -142,6 +142,18 @@ void rasterizer_text_cache_flush(void);
 
 /* ---------- globals */
 
+struct rasterizer_globals_struct
+{
+	boolean active;
+	short current_lock_operation;
+	rectangle2d screen_bounds;
+	rectangle2d frame_bounds;
+};
+
+
+extern struct rasterizer_globals_struct rasterizer_globals;
+
+
 extern real_argb_color *global_rasterizer_model_ambient_reflection_tint;
 
 /* comm. not sure where this should be */

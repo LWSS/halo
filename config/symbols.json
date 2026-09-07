@@ -5422,7 +5422,7 @@
 { "file_offset": 1295568, "flags": 32, "name": "_collision_model_test_pill" },
 { "file_offset": 1295920, "flags": 32, "name": "_collision_model_get_features_in_sphere" },
 { "file_offset": 1296240, "flags": 32, "name": "_render_debug_collision_model" },
-{ "file_offset": 1296432, "flags": 32, "name": "_code_0013c830" },
+{ "file_offset": 1296432, "flags": 32, "name": "_collision_log_compare_usage" },
 { "file_offset": 1296480, "flags": 32, "name": "_collision_log_initialize" },
 { "file_offset": 1296576, "flags": 32, "name": "_collision_log_enable" },
 { "file_offset": 1296592, "flags": 32, "name": "_collision_log_store_period" },

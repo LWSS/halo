@@ -1,113 +1,6 @@
 /*
 COLLISION_USAGE.C
 
-symbols in this file:
-0013C830 0030:
-	_code_0013c830 (0000)
-0013C860 0060:
-	_collision_log_initialize (0000)
-0013C8C0 0010:
-	_collision_log_enable (0000)
-0013C8D0 0080:
-	_code_0013c8d0 (0000)
-0013C950 0020:
-	_collision_log_begin_period (0000)
-0013C970 0020:
-	_collision_log_continue_period (0000)
-0013C990 0070:
-	_collision_log_end_period (0000)
-0013CA00 0060:
-	_code_0013ca00 (0000)
-0013CA60 0630:
-	_collision_log_render (0000)
-0013D090 0100:
-	_code_0013d090 (0000)
-0013D190 0010:
-	_collision_log_start_time (0000)
-0013D1A0 0080:
-	_collision_log_end_time (0000)
-0013D220 0050:
-	_collision_log_usage (0000)
-0013D270 0060:
-	_collision_log_display (0000)
-0028B750 0006:
-	??_C@_05GFCDIDHO@debug?$AA@ (0000)
-0028B758 0003:
-	??_C@_02OGLLFMLI@ui?$AA@ (0000)
-0028B75C 0005:
-	??_C@_04EMABALKC@limp?$AA@ (0000)
-0028B764 0004:
-	??_C@_03HDNHDHMH@veh?$AA@ (0000)
-0028B768 0005:
-	??_C@_04NNKAIPAK@proj?$AA@ (0000)
-0028B770 0008:
-	??_C@_07MNOKBFBP@pt?9phys?$AA@ (0000)
-0028B778 0006:
-	??_C@_05DPHKKMC@obsrv?$AA@ (0000)
-0028B780 0008:
-	??_C@_07NPPHEEOC@areadmg?$AA@ (0000)
-0028B788 0009:
-	??_C@_08PBPOKHFB@ai?9melee?$AA@ (0000)
-0028B794 0008:
-	??_C@_07DMCDIGNF@ai?9fire?$AA@ (0000)
-0028B79C 0008:
-	??_C@_07OALDIDM@ai?9comm?$AA@ (0000)
-0028B7A4 0007:
-	??_C@_06GPJBDMGE@ai?9los?$AA@ (0000)
-0028B7AC 0008:
-	??_C@_07NJIFNMAF@ai?9look?$AA@ (0000)
-0028B7B4 0005:
-	??_C@_04MFANEHND@?$DP?$DP?$DP?$DP?$AA@ (0000)
-0028B7BC 0015:
-	??_C@_0BF@HGKOAJPN@structure?9bsp?9sphere?$AA@ (0000)
-0028B7D4 0012:
-	??_C@_0BC@CFFMELFA@object?9bsp?9sphere?$AA@ (0000)
-0028B7E8 0015:
-	??_C@_0BF@PJIFAACM@structure?9bsp?9vector?$AA@ (0000)
-0028B800 0012:
-	??_C@_0BC@KKHHECIB@object?9bsp?9vector?$AA@ (0000)
-0028B814 000d:
-	??_C@_0N@FPLJAJFK@model?9vector?$AA@ (0000)
-0028B824 0013:
-	??_C@_0BD@PLJPFLJA@features?9in?9sphere?$AA@ (0000)
-0028B838 000f:
-	??_C@_0P@EBIJMEDI@vector?9objects?$AA@ (0000)
-0028B848 0011:
-	??_C@_0BB@MLMKGLBG@vector?9structure?$AA@ (0000)
-0028B85C 0029:
-	??_C@_0CJ@GINJHFMK@c?3?2halo?2SOURCE?2physics?2collision@ (0000)
-0028B888 0047:
-	??_C@_0EH@MHCPNMCF@?$CItime_period?5?$DO?$DN?50?$CJ?5?$CG?$CG?5?$CItime_peri@ (0000)
-0028B8D0 0027:
-	??_C@_0CH@NAJCGNL@collision_usage_current_period?5?$DN@ (0000)
-0028B8F8 006d:
-	??_C@_0GN@KBNMKOHA@?$CIcollision_usage_current_period?5@ (0000)
-0028B968 0008:
-	??_C@_07PPMMBGBH@?$CFd?1?$CF?42f?$AA@ (0000)
-0028B970 0043:
-	??_C@_0ED@GBKMDDBI@?$CIuser_index?5?$DO?$DN?50?$CJ?5?$CG?$CG?5?$CIuser_index@ (0000)
-0028B9B4 0005:
-	??_C@_04CDPLFOEF@?$CFc?$CFs?$AA@ (0000)
-0028B9C0 0057:
-	??_C@_0FH@FIPBMPPP@?$CIcollision_function?5?$DO?$DN?50?$CJ?5?$CG?$CG?5?$CIco@ (0000)
-0028BA18 0037:
-	??_C@_0DH@BEMKFPGN@?$CIuser?5?$DO?$DN?50?$CJ?5?$CG?$CG?5?$CIuser?5?$DM?5NUMBER_OF@ (0000)
-0028BA50 0028:
-	??_C@_0CI@PANLECBF@global_current_collision_user_de@ (0000)
-0028BA78 003b:
-	??_C@_0DL@IIDCDOP@sphere?5?$CF?53df?5?$CF?53db?0?5str?9vec?5?$CF?53d@ (0000)
-0030CD58 008a:
-	_global_collision_function_names (0000)
-	_global_collision_user_names (0028)
-	_global_collision_log_enable (0084)
-	_collision_usage_current_period (0088)
-0045DFF0 000a:
-	_collision_log_render_enable (0000)
-	_collision_log_detailed (0001)
-	_collision_log_extended (0002)
-	_collision_log_totals_only (0003)
-	_collision_log_time (0004)
-	_global_current_collision_user_depth (0008)
 */
 
 /* ---------- headers */
@@ -119,6 +12,9 @@ symbols in this file:
 #include "integer_math.h"
 #include "game.h"
 #include "editor_stubs.h"
+#include "rasterizer.h"
+#include "interface.h"
+#include "draw_string.h"
 
 /* ---------- constants */
 
@@ -156,23 +52,12 @@ struct collision_overall_usage
 	short user_type;
 	unsigned short pad;
 	struct collision_log total_all_periods;
-	struct collision_log usage_by_period[7];
+	struct collision_log usage_by_period[NUMBER_OF_COLLISION_TIME_PERIODS];
 };
 
 /* ---------- prototypes */
 
 /* ---------- globals */
-
-boolean global_collision_log_enable = TRUE;
-
-short global_current_collision_user_depth = 0;
-short global_current_collision_users[MAXIMUM_COLLISION_USER_STACK_DEPTH];
-
-boolean collision_log_render_enable = FALSE;
-boolean collision_log_detailed = FALSE;
-boolean collision_log_extended = FALSE;
-boolean collision_log_totals_only = FALSE;
-boolean collision_log_time = FALSE;
 
 const char *global_collision_function_names[] =
 {
@@ -214,13 +99,16 @@ const char *global_collision_user_names[] =
 	NULL
 };
 
-// extern bool global_collision_log_switch_pending; // 0x181812016
-// extern bool global_collision_log_switch_pending_value; // 0x181812017
-// extern short global_collision_period_depth; // 0x181812060
-// extern short global_collision_periods[8]; // 0x181812068
-// extern collision_period collision_usage_current; // 0x181812080
-// extern collision_period collision_usage_this_frame_buffer[8]; // 0x181813650
-// extern collision_period collision_usage_last_frame_buffer[8]; // 0x18181E490
+boolean global_collision_log_enable = TRUE;
+
+boolean collision_log_render_enable = FALSE;
+boolean collision_log_detailed = FALSE;
+boolean collision_log_extended = FALSE;
+boolean collision_log_totals_only = FALSE;
+boolean collision_log_time = FALSE;
+
+short global_current_collision_user_depth = 0;
+short global_current_collision_users[MAXIMUM_COLLISION_USER_STACK_DEPTH];
 
 short collision_usage_current_period = NONE;
 struct collision_period collision_usage_buffer[NUMBER_OF_COLLISION_TIME_PERIODS];
@@ -236,8 +124,7 @@ void collision_log_initialize(
 	
 	match_assert("c:\\halo\\SOURCE\\physics\\collision_usage.c", 150, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
 
-	global_current_collision_users[global_current_collision_user_depth] = 0;
-	global_current_collision_user_depth = global_current_collision_user_depth + 1;
+	global_current_collision_users[global_current_collision_user_depth++] = _collision_user_unknown;
 
 	return;
 }
@@ -259,13 +146,13 @@ static void collision_log_store_period(
 
 	memset(&collision_usage_current, 0, sizeof(collision_usage_current));
 	collision_usage_current_period = time_period;
+
+	return;
 }
 
 void collision_log_begin_period(
 	short time_period)
 {
-	short current_period;
-
 	collision_log_store_period(time_period, TRUE);
 
 	return;
@@ -274,8 +161,6 @@ void collision_log_begin_period(
 void collision_log_continue_period(
 	short time_period)
 {
-	short current_period;
-
 	collision_log_store_period(time_period, FALSE);
 
 	return;
@@ -295,27 +180,33 @@ void collision_log_end_period(
 	return;
 }
 
-void collision_log_format_usage(
-	__int64 aaa,
+static void collision_log_format_usage(
 	const struct collision_log *usage,
 	char *buffer)
 {
-	if ( collision_log_time )
+	if (collision_log_time)
 	{
-		float milliseconds;
 		__int64 frequency;
-
 		QueryPerformanceFrequency((PLARGE_INTEGER)&frequency);
-
-		milliseconds = aaa;
-		sprintf(buffer, "%d/%.2f", usage->calls, milliseconds * 1000.0f / (double)frequency);
-
-		return;
+		sprintf(buffer, "%d/%.2f", usage->calls, (real)usage->elapsed_time * 1000.f / (real)frequency);
+	}
+	else
+	{
+		sprintf(buffer, "%d", usage->calls);
 	}
 
-	sprintf(buffer, "%d", usage->calls);
-
 	return;
+}
+
+static int __cdecl collision_log_compare_usage(
+	const void *a,
+	const void *b)
+{
+	const struct collision_overall_usage *usage_a = a;
+	const struct collision_overall_usage *usage_b = b;
+	if (usage_a->total_all_periods.calls > usage_b->total_all_periods.calls)
+		return -1;
+	return usage_a->total_all_periods.calls < usage_b->total_all_periods.calls;
 }
 
 void collision_log_render(
@@ -325,81 +216,149 @@ void collision_log_render(
 	{
 		char linebuf[2048];
 		short function_index;
-		rectangle2d frame_bounds;
-		short debug_string_position;
+		short debug_string_position = rasterizer_globals.frame_bounds.y1 - 30;
 
 		for (function_index = 0; function_index < NUMBER_OF_COLLISION_FUNCTION_TYPES; function_index++)
 		{
-			boolean recorded;
+			boolean recorded = FALSE;
 			short time_period_index;
-
+			if (function_index < 3 || collision_log_extended)
 			{
-				struct collision_overall_usage total_usage;
-				struct collision_overall_usage overall_usage[28];
-
+				for (time_period_index = 0; time_period_index < NUMBER_OF_COLLISION_TIME_PERIODS; time_period_index++)
 				{
-				    short user_type_index;
+					if (collision_usage_buffer[time_period_index].reset_upon_next_use &&
+						collision_usage_buffer[time_period_index].function[function_index].total_all_users.calls > 0)
+						recorded = TRUE;
 				}
-
+				if (recorded)
 				{
-				    char tempstring[512];
-				    {
-				        char tempbuf[256];
-				    }
-				    {
-				        char tempbuf[256];
-				    }
-				}
-
-				{
-				    short index;
-				    {
-				        short user_index;
-				        {
-				            char tempbuf[256];
-				        }
-				        {
-				            char tempbuf[256];
-				        }
-				    }
-				}
-
-				{
-				    rectangle2d bounds;
-				    point2d cursor;
+					struct collision_overall_usage total_usage;
+					struct collision_overall_usage overall_usage[NUMBER_OF_COLLISION_USER_TYPES];
+					short user_type_index;
+					memset(&total_usage, 0, sizeof(total_usage));
+					memset(overall_usage, 0, sizeof(overall_usage));
+					for (user_type_index = 0; user_type_index < NUMBER_OF_COLLISION_USER_TYPES; user_type_index++)
+					{
+						overall_usage[user_type_index].user_type = user_type_index;
+						if (user_type_index != _collision_user_debugging || collision_log_extended)
+						{
+							for (time_period_index = 0; time_period_index < NUMBER_OF_COLLISION_TIME_PERIODS; time_period_index++)
+							{
+								if (collision_usage_buffer[time_period_index].reset_upon_next_use)
+								{
+									overall_usage[user_type_index].usage_by_period[time_period_index] = collision_usage_buffer[time_period_index].function[function_index].usage_by_user[user_type_index];
+									total_usage.usage_by_period[time_period_index].calls += collision_usage_buffer[time_period_index].function[function_index].usage_by_user[user_type_index].calls;
+									total_usage.usage_by_period[time_period_index].elapsed_time += collision_usage_buffer[time_period_index].function[function_index].usage_by_user[user_type_index].elapsed_time;
+								}
+								overall_usage[user_type_index].total_all_periods.calls += overall_usage[user_type_index].usage_by_period[time_period_index].calls;
+								overall_usage[user_type_index].total_all_periods.elapsed_time += overall_usage[user_type_index].usage_by_period[time_period_index].elapsed_time;
+								total_usage.total_all_periods.calls += overall_usage[user_type_index].usage_by_period[time_period_index].calls;
+								total_usage.total_all_periods.elapsed_time += overall_usage[user_type_index].usage_by_period[time_period_index].elapsed_time;
+							}
+						}
+					}
+					qsort(overall_usage, NUMBER_OF_COLLISION_USER_TYPES, sizeof(overall_usage[0]), collision_log_compare_usage);
+					sprintf(linebuf, "%s:", global_collision_function_names[function_index]);
+					if (collision_log_totals_only)
+					{
+						char tempstring[512];
+						strcpy(tempstring, " ");
+						if (collision_log_detailed)
+						{
+							for (time_period_index = 0; time_period_index < NUMBER_OF_COLLISION_TIME_PERIODS; time_period_index++)
+							{
+								char tempbuf[256];
+								short length = strlen(tempstring);
+								collision_log_format_usage(&total_usage.usage_by_period[time_period_index], tempbuf);
+								_snprintf(tempstring + length, sizeof(tempstring) - length, "%c%s", time_period_index ? '/' : ' ', tempbuf);
+							}
+						}
+						else
+						{
+							char tempbuf[256];
+							short length = strlen(tempstring);
+							collision_log_format_usage(&total_usage.total_all_periods, tempbuf);
+							_snprintf(tempstring + length, sizeof(tempstring) - length, " %s", tempbuf);
+						}
+						strcat(linebuf, tempstring);
+					}
+					else
+					{
+						short index;
+						for (index = 0; index < 6; index++)
+						{
+							short user_index = overall_usage[index].user_type;
+							match_assert("c:\\halo\\SOURCE\\physics\\collision_usage.c", 342, (user_index >= 0) && (user_index < NUMBER_OF_COLLISION_USER_TYPES));
+							if (overall_usage[index].total_all_periods.calls > 0)
+							{
+								char tempstring[512];
+								_snprintf(tempstring, sizeof(tempstring), " %s", global_collision_user_names[user_index]);
+								if (collision_log_detailed)
+								{
+									for (time_period_index = 0; time_period_index < NUMBER_OF_COLLISION_TIME_PERIODS; time_period_index++)
+									{
+										char tempbuf[256];
+										short length = strlen(tempstring);
+										collision_log_format_usage(&overall_usage[index].usage_by_period[time_period_index], tempbuf);
+										_snprintf(tempstring + length, sizeof(tempstring) - length, "%c%s", time_period_index ? '/' : ' ', tempbuf);
+									}
+								}
+								else
+								{
+									char tempbuf[256];
+									short length = strlen(tempstring);
+									collision_log_format_usage(&overall_usage[index].total_all_periods, tempbuf);
+									_snprintf(tempstring + length, sizeof(tempstring) - length, " %s", tempbuf);
+								}
+								strcat(linebuf, tempstring);
+							}
+						}
+					}
+					{
+						rectangle2d bounds;
+						point2d cursor;
+						bounds.x0 = rasterizer_globals.frame_bounds.x0;
+						bounds.y0 = debug_string_position;
+						bounds.y1 = bounds.x1 = SHRT_MAX;
+						interface_set_bitmap_text_draw_mode(_interface_font_terminal, NONE, 0, 0, _interface_color_table_dialog, 0);
+						draw_string_set_color(global_real_argb_white);
+						draw_string_set_tab_stops(NULL, 0);
+						rasterizer_draw_string(&bounds, NULL, &cursor, 0, linebuf);
+						debug_string_position -= cursor.y - bounds.y0;
+					}
 				}
 			}
 		}
-		//function call : void (void *, unsigned long long, unsigned long long, __int32 (*)(void const *, void const *))
 	}
 
 	return;
 }
 
-static long collision_log_get_current_user(
+static short collision_log_get_current_user(
 	short collision_function)
 {
 	short user;
 
 	match_assert("c:\\halo\\SOURCE\\physics\\collision_usage.c", 403, global_current_collision_user_depth > 0);
 
-	user = global_current_collision_users[global_current_collision_user_depth];
+	user = global_current_collision_users[global_current_collision_user_depth - 1];
 	match_assert("c:\\halo\\SOURCE\\physics\\collision_usage.c", 406, (user >= 0) && (user < NUMBER_OF_COLLISION_USER_TYPES));
 	match_assert("c:\\halo\\SOURCE\\physics\\collision_usage.c", 407,
 		(collision_function >= 0) && (collision_function < NUMBER_OF_COLLISION_FUNCTION_TYPES));
 
 	if (!game_in_progress() || game_in_editor() || !global_collision_log_enable)
 	{
-		return NONE;
+		user = NONE;
 	}
-
-	if (collision_usage_current_period == NONE)
+	else if (collision_usage_current_period == NONE)
 	{
-		return NONE;
+		user = NONE;
 	}
-
-	match_assert("c:\\halo\\SOURCE\\physics\\collision_usage.c", 424,
-		(collision_usage_current_period >= 0) && (collision_usage_current_period < NUMBER_OF_COLLISION_TIME_PERIODS));
+	else
+	{
+		match_assert("c:\\halo\\SOURCE\\physics\\collision_usage.c", 424,
+			(collision_usage_current_period >= 0) && (collision_usage_current_period < NUMBER_OF_COLLISION_TIME_PERIODS));
+	}
 
 	return user;
 }
@@ -437,13 +396,30 @@ void collision_log_end_time(
 void collision_log_usage(
 	short collision_function)
 {
+	short user = collision_log_get_current_user(collision_function);
+	if (user != NONE)
+	{
+		collision_usage_current.function[collision_function].total_all_users.calls++;
+		collision_usage_current.function[collision_function].usage_by_user[user].calls++;
+	}
+
 	return;
 }
 
 void collision_log_display(
 	char *buffer)
 {
+	if (collision_usage_buffer[0].reset_upon_next_use)
+	{
+		sprintf(buffer + strlen(buffer), "sphere % 3df % 3db, str-vec % 3d/% 3d, obj-vec % 3d/% 3d|n",
+			collision_usage_buffer[0].function[_collision_function_vector_bounds_object].total_all_users.calls,
+			collision_usage_buffer[0].function[_collision_function_sphere_intersect_bsp_structure].total_all_users.calls +
+			collision_usage_buffer[0].function[_collision_function_sphere_intersect_bsp_object].total_all_users.calls,
+			collision_usage_buffer[0].function[_collision_function_vector_structure].total_all_users.calls,
+			collision_usage_buffer[0].function[_collision_function_vector_intersect_bsp_structure].total_all_users.calls,
+			collision_usage_buffer[0].function[_collision_function_vector_objects].total_all_users.calls,
+			collision_usage_buffer[0].function[_collision_function_vector_intersect_bsp_object].total_all_users.calls);
+	}
+
 	return;
 }
-
-/* ---------- private code */
