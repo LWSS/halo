@@ -17,6 +17,9 @@ header included in hcex build.
 /* ---------- prototypes/GAME_ENGINE.C */
 
 boolean game_engine_running(void);
+boolean game_engine_has_shield(long player_index);
+boolean game_engine_has_teams(void);
+boolean game_engine_hud_draw_motion_sensor(long player_index);
 
 boolean game_engine_infinite_grenades(long player_index);
 

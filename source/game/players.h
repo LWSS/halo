@@ -87,6 +87,10 @@ void player_control_unzoom(long unit_index);
 
 /* ---------- prototypes/PLAYERS.C */
 
+short local_player_count(void);
+short local_player_get_next(short local_player_index);
+long local_player_get_player_index(short local_player_index);
+
 long player_index_from_unit_index(long unit_index);
 long local_player_get_player_index(short local_player_index);
 

@@ -14,7 +14,10 @@ header included in hcex build.
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/PLAYER_EFFECTS.C */
+
+void player_effect_get_damage_indicators(short local_player_index, byte *damage_indicators);
+void player_effect_clear_damage_indicators(short local_player_index);
 
 /* ---------- globals */
 

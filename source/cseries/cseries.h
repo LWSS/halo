@@ -294,10 +294,24 @@ __inline long fast_ftol(
 	return result;
 }
 
+// cachebeta: 0x004C0FF0
+// Sapien: 0x0096AB50
 __inline long fast_ftol_C(
 	float x)
 {
-	return (long)x;
+	long result = fast_ftol(x);
+
+	// This is to simulate a C-cast where the result is truncated 
+	// Default float rounding is to nearest whole number (even numbers preferred when .5)
+	if (x >= 0.f)
+	{
+		if ((float)result > x)
+			result--;
+	}
+	else if ((float)result < x)
+		result++;
+
+	return result;
 }
 
 #endif // __CSERIES_H
