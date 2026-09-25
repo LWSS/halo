@@ -25,6 +25,14 @@ enum
 	BSP3D_ROOT_NODE_INDEX = 0,
 };
 
+enum
+{
+	_contents_unknown = 0,
+	_contents_empty,
+	_contents_semi_empty,
+	_contents_solid
+};
+
 /* ---------- structures */
 
 struct bsp3d

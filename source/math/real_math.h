@@ -926,6 +926,43 @@ __inline real distance_squared3d(
 	return magnitude_squared3d(vector_from_points3d(a, b, &v));
 }
 
+// This is basically a handrolled SSE version of distance_squared3d()
+// Only see 1 usage, if you sig search, it's literally the only place 'subps' ( 0F 5C C1 ) is used
+__inline real fast_distance_squared3d(
+	real_point3d const *point0,
+	real_point3d const *point1)
+{
+	real distance_squared;
+	real *distance_squared_reference = &distance_squared;
+
+	__asm
+	{
+		mov eax, distance_squared_reference
+
+		mov ecx, point0			// moving point0 into xmm0...
+		movss xmm0, [ecx]		// Copy 4 byte float (x)
+		movhps xmm0, [ecx+4]	// Copy 2 more 4byte floats (y/z)
+
+		mov ecx, point1			// moving point1 into xmm1...
+		movss xmm1, [ecx]
+		movhps xmm1, [ecx+4]
+
+		subps xmm0, xmm1        // subtract point0 - point1
+		mulps xmm0, xmm0		// ^2 all elements in place
+
+		// distance_squared = x*x + y*y + z*z;
+		movss xmm2, xmm0
+		shufps xmm0, xmm0, 14 // shuffle to access y and and z
+		addss xmm2, xmm0
+		shufps xmm0, xmm0, 57 // ^^
+		addss xmm2, xmm0
+
+		movss [eax], xmm2		// store final result in `distance_squared`
+	}
+
+	return distance_squared;
+}
+
 __inline real distance3d(
 	real_point3d const *a,
 	real_point3d const *b)
@@ -971,10 +1008,8 @@ __inline real triple_product3d(
 	real_vector3d const *b,
 	real_vector3d const *n)
 {
-	// TODO: doesn't match
-	return (n->i * ((b->k * a->j) - (b->j * a->k)))
-		 + (n->k * ((a->i * b->j) - (b->i * a->j)))
-		 + (n->j * ((b->i * a->k) - (a->i * b->k)));
+	real_vector3d cross;
+	return dot_product3d(cross_product3d(a, b, &cross), n);
 }
 
 __inline real_vector3d *add_vectors3d(

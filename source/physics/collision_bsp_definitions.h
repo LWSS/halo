@@ -28,9 +28,35 @@ enum
 	MAXIMUM_EDGES_PER_COLLISION_SURFACE = 8,
 };
 
+enum
+{
+	_collision_surface_two_sided_bit = 0,
+	_collision_surface_invisible_bit,
+	_collision_surface_climbable_bit,
+	_collision_surface_breakable_bit
+};
+
+enum
+{
+	_collision_leaf_contains_two_sided_bit = 0
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
+
+struct collision_leaf
+{
+	word flags;
+	short bsp2d_reference_count;
+	long first_bsp2d_reference_index;
+};
+
+struct bsp2d_reference
+{
+	long plane_designator;
+	long root_index;
+};
 
 struct collision_surface
 {

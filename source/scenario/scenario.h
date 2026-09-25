@@ -112,6 +112,8 @@ void scenario_get_current_from_weather_palette( real_point3d const *position, re
 
 /* ---------- globals */
 
+extern struct collision_bsp *global_collision_bsp;
+
 extern long global_scenario_index;
 extern short global_structure_bsp_index;
 
