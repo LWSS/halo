@@ -8,11 +8,78 @@ header included in hcex build.
 #define __GAME_ENGINE_H
 #pragma once
 
+/* ---------- headers */
+
+#include "real_math.h"
+
 /* ---------- constants */
+
+enum
+{
+	_game_engine_none = 0,
+	_game_engine_ctf,
+	_game_engine_slayer,
+	_game_engine_oddball,
+	_game_engine_king,
+	_game_engine_race,
+	_game_engine_terminator,
+	_game_engine_stub,
+	NUMBER_OF_GAME_ENGINES,
+	FIRST_USABLE_GAME_ENGINE_INDEX = _game_engine_ctf,
+	LAST_USABLE_GAME_ENGINE_INDEX = _game_engine_race
+};
+
+enum get_score_type
+{
+	_get_score_individual = 0,
+	_get_score_team
+};
 
 /* ---------- macros */
 
 /* ---------- structures */
+
+struct game_statistics;
+struct weapon_datum;
+struct scenario_player;
+
+struct game_engine
+{
+	char const *name;
+	unsigned long type;
+	void (*dispose)(void);
+	boolean (*initialize)(void);
+	void (*dispose_from_old_map)(void);
+	void (*player_added)(long);
+	void (*game_ending)(void);
+	void (*game_starting)(void);
+	void (*statistics_append)(struct game_statistics *, struct game_statistics *);
+	void (*handle_client_message)(long, void *, short);
+	void (*handle_server_message)(void *, short);
+	void (*pregame_post_rasterize)(void);
+	void (*post_rasterize)(void);
+	void (*player_update)(long);
+	void (*weapon_update)(long, struct weapon_datum *);
+	boolean (*weapon_pickup)(long, long);
+	void (*weapon_drop)(long);
+	void (*update)(void);
+	long (*get_score)(long, enum get_score_type);
+	long (*get_team_score)(long);
+	unsigned short *(*get_score_string)(long, unsigned short *);
+	unsigned short *(*get_team_score_string)(long, unsigned short *);
+	boolean (*allow_pick_up)(long, long);
+	void (*player_damaged_player)(long, long, boolean);
+	void (*player_killed_player)(long, long, long, boolean);
+	boolean (*rasterize_score)(long, long, long, unsigned short *, long);
+	real (*starting_location_rating)(long, struct scenario_player *);
+	void (*prespawn_player_update)(long);
+	boolean (*postspawn_player_update)(long);
+	long (*game_engine_player_get_team_index)(long);
+	boolean (*goal_matches_player)(long, long);
+	boolean (*game_engine_test_flag)(long);
+	boolean (*game_engine_test_trait)(long, long);
+	long (*game_engine_did_player_win)(long);
+};
 
 /* ---------- prototypes/GAME_ENGINE.C */
 
