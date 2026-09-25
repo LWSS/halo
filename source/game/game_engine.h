@@ -39,10 +39,6 @@ enum get_score_type
 
 /* ---------- structures */
 
-struct game_statistics;
-struct weapon_datum;
-struct scenario_player;
-
 struct game_engine
 {
 	char const *name;

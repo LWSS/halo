@@ -43,27 +43,27 @@ struct game_engine stub_engine =
 	stub_engine_handle_server_message,
 	stub_engine_pregame_post_rasterize,
 	stub_engine_post_rasterize,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	NULL, // player_update
+	NULL, // weapon_update
+	NULL, // weapon_pickup
+	NULL, // weapon_drop
 	stub_engine_update,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	NULL, // get_score
+	NULL, // get_team_score
+	NULL, // get_score_string
+	NULL, // get_team_score_string
 	stub_engine_allow_pick_up,
 	stub_engine_player_damaged_player,
 	stub_engine_player_killed_player,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	NULL, // rasterize_score
+	NULL, // starting_location_rating
+	NULL, // prespawn_player_update
+	NULL, // postspawn_player_update
+	NULL, // game_engine_player_get_team_index
+	NULL, // goal_matches_player
+	NULL, // game_engine_test_flag
+	NULL, // game_engine_test_trait
+	NULL, // game_engine_did_player_win
 };
 
 /* ---------- private code */
