@@ -15,6 +15,12 @@ header included in hcex build.
 
 enum
 {
+	MAXIMUM_COLLISION_LEAVES_PER_TEST = 256,
+	MAXIMUM_COLLISION_FEATURES_PER_TEST = 256
+};
+
+enum
+{
 	_collision_bsp_test_front_facing_surfaces_bit = 0,
 	_collision_bsp_test_back_facing_surfaces_bit,
 	_collision_bsp_test_ignore_two_sided_surfaces_bit,
@@ -37,7 +43,7 @@ struct collision_bsp_test_vector_result
 	byte breakable_surface_index;
 	short material_index;
 	long leaf_count;
-	long leaf_indices[256];
+	long leaf_indices[MAXIMUM_COLLISION_LEAVES_PER_TEST];
 };
 
 struct collision_model_test_vector_result
@@ -57,7 +63,7 @@ struct collision_bsp_test_pill_result
 	byte breakable_surface_index;
 	short material_index;
 	long leaf_count;
-	long leaf_indices[256];
+	long leaf_indices[MAXIMUM_COLLISION_LEAVES_PER_TEST];
 };
 
 struct collision_model_test_pill_result
@@ -81,13 +87,13 @@ struct collision_surface_test_line2d_result
 struct collision_bsp_test_sphere_result
 {
 	long surface_count;
-	long surface_indices[256];
+	long surface_indices[MAXIMUM_COLLISION_FEATURES_PER_TEST];
 	long edge_count;
-	long edge_indices[256];
+	long edge_indices[MAXIMUM_COLLISION_FEATURES_PER_TEST];
 	long vertex_count;
-	long vertex_indices[256];
+	long vertex_indices[MAXIMUM_COLLISION_FEATURES_PER_TEST];
 	long leaf_count;
-	long leaf_indices[256];
+	long leaf_indices[MAXIMUM_COLLISION_LEAVES_PER_TEST];
 };
 
 /* ---------- prototypes/COLLISION_BSP.C */

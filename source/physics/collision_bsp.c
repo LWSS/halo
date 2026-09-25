@@ -259,6 +259,7 @@ boolean collision_surface_test_point2d(
 	struct collision_surface *surface = TAG_BLOCK_GET_ELEMENT(&bsp->surfaces, surface_index, struct collision_surface);
 	long first_edge_index = surface->first_edge_index;
 	long edge_index = first_edge_index;
+	boolean result = TRUE;
 
 	do
 	{
@@ -277,14 +278,15 @@ boolean collision_surface_test_point2d(
 		vector_from_points2d(&point1, point, &v1);
 		if (cross_product2d(&v0, &v1) > 0.f)
 		{
-			return FALSE;
+			result = FALSE;
+			break;
 		}
 
 		edge_index = edge->edge_indices[side];
 	}
 	while (edge_index != first_edge_index);
 
-	return TRUE;
+	return result;
 }
 
 boolean collision_surface_find_closest_point2d(
@@ -403,9 +405,7 @@ boolean collision_surface_test_line2d(
 	boolean side;
 	real t;
 	real_vector2d edge_vector, point_vector;
-	struct collision_surface *surface;
-
-	surface = TAG_BLOCK_GET_ELEMENT(&bsp->surfaces, surface_index, struct collision_surface);
+	struct collision_surface *surface = TAG_BLOCK_GET_ELEMENT(&bsp->surfaces, surface_index, struct collision_surface);
 
 	first_edge_index = surface->first_edge_index;
 	edge_index = first_edge_index;
@@ -546,7 +546,7 @@ static void bsp3d_test_sphere_recursive(
 		struct collision_leaf *leaf = TAG_BLOCK_GET_ELEMENT(&data->bsp->leaves, leaf_index, struct collision_leaf);
 		long i;
 
-		if (data->result->leaf_count < 256)
+		if (data->result->leaf_count < MAXIMUM_COLLISION_LEAVES_PER_TEST)
 		{
 			data->result->leaf_indices[data->result->leaf_count++] = leaf_index;
 		}
@@ -753,19 +753,13 @@ void render_debug_collision_edge(
 	real_matrix4x3 const *matrix,
 	real_argb_color const *color)
 {
-	struct collision_edge *edge;
-	struct collision_vertex *v0;
-	struct collision_vertex *v1;
-	real_point3d *point0;
-	real_point3d *point1;
+	struct collision_edge *edge = TAG_BLOCK_GET_ELEMENT(&bsp->edges, edge_index, struct collision_edge);
+	struct collision_vertex *v0 = TAG_BLOCK_GET_ELEMENT(&bsp->vertices, edge->vertex_indices[0], struct collision_vertex);
+	real_point3d *point0 = &v0->point;
+	struct collision_vertex *v1 = TAG_BLOCK_GET_ELEMENT(&bsp->vertices, edge->vertex_indices[1], struct collision_vertex);
+	real_point3d *point1 = &v1->point;
 	real_point3d transformed_point1;
 	real_point3d transformed_point0;
-
-	edge = TAG_BLOCK_GET_ELEMENT(&bsp->edges, edge_index, struct collision_edge);
-	v0 = TAG_BLOCK_GET_ELEMENT(&bsp->vertices, edge->vertex_indices[0], struct collision_vertex);
-	point0 = &v0->point;
-	v1 = TAG_BLOCK_GET_ELEMENT(&bsp->vertices, edge->vertex_indices[1], struct collision_vertex);
-	point1 = &v1->point;
 
 	if (matrix)
 	{
@@ -828,7 +822,7 @@ static void add_feature(
 		}
 	}
 
-	if (*count < 256)
+	if (*count < MAXIMUM_COLLISION_FEATURES_PER_TEST)
 	{
 		indices[(*count)++] = index;
 	}
@@ -986,13 +980,13 @@ static boolean collision_bsp_test_vector_recursive(
 
 		if (leaf_index != NONE)
 		{
-			if (data->result->leaf_count < 256)
+			if (data->result->leaf_count < MAXIMUM_COLLISION_LEAVES_PER_TEST)
 			{
 				data->result->leaf_indices[data->result->leaf_count++] = leaf_index;
 			}
 			else
 			{
-				data->result->leaf_indices[255] = leaf_index;
+				data->result->leaf_indices[MAXIMUM_COLLISION_LEAVES_PER_TEST - 1] = leaf_index;
 			}
 		}
 
@@ -1266,13 +1260,13 @@ static boolean bsp3d_test_pill_recursive(
 				}
 			}
 
-			if (data->result->leaf_count < 256)
+			if (data->result->leaf_count < MAXIMUM_COLLISION_LEAVES_PER_TEST)
 			{
 				data->result->leaf_indices[data->result->leaf_count++] = leaf_index;
 			}
 			else
 			{
-				data->result->leaf_indices[255] = leaf_index;
+				data->result->leaf_indices[MAXIMUM_COLLISION_LEAVES_PER_TEST - 1] = leaf_index;
 			}
 		}
 	}
@@ -1449,6 +1443,7 @@ static boolean sphere_test_vector(
 {
 	real_vector3d v;
 	real c;
+	boolean result;
 
 	vector_from_points3d(point, center, &v);
 	c = magnitude_squared3d(&v) - radius * radius;
@@ -1457,7 +1452,7 @@ static boolean sphere_test_vector(
 	{
 		*t_reference = 0.f;
 
-		return TRUE;
+		result = TRUE;
 	}
 	else
 	{
@@ -1476,13 +1471,25 @@ static boolean sphere_test_vector(
 				{
 					*t_reference = t;
 
-					return TRUE;
+					result = TRUE;
+				}
+				else
+				{
+					result = FALSE;
 				}
 			}
+			else
+			{
+				result = FALSE;
+			}
+		}
+		else
+		{
+			result = FALSE;
 		}
 	}
 
-	return FALSE;
+	return result;
 }
 
 boolean collision_bsp_test_pill_new(
