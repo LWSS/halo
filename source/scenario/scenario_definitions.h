@@ -47,6 +47,19 @@ struct scenario_object_datum
 	unsigned long unused;
 };
 
+struct scenario_object_permutation
+{
+	unsigned long change_colors[4];
+	byte region_permutations[8];
+	unsigned long unused2[2];
+};
+
+struct scenario_scenery_datum
+{
+	struct scenario_object_datum object;
+	struct scenario_object_permutation permutation;
+};
+
 struct scenario_placeholder_datum
 {
 	struct scenario_object_datum object;

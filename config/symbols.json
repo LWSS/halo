@@ -5343,7 +5343,7 @@
 { "file_offset": 1265104, "flags": 32, "name": "_scenery_new" },
 { "file_offset": 1265232, "flags": 32, "name": "_scenery_delete" },
 { "file_offset": 1265248, "flags": 32, "name": "_scenery_update" },
-{ "file_offset": 1265328, "flags": 32, "name": "_code_00134eb0" },
+{ "file_offset": 1265328, "flags": 32, "name": "_scenery_animation_start_private" },
 { "file_offset": 1265552, "flags": 32, "name": "_scenery_get_animation_time" },
 { "file_offset": 1265664, "flags": 32, "name": "_scenery_animation_start" },
 { "file_offset": 1265696, "flags": 32, "name": "_scenery_animation_start_at_frame" },
