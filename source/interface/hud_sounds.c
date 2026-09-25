@@ -12,6 +12,7 @@ HUD_SOUNDS.C
 #include "sound_manager.h"
 
 /* ---------- public code */
+
 void hud_play_sound(
 	short local_player_index,
 	long type_flags,
