@@ -17,7 +17,6 @@ header included in hcex build.
 
 enum
 {
-	MAXIMUM_COLLISION_FEATURES_PER_TEST = 256,
 	MAXIMUM_POINTS_PER_COLLISION_PRISM = 8,
 };
 
