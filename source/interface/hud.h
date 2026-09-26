@@ -15,6 +15,7 @@ header included in hcex build.
 
 enum
 {
+    // (Not real enum names)
 	HUD_STACK_BUFFER_LONG_COUNT = 128,
 	HUD_STACK_BUFFER_BYTE = 0x62,
 	HUD_STACK_BUFFER_LONG = 0x62626262
