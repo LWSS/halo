@@ -48,6 +48,22 @@ enum
 	NUMBER_OF_UNIT_DEFINITION_FLAGS,
 };
 
+enum
+{
+	_unit_seat_is_invisible_bit = 0,
+	_unit_seat_is_locked_bit,
+	_unit_seat_is_driver_bit,
+	_unit_seat_is_gunner_bit,
+	_unit_seat_has_third_person_camera_bit,
+	_unit_seat_allows_weapons_bit,
+	_unit_seat_third_person_on_enter_bit,
+	_unit_seat_slave_first_person_camera_bit,
+	_unit_seat_allow_vehicle_communication_animations_bit,
+	_unit_seat_not_valid_without_driver_bit,
+	_unit_seat_allow_noncombatants_bit,
+	NUMBER_OF_UNIT_SEAT_FLAGS,
+};
+
 /* ---------- macros */
 
 #define unit_definition_get(index) ((struct unit_definition *)tag_get(UNIT_DEFINITION_TAG, index))
@@ -155,7 +171,10 @@ struct unit_definition
 	struct _unit_definition unit;
 };
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/UNIT_DEFINITIONS.C */
+
+long unit_definition_get_active_hud_index(struct unit_definition const *definition, boolean multiplayer);
+long unit_definition_get_seat_active_hud_index(struct unit_definition const *definition, short seat_index, boolean multiplayer);
 
 /* ---------- globals */
 

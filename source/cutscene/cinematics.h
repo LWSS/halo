@@ -14,7 +14,9 @@ header included in hcex build.
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/CINEMATICS.C */
+
+boolean cinematic_in_progress(void);
 
 /* ---------- globals */
 
