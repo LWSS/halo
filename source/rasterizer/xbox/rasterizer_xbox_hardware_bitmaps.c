@@ -170,11 +170,11 @@ static void rasterizer_bitmap_2d_changed(
 
 				if (TEST_FLAG(bitmap->flags, _bitmap_compressed_bit))
 				{
-					csmemcpy(destination, source, bitmap_mipmap_get_pixel_data_size(bitmap, mipmap_index));
+					memcpy(destination, source, bitmap_mipmap_get_pixel_data_size(bitmap, mipmap_index));
 				}
 				else
 				{
-					switch (bitmap_format_get_bits_per_pixel(bitmap->format)/8)
+					switch (bitmap_format_get_bits_per_pixel(bitmap->format)/CHAR_BITS)
 					{
 					case 1:
 						rasterizer_xbox_bitmap_swizzle2d_byte(destination, source, width, height);
@@ -241,14 +241,14 @@ static void rasterizer_bitmap_3d_changed(
 					{
 						long slice_size = bitmap_mipmap_get_pixel_data_size(bitmap, mipmap_index)/depth;
 
-						csmemcpy(destination, source, slice_size);
+						memcpy(destination, source, slice_size);
 						source+= slice_size;
 						destination+= d3d_locked_box.SlicePitch;
 					}
 				}
 				else
 				{
-					switch (bitmap_format_get_bits_per_pixel(bitmap->format)/8)
+					switch (bitmap_format_get_bits_per_pixel(bitmap->format)/CHAR_BITS)
 					{
 					case 1:
 						rasterizer_xbox_bitmap_swizzle3d_byte(destination, source, width, height, depth);
@@ -322,11 +322,11 @@ static void rasterizer_bitmap_cm_changed(
 
 					if (TEST_FLAG(bitmap->flags, _bitmap_compressed_bit))
 					{
-						csmemcpy(destination, source, bitmap_mipmap_get_pixel_data_size(bitmap, mipmap_index)/6);
+						memcpy(destination, source, bitmap_mipmap_get_pixel_data_size(bitmap, mipmap_index)/6);
 					}
 					else
 					{
-						switch (bitmap_format_get_bits_per_pixel(bitmap->format)/8)
+						switch (bitmap_format_get_bits_per_pixel(bitmap->format)/CHAR_BITS)
 						{
 						case 1:
 							rasterizer_xbox_bitmap_swizzle2d_byte(destination, source, width, height);
