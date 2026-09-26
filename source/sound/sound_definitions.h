@@ -8,6 +8,12 @@ file has inline function assertions.
 #define __SOUND_DEFINITIONS_H
 #pragma once
 
+/* ---------- headers */
+
+#include "real_math.h"
+#include "tag_files.h"
+#include "tag_groups.h"
+
 /* ---------- constants */
 
 enum
@@ -36,7 +42,48 @@ enum
 
 /* ---------- macros */
 
+#define sound_definition_get(index) ((struct sound_definition *)tag_get(SOUND_DEFINITION_TAG, (index)))
+
 /* ---------- structures */
+
+struct sound_scale_modifiers
+{
+	real skip_fraction;
+	real gain;
+	real pitch;
+	long unused0[3];
+};
+
+struct sound_definition
+{
+	long flags;
+	short class_index;
+	short sample_rate;
+	real minimum_distance;
+	real maximum_distance;
+	real skip_fraction;
+	real pitch_lower_bound;
+	real pitch_upper_bound;
+	real inner_cone_angle;
+	real outer_cone_angle;
+	real outer_cone_gain;
+	real gain;
+	real maximum_bend;
+	long unused[3];
+	struct sound_scale_modifiers scale_lower_bound;
+	struct sound_scale_modifiers scale_upper_bound;
+	short encoding;
+	short compression;
+	struct tag_reference promotion_sound;
+	short promotion_count;
+	word pad2;
+	long runtime_maximum_play_time;
+	long runtime_promotion_counter;
+	long runtime_promotion_time;
+	long runtime_scripting_time;
+	long runtime_scripting_sound_index;
+	struct tag_block pitch_ranges;
+};
 
 /* ---------- prototypes/EXAMPLE.C */
 

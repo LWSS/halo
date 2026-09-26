@@ -140,6 +140,18 @@ struct game_globals_first_person_interface
 	unsigned long unused[22];
 };
 
+struct game_globals_multiplayer_information
+{
+	struct tag_reference flag;
+	struct tag_reference player_unit;
+	struct tag_block vehicles;
+	struct tag_reference hill_shader;
+	struct tag_reference flag_shader;
+	struct tag_reference ball;
+	struct tag_block sounds;
+	long unused[14];
+};
+
 struct game_globals
 {
 	unsigned long flags;

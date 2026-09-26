@@ -35,6 +35,54 @@ enum get_score_type
 	_get_score_team
 };
 
+enum
+{
+	_multiplayer_sound_oddball_spawn = 0,
+	_multiplayer_sound_game_over,
+	_multiplayer_sound_60_seconds,
+	_multiplayer_sound_30_seconds,
+	_multiplayer_sound_red_60_seconds,
+	_multiplayer_sound_red_30_seconds,
+	_multiplayer_sound_blue_60_seconds,
+	_multiplayer_sound_blue_30_seconds,
+	_multiplayer_sound_ctf_blue_took_flag,
+	_multiplayer_sound_ctf_blue_returned_flag,
+	_multiplayer_sound_ctf_blue_captured_flag,
+	_multiplayer_sound_ctf_red_took_flag,
+	_multiplayer_sound_ctf_red_returned_flag,
+	_multiplayer_sound_ctf_red_captured_flag,
+	_multiplayer_sound_double_kill,
+	_multiplayer_sound_triple_kill,
+	_multiplayer_sound_killtacular_kill,
+	_multiplayer_sound_running_riot,
+	_multiplayer_sound_killing_spree,
+	_multiplayer_sound_oddball,
+	_multiplayer_sound_race,
+	_multiplayer_sound_slayer,
+	_multiplayer_sound_ctf,
+	_multiplayer_sound_warthog,
+	_multiplayer_sound_ghost,
+	_multiplayer_sound_scorpion,
+	_multiplayer_sound_countdown_timer,
+	_multiplayer_sound_teleporter_activate,
+	_multiplayer_sound_flag_failure,
+	_multiplayer_sound_countdown_for_respawn,
+	_multiplayer_sound_hill_move,
+	_multiplayer_sound_respawn,
+	_multiplayer_sound_team_king,
+	_multiplayer_sound_team_oddball,
+	_multiplayer_sound_team_race,
+	_multiplayer_sound_team_slayer,
+	_multiplayer_sound_king,
+	_multiplayer_sound_blue_team_ctf,
+	_multiplayer_sound_red_team_ctf,
+	_multiplayer_sound_hill_contested,
+	_multiplayer_sound_hill_controlled,
+	_multiplayer_sound_hill_occupied,
+	_multiplayer_sound_countdown_timer_end,
+	NUMBER_OF_MULTIPLAYER_SOUNDS,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
@@ -91,6 +139,12 @@ long game_engine_remap_weapon(long weapon_definition_index);
 
 
 boolean game_engine_allow_integrated_lights(long object_index);
+
+/* ---------- prototypes/GAME_ENGINE_MULTIPLAYER_SOUNDS.C */
+
+void game_engine_update_multiplayer_sound(void);
+void game_engine_play_multiplayer_sound(long index);
+void game_engine_intialize_queued_sounds(void);
 
 /* ---------- globals */
 
