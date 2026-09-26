@@ -18,6 +18,8 @@ header included in hcex build.
 
 /* ---------- globals */
 
+extern struct game_engine stub_engine;
+
 /* ---------- public code */
 
 #endif // __GAME_ENGINE_LIST_H
