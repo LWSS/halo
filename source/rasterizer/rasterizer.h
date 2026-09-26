@@ -78,6 +78,28 @@ enum
 	NUMBER_OF_RASTERIZER_PROFILES,
 };
 
+enum
+{
+	_rasterizer_lock_none = 0,
+	_rasterizer_lock_texture_changed,
+	_rasterizer_lock_vertexbuffer_new,
+	_rasterizer_lock_detail_objects,
+	_rasterizer_lock_decal_update,
+	_rasterizer_lock_decal_vertices,
+	_rasterizer_lock_bink,
+	_rasterizer_lock_ui,
+	_rasterizer_lock_cinematics,
+	_rasterizer_lock_koth,
+	_rasterizer_lock_hud,
+	_rasterizer_lock_flag,
+	_rasterizer_lock_lightning,
+	_rasterizer_lock_debug,
+	_rasterizer_lock_text,
+	_rasterizer_lock_contrail,
+	_rasterizer_lock_sprite,
+	_rasterizer_lock_bsp_switch
+};
+
 
 /* ---------- macros */
 
@@ -118,6 +140,12 @@ void rasterizer_present(struct bitmap_data *screenshot_bitmap, const point2d *sc
 void rasterizer_dispose(void);
 
 void rasterizer_decals_update_function_pointers(void);
+
+/* ---------- prototypes/RASTERIZER_XBOX_HARDWARE_BITMAPS.C */
+
+boolean rasterizer_bitmap_new(struct bitmap_data *bitmap);
+void rasterizer_bitmap_delete(struct bitmap_data *bitmap);
+void rasterizer_bitmap_changed(struct bitmap_data *bitmap);
 
 /* ---------- prototypes/RASTERIZER_TEXT.C */
 

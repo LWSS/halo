@@ -14,7 +14,9 @@ header included in hcex build.
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/XBOX_TEXTURE_CACHE.C */
+
+void texture_cache_bitmap_delete(struct bitmap_data *bitmap);
 
 /* ---------- globals */
 
