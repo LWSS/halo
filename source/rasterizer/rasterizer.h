@@ -124,7 +124,6 @@ struct rasterizer_window_begin_parameters
 	struct render_screen_effect screen_effect;
 };
 
-// Cachebeta prefix through the decal fog option.
 struct rasterizer_debug_options_struct
 {
 	boolean fps_accumulation;
@@ -198,7 +197,6 @@ struct rasterizer_debug_options_struct
 	boolean filthy_decal_fog_hack_enabled;
 };
 
-// Reconstructed cachebeta statistics prefix; the Xbox 360 build keeps only FPS data.
 struct rasterizer_frame_statistics_s
 {
 	real fps;

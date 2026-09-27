@@ -36,7 +36,7 @@ void lruv_flush(struct lruv_cache *cache);
 void lruv_delete(struct lruv_cache *cache);
 void lruv_idle(struct lruv_cache *cache);
 long lruv_block_new(struct lruv_cache *cache, long size);
-long lruv_block_get_address(struct lruv_cache const *cache, long block_index);
+unsigned long lruv_block_get_address(struct lruv_cache const *cache, long block_index);
 void lruv_block_delete(struct lruv_cache *cache, long block_index);
 
 /* ---------- globals */

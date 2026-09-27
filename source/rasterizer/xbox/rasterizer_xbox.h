@@ -29,8 +29,8 @@ enum
 
 void rasterizer_preinitialize__fill_you_up_with_the_devils_cock(void);
 union point2d *rasterizer_set_texture(short stage, short type, short usage, long bitmap_group_index, short bitmap_index);
-void rasterizer_set_stencil_mode(short mode);
-void rasterizer_set_framebuffer_blend_function(short function);
+void rasterizer_set_stencil_mode(short stencil_mode);
+void rasterizer_set_framebuffer_blend_function(short framebuffer_blend_function);
 void rasterizer_set_pixel_shader(D3DPIXELSHADERDEF const *shader);
 
 

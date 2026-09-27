@@ -40,6 +40,8 @@ enum
 
 /* ---------- macros */
 
+#define decal_get(index) ((struct decal_datum *)datum_get(global_decal_data, (index)))
+
 /* ---------- structures */
 
 struct decal_vertex

@@ -9,6 +9,7 @@ RASTERIZER_XBOX_DECALS.C
 #include "errors.h"
 #include "real_math.h"
 #include "bitmaps.h"
+#include "bitmaps/bitmap_macros.h"
 #include "effects/decals.h"
 #include "effects/decal_definitions.h"
 #include "memory/lruv_cache.h"
@@ -43,13 +44,13 @@ static void rasterizer_decal_vertices_purge_proc(
 	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 31, decal_index!=NONE);
 	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 32, decal_index!=0);
 
-	if (TEST_FLAG(((struct decal_datum *)datum_get(global_decal_data, decal_index))->flags, _decal_locked_bit) && !locked_warning_issued)
+	if (TEST_FLAG(decal_get(decal_index)->flags, _decal_locked_bit) && !locked_warning_issued)
 	{
 		error(_error_silent, "### ERROR decals: deleting locked decal (#%d, queried=#%d) in rasterizer -- tell Bernie!!", decal_index, last_decal_index_queried_by_lruv_cache);
 		locked_warning_issued = TRUE;
 	}
 
-	if (TEST_FLAG(((struct decal_datum *)datum_get(global_decal_data, decal_index))->flags, _decal_permanent_bit) && !permanent_warning_issued)
+	if (TEST_FLAG(decal_get(decal_index)->flags, _decal_permanent_bit) && !permanent_warning_issued)
 	{
 		error(_error_silent, "### ERROR decals: deleting permanent decal (#%d, queried=#%d) in rasterizer -- tell Bernie!!", decal_index, last_decal_index_queried_by_lruv_cache);
 		permanent_warning_issued = TRUE;
@@ -70,7 +71,7 @@ static boolean rasterizer_decal_vertices_locked_proc(
 	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 72, decal_index!=NONE);
 	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 73, decal_index!=0);
 
-	decal = datum_get(global_decal_data, decal_index);
+	decal = decal_get(decal_index);
 
 	locked = TEST_FLAG(decal->flags, _decal_locked_bit) || TEST_FLAG(decal->flags, _decal_permanent_bit);
 
@@ -190,7 +191,7 @@ void *_rasterizer_decal_vertices_lock(
 	long cache_size)
 {
 	byte *result = NULL;
-	long cache_offset;
+	unsigned long cache_offset;
 
 	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 217, cache_index!=NONE);
 	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 218, local_vertex_cache);
@@ -232,7 +233,7 @@ void _rasterizer_decals_begin(
 	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 283, global_d3d_device);
 
 	{
-		unsigned short decal_profiles[NUMBER_OF_DECAL_LAYERS] =
+		short const decal_profiles[NUMBER_OF_DECAL_LAYERS] =
 		{
 			_rasterizer_profile_environment_decals_primary,
 			_rasterizer_profile_environment_decals_secondary,
@@ -304,7 +305,7 @@ void _rasterizer_decals_begin(
 
 		rasterizer_set_vertex_shader_permutation(1, _rasterizer_vertex_type_decal, 0);
 
-		csmemset(&pixel_shader, 0, sizeof(pixel_shader));
+		memset(&pixel_shader, 0, sizeof(pixel_shader));
 		pixel_shader.PSTextureModes = PS_TEXTUREMODES(PS_TEXTUREMODES_PROJECT2D, PS_TEXTUREMODES_NONE, PS_TEXTUREMODES_NONE, PS_TEXTUREMODES_NONE);
 		pixel_shader.PSRGBOutputs[0] = PS_COMBINEROUTPUTS(PS_REGISTER_DISCARD, PS_REGISTER_DISCARD, PS_REGISTER_R0, 0);
 		pixel_shader.PSAlphaOutputs[1] = PS_COMBINEROUTPUTS(PS_REGISTER_DISCARD, PS_REGISTER_DISCARD, PS_REGISTER_R0, 0);
@@ -345,12 +346,12 @@ void _rasterizer_decals_draw(
 		{
 			struct decal_definition *definition;
 			struct _shader_decal *shader;
-			unsigned long color;
+			pixel32 color;
 			unsigned long intensity;
 			unsigned long vertex_data_offset;
 
-			decal = datum_get(global_decal_data, decal_index);
-			definition = tag_get('deca', decal->definition_index);
+			decal = decal_get(decal_index);
+			definition = decal_definition_get(decal->definition_index);
 			shader = &definition->shader.decal;
 
 			if (local_framebuffer_blend_function != shader->framebuffer_blend_function)
@@ -453,7 +454,7 @@ void _rasterizer_decals_end(
 		rasterizer_set_stencil_mode(_rasterizer_stencil_mode_reject);
 	}
 	{
-		unsigned short decal_profiles[NUMBER_OF_DECAL_LAYERS] =
+		short const decal_profiles[NUMBER_OF_DECAL_LAYERS] =
 		{
 			_rasterizer_profile_environment_decals_primary,
 			_rasterizer_profile_environment_decals_secondary,

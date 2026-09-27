@@ -14,7 +14,14 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	DECAL_DEFINITION_TAG = 'deca'
+};
+
 /* ---------- macros */
+
+#define decal_definition_get(index) ((struct decal_definition *)tag_get(DECAL_DEFINITION_TAG, (index)))
 
 /* ---------- structures */
 
