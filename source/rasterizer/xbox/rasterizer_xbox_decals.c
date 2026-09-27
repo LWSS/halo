@@ -1,121 +1,471 @@
 /*
 RASTERIZER_XBOX_DECALS.C
-
-symbols in this file:
-0014A5F0 01b0:
-	_code_0014a5f0 (0000)
-0014A7A0 0050:
-	_code_0014a7a0 (0000)
-0014A7F0 0120:
-	_code_0014a7f0 (0000)
-0014A910 0090:
-	_code_0014a910 (0000)
-0014A9A0 0040:
-	__rasterizer_decals_update_function_pointers (0000)
-0014A9E0 0220:
-	_code_0014a9e0 (0000)
-0014AC00 0010:
-	__rasterizer_decals_initialize_for_new_map (0000)
-0014AC10 0040:
-	__rasterizer_decals_dispose_from_old_map (0000)
-0014AC50 0040:
-	__rasterizer_decals_flush (0000)
-0014AC90 0010:
-	_rasterizer_decal_vertices_begin_update (0000)
-0014ACA0 0010:
-	_rasterizer_decal_vertices_end_update (0000)
-0014ACB0 0070:
-	__rasterizer_decal_vertices_new (0000)
-0014AD20 0060:
-	_code_0014ad20 (0000)
-0014AD80 0030:
-	_code_0014ad80 (0000)
-0014ADB0 0070:
-	__rasterizer_decal_vertices_delete (0000)
-0014AE20 0010:
-	_code_0014ae20 (0000)
-0014AE30 0070:
-	__rasterizer_decals_end (0000)
-0014AEA0 0020:
-	_code_0014aea0 (0000)
-0014AEC0 0010:
-	_code_0014aec0 (0000)
-0014AED0 0010:
-	_code_0014aed0 (0000)
-0014AEE0 0010:
-	_code_0014aee0 (0000)
-0014AEF0 0020:
-	_code_0014aef0 (0000)
-0014AF10 0010:
-	_code_0014af10 (0000)
-0014AF20 0110:
-	__rasterizer_decals_initialize (0000)
-0014B030 00b0:
-	__rasterizer_decals_dispose (0000)
-0014B0E0 00d0:
-	__rasterizer_decal_vertices_lock (0000)
-0014B1B0 0010:
-	__rasterizer_decal_vertices_unlock (0000)
-0014B1C0 02d0:
-	__rasterizer_decals_begin (0000)
-0014B490 0350:
-	__rasterizer_decals_draw (0000)
-0028DD18 0058:
-	_D3DPRIMITIVETOVERTEXCOUNT (0000)
-0028DD70 0012:
-	??_C@_0BC@JENGFNKJ@decal_index?$CB?$DNNONE?$AA@ (0000)
-0028DD88 005d:
-	??_C@_0FN@KMDPMKOA@?$CD?$CD?$CD?5ERROR?5decals?3?5deleting?5perma@ (0000)
-0028DDE8 005a:
-	??_C@_0FK@BJHCLOEJ@?$CD?$CD?$CD?5ERROR?5decals?3?5deleting?5locke@ (0000)
-0028DE44 000f:
-	??_C@_0P@MKLHCCBN@decal_index?$CB?$DN0?$AA@ (0000)
-0028DE54 000c:
-	??_C@_0M@LJKLFPHM@decal_index?$AA@ (0000)
-0028DE60 0029:
-	??_C@_0CJ@FLPDNPAK@lruv_has_locked_proc?$CIlocal_verte@ (0000)
-0028DE8C 0038:
-	??_C@_0DI@DFPBIFJA@c?3?2halo?2SOURCE?2rasterizer?2xbox?2r@ (0000)
-0028DEC4 0013:
-	??_C@_0BD@GMDLIMJM@local_vertex_cache?$AA@ (0000)
-0028DED8 002a:
-	??_C@_0CK@DKKOCKIP@cache_size?$CFsizeof?$CIstruct?5decal_v@ (0000)
-0028DF04 0027:
-	??_C@_0CH@FLDEKCGM@cache_size?$DOsizeof?$CIstruct?5decal_v@ (0000)
-0028DF2C 0012:
-	??_C@_0BC@NONEJICN@cache_index?$CB?$DNNONE?$AA@ (0000)
-0028DF40 0013:
-	??_C@_0BD@NBMEPDOH@decal?5vertex?5cache?$AA@ (0000)
-0028DF54 001e:
-	??_C@_0BO@OHOOIFNI@local_d3d_vertex_buffer?9?$DOData?$AA@ (0000)
-0028DF74 000f:
-	??_C@_0P@PKAEFIHO@decal?5vertices?$AA@ (0000)
-0028DF84 0018:
-	??_C@_0BI@PCGDDGMG@local_d3d_vertex_buffer?$AA@ (0000)
-0028DF9C 0032:
-	??_C@_0DC@BMDAFKAI@vertex_data_offset?$CFsizeof?$CIstruct@ (0000)
-0028DFD0 0022:
-	??_C@_0CC@GHCFEIDO@intensity?$DM?$DNPIXEL32_COMPONENT_MAS@ (0000)
-0028DFF4 0031:
-	??_C@_0DB@GLODBMEM@?$CD?$CD?$CD?5ERROR?5unsupported?5framebuffe@ (0000)
-0030CEF4 0004:
-	_data_0030cef4 (0000)
-0045E8E8 001b:
-	_bss_0045e8e8 (0000)
 */
 
 /* ---------- headers */
 
-/* ---------- constants */
-
-/* ---------- macros */
-
-/* ---------- structures */
+#include "cseries.h"
+#include "cseries_windows.h"
+#include "errors.h"
+#include "real_math.h"
+#include "bitmaps.h"
+#include "effects/decals.h"
+#include "effects/decal_definitions.h"
+#include "memory/lruv_cache.h"
+#include "game_state.h"
+#include "rasterizer.h"
+#include "rasterizer_geometry.h"
+#include "xbox/rasterizer_xbox.h"
 
 /* ---------- prototypes */
 
 /* ---------- globals */
 
-/* ---------- public code */
+static short local_layer = 0;
+static long local_bitmap_group_index = 0;
+static short local_bitmap_index = 0;
+static short local_framebuffer_blend_function = 0;
+static IDirect3DVertexBuffer8 *local_d3d_vertex_buffer = NULL;
+static struct lruv_cache *local_vertex_cache = NULL;
+static boolean locked_warning_issued = FALSE;
+static boolean permanent_warning_issued = FALSE;
+static boolean local_filthy_decal_fog_hack_enabled = FALSE;
+
+static long last_decal_index_queried_by_lruv_cache = NONE;
 
 /* ---------- private code */
+
+static void rasterizer_decal_vertices_purge_proc(
+	long decal_index)
+{
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 29, lruv_has_locked_proc(local_vertex_cache));
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 30, decal_index);
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 31, decal_index!=NONE);
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 32, decal_index!=0);
+
+	if (TEST_FLAG(((struct decal_datum *)datum_get(global_decal_data, decal_index))->flags, _decal_locked_bit) && !locked_warning_issued)
+	{
+		error(_error_silent, "### ERROR decals: deleting locked decal (#%d, queried=#%d) in rasterizer -- tell Bernie!!", decal_index, last_decal_index_queried_by_lruv_cache);
+		locked_warning_issued = TRUE;
+	}
+
+	if (TEST_FLAG(((struct decal_datum *)datum_get(global_decal_data, decal_index))->flags, _decal_permanent_bit) && !permanent_warning_issued)
+	{
+		error(_error_silent, "### ERROR decals: deleting permanent decal (#%d, queried=#%d) in rasterizer -- tell Bernie!!", decal_index, last_decal_index_queried_by_lruv_cache);
+		permanent_warning_issued = TRUE;
+	}
+
+	decal_delete(decal_index);
+
+	return;
+}
+
+static boolean rasterizer_decal_vertices_locked_proc(
+	long decal_index)
+{
+	struct decal_datum *decal;
+	boolean locked;
+
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 71, decal_index);
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 72, decal_index!=NONE);
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 73, decal_index!=0);
+
+	decal = datum_get(global_decal_data, decal_index);
+
+	locked = TEST_FLAG(decal->flags, _decal_locked_bit) || TEST_FLAG(decal->flags, _decal_permanent_bit);
+
+	last_decal_index_queried_by_lruv_cache = decal_index;
+
+	return locked;
+}
+
+/* ---------- public code */
+
+void _rasterizer_decals_initialize(
+	void)
+{
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 89, global_d3d_device);
+
+	local_d3d_vertex_buffer = match_malloc("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 91, sizeof(IDirect3DVertexBuffer8));
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 92, local_d3d_vertex_buffer);
+	local_d3d_vertex_buffer->Common = D3DCOMMON_TYPE_VERTEXBUFFER | 1;
+	local_d3d_vertex_buffer->Data = (unsigned long)game_state_gpu_malloc("decal vertices", NULL, MAXIMUM_DECAL_VERTICES_PER_MAP*sizeof(struct decal_vertex));
+	local_d3d_vertex_buffer->Lock = 0;
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 96, local_d3d_vertex_buffer->Data);
+
+	IDirect3DVertexBuffer8_Register(local_d3d_vertex_buffer, NULL);
+
+	local_vertex_cache = game_state_lruv_cache_new("decal vertex cache",
+		MAXIMUM_DECAL_VERTICES_PER_MAP*sizeof(struct decal_vertex)/64,
+		6,
+		MAXIMUM_DECALS_PER_MAP,
+		rasterizer_decal_vertices_purge_proc,
+		rasterizer_decal_vertices_locked_proc);
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 106, local_vertex_cache);
+
+	return;
+}
+
+void _rasterizer_decals_update_function_pointers(
+	void)
+{
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 116, local_vertex_cache);
+
+	lruv_update_function_pointers(local_vertex_cache, rasterizer_decal_vertices_purge_proc, rasterizer_decal_vertices_locked_proc);
+
+	return;
+}
+
+void _rasterizer_decals_initialize_for_new_map(
+	void)
+{
+	return;
+}
+
+void _rasterizer_decals_dispose_from_old_map(
+	void)
+{
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 131, local_vertex_cache);
+
+	decals_unlock(TRUE);
+	lruv_flush(local_vertex_cache);
+
+	return;
+}
+
+void _rasterizer_decals_flush(
+	void)
+{
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 142, local_vertex_cache);
+
+	decals_unlock(FALSE);
+	lruv_flush(local_vertex_cache);
+
+	return;
+}
+
+void _rasterizer_decals_dispose(
+	void)
+{
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 153, local_vertex_cache);
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 154, local_d3d_vertex_buffer);
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 155, global_d3d_device);
+
+	if (local_d3d_vertex_buffer)
+	{
+		IDirect3DVertexBuffer8_Release(local_d3d_vertex_buffer);
+		local_d3d_vertex_buffer = NULL;
+	}
+
+	lruv_delete(local_vertex_cache);
+
+	return;
+}
+
+void rasterizer_decal_vertices_begin_update(
+	void)
+{
+	lruv_idle(local_vertex_cache);
+
+	return;
+}
+
+void rasterizer_decal_vertices_end_update(
+	void)
+{
+	return;
+}
+
+long _rasterizer_decal_vertices_new(
+	long cache_size)
+{
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 204, cache_size>sizeof(struct decal_vertex));
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 205, cache_size%sizeof(struct decal_vertex)==0);
+
+	return lruv_block_new(local_vertex_cache, cache_size);
+}
+
+void *_rasterizer_decal_vertices_lock(
+	long cache_index,
+	long cache_size)
+{
+	byte *result = NULL;
+	long cache_offset;
+
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 217, cache_index!=NONE);
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 218, local_vertex_cache);
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 219, global_d3d_device);
+
+	cache_offset = lruv_block_get_address(local_vertex_cache, cache_index);
+
+	rasterizer_globals.current_lock_operation = _rasterizer_lock_decal_vertices;
+
+	IDirect3DVertexBuffer8_Lock(local_d3d_vertex_buffer, cache_offset, cache_size, &result, D3DLOCK_READONLY);
+
+	rasterizer_globals.current_lock_operation = _rasterizer_lock_none;
+
+	return result;
+}
+
+void _rasterizer_decal_vertices_unlock(
+	void)
+{
+	IDirect3DVertexBuffer8_Unlock(local_d3d_vertex_buffer);
+
+	return;
+}
+
+void _rasterizer_decal_vertices_delete(
+	long cache_index)
+{
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 262, cache_index!=NONE);
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 263, local_vertex_cache);
+
+	lruv_block_delete(local_vertex_cache, cache_index);
+
+	return;
+}
+
+void _rasterizer_decals_begin(
+	short layer)
+{
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 283, global_d3d_device);
+
+	{
+		unsigned short decal_profiles[NUMBER_OF_DECAL_LAYERS] =
+		{
+			_rasterizer_profile_environment_decals_primary,
+			_rasterizer_profile_environment_decals_secondary,
+			_rasterizer_profile_environment_decals_light,
+			_rasterizer_profile_environment_decals_alpha_tested,
+			_rasterizer_profile_environment_decals_water
+		};
+		if (layer>=0 && layer<NUMBER_OF_DECAL_LAYERS)
+		{
+			rasterizer_profile_begin(decal_profiles[layer]);
+		}
+	}
+
+	local_layer = layer;
+
+	if (!rasterizer_debug_options.drawing_mode && rasterizer_debug_options.draw_environment_decals)
+	{
+		match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 307, layer>=0 && layer<NUMBER_OF_DECAL_LAYERS);
+
+		local_framebuffer_blend_function = NONE;
+		local_bitmap_index = NONE;
+		local_bitmap_group_index = NONE;
+
+		local_filthy_decal_fog_hack_enabled = FALSE;
+
+		rasterizer_set_texture(0, _bitmap_type_2d, _bitmap_usage_multiplicative, NONE, 0);
+
+		IDirect3DDevice8_SetTextureStageState(global_d3d_device, 0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
+		IDirect3DDevice8_SetTextureStageState(global_d3d_device, 0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
+
+		IDirect3DDevice8_SetTextureStageState(global_d3d_device, 0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR);
+		IDirect3DDevice8_SetTextureStageState(global_d3d_device, 0, D3DTSS_MINFILTER, D3DTEXF_LINEAR);
+		IDirect3DDevice8_SetTextureStageState(global_d3d_device, 0, D3DTSS_MIPFILTER, D3DTEXF_LINEAR);
+
+		IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_CULLMODE, D3DCULL_CCW);
+
+		IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_ALPHABLENDENABLE, TRUE);
+		IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_ZENABLE, TRUE);
+		IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_ZWRITEENABLE, FALSE);
+		IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
+		IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_ZBIAS, rasterizer_debug_options.zbias);
+
+		if (layer == _decal_layer_alpha_tested)
+		{
+			IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_ALPHATESTENABLE, TRUE);
+			IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_ALPHAREF, 127);
+
+			rasterizer_set_stencil_mode(_rasterizer_stencil_mode_write_alpha_tested_decal);
+		}
+		else
+		{
+
+			if (rasterizer_debug_options.filthy_decal_fog_hack_enabled && global_window_parameters.fog.atmospheric_maximum_density == 1.f)
+			{
+				local_filthy_decal_fog_hack_enabled = TRUE;
+			}
+
+			if (local_filthy_decal_fog_hack_enabled)
+			{
+				IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_ALPHATESTENABLE, TRUE);
+				IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_ALPHAREF, 0);
+			}
+			else
+			{
+				IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_ALPHATESTENABLE, FALSE);
+			}
+		}
+
+		rasterizer_set_vertex_shader_permutation(1, _rasterizer_vertex_type_decal, 0);
+
+		csmemset(&pixel_shader, 0, sizeof(pixel_shader));
+		pixel_shader.PSTextureModes = PS_TEXTUREMODES(PS_TEXTUREMODES_PROJECT2D, PS_TEXTUREMODES_NONE, PS_TEXTUREMODES_NONE, PS_TEXTUREMODES_NONE);
+		pixel_shader.PSRGBOutputs[0] = PS_COMBINEROUTPUTS(PS_REGISTER_DISCARD, PS_REGISTER_DISCARD, PS_REGISTER_R0, 0);
+		pixel_shader.PSAlphaOutputs[1] = PS_COMBINEROUTPUTS(PS_REGISTER_DISCARD, PS_REGISTER_DISCARD, PS_REGISTER_R0, 0);
+		pixel_shader.PSRGBOutputs[1] = PS_COMBINEROUTPUTS(PS_REGISTER_DISCARD, PS_REGISTER_DISCARD, PS_REGISTER_R0, 0);
+
+		if (local_filthy_decal_fog_hack_enabled)
+		{
+			pixel_shader.PSCombinerCount = PS_COMBINERCOUNT(3, 0);
+			pixel_shader.PSConstant0[0] = D3DCOLOR_ARGB(1, 0, 0, 0);
+			pixel_shader.PSAlphaInputs[2] = PS_COMBINERINPUTS(PS_REGISTER_R0 | PS_CHANNEL_ALPHA, PS_REGISTER_V1 | PS_CHANNEL_ALPHA, PS_REGISTER_C0 | PS_CHANNEL_ALPHA, PS_REGISTER_V1 | PS_CHANNEL_ALPHA);
+			pixel_shader.PSAlphaOutputs[2] = PS_COMBINEROUTPUTS(PS_REGISTER_DISCARD, PS_REGISTER_DISCARD, PS_REGISTER_R0, 0);
+		}
+		else
+		{
+			pixel_shader.PSCombinerCount = PS_COMBINERCOUNT(2, 0);
+		}
+
+		pixel_shader.PSFinalCombinerInputsABCD = PS_COMBINERINPUTS(PS_REGISTER_ZERO, PS_REGISTER_ZERO, PS_REGISTER_ZERO, PS_REGISTER_R0);
+		pixel_shader.PSFinalCombinerInputsEFG = PS_COMBINERINPUTS(PS_REGISTER_ZERO, PS_REGISTER_ZERO, PS_REGISTER_R0 | PS_CHANNEL_ALPHA, 0);
+
+		IDirect3DDevice8_SetStreamSource(global_d3d_device, 0, local_d3d_vertex_buffer, sizeof(struct decal_vertex));
+	}
+
+	return;
+}
+
+void _rasterizer_decals_draw(
+	short cluster_index)
+{
+	match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 408, global_d3d_device);
+
+	if (!rasterizer_debug_options.drawing_mode && rasterizer_debug_options.draw_environment_decals)
+	{
+		long decal_index;
+		struct decal_datum *decal;
+
+		for (decal_index=decal_get_first_decal_index(cluster_index, local_layer); decal_index!=NONE; decal_index=decal->next_decal_index)
+		{
+			struct decal_definition *definition;
+			struct _shader_decal *shader;
+			unsigned long color;
+			unsigned long intensity;
+			unsigned long vertex_data_offset;
+
+			decal = datum_get(global_decal_data, decal_index);
+			definition = tag_get('deca', decal->definition_index);
+			shader = &definition->shader.decal;
+
+			if (local_framebuffer_blend_function != shader->framebuffer_blend_function)
+			{
+				local_framebuffer_blend_function = shader->framebuffer_blend_function;
+
+				if (local_framebuffer_blend_function == _shader_framebuffer_blend_function_multiply || local_framebuffer_blend_function == _shader_framebuffer_blend_function_double_multiply)
+				{
+					IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALL);
+				}
+				else
+				{
+					IDirect3DDevice8_SetRenderState(global_d3d_device, D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
+				}
+
+				switch (local_framebuffer_blend_function)
+				{
+				case _shader_framebuffer_blend_function_add:
+				case _shader_framebuffer_blend_function_reverse_subtract:
+				case _shader_framebuffer_blend_function_max:
+					pixel_shader.PSRGBInputs[0] = PS_COMBINERINPUTS(PS_REGISTER_T0, PS_REGISTER_V0, PS_REGISTER_ZERO, PS_REGISTER_ZERO);
+					pixel_shader.PSRGBInputs[1] = PS_COMBINERINPUTS(PS_REGISTER_V0 | PS_CHANNEL_ALPHA | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_R0, PS_REGISTER_ZERO, PS_REGISTER_ZERO);
+					break;
+				case _shader_framebuffer_blend_function_multiply:
+				case _shader_framebuffer_blend_function_min:
+					pixel_shader.PSRGBInputs[0] = PS_COMBINERINPUTS(PS_REGISTER_T0 | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_V0 | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_T0, PS_REGISTER_ZERO | PS_INPUTMAPPING_UNSIGNED_INVERT);
+					pixel_shader.PSRGBInputs[1] = PS_COMBINERINPUTS(PS_REGISTER_V0 | PS_CHANNEL_ALPHA | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_R0, PS_REGISTER_V0 | PS_CHANNEL_ALPHA, PS_REGISTER_ZERO | PS_INPUTMAPPING_UNSIGNED_INVERT);
+					pixel_shader.PSAlphaInputs[1] = PS_COMBINERINPUTS(PS_REGISTER_V0 | PS_CHANNEL_ALPHA | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_R0 | PS_CHANNEL_ALPHA, PS_REGISTER_V0 | PS_CHANNEL_ALPHA, PS_REGISTER_ZERO | PS_INPUTMAPPING_UNSIGNED_INVERT);
+					break;
+				case _shader_framebuffer_blend_function_double_multiply:
+					pixel_shader.PSRGBInputs[0] = PS_COMBINERINPUTS(PS_REGISTER_T0 | PS_INPUTMAPPING_HALFBIAS_NEGATE, PS_REGISTER_V0 | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_T0, PS_REGISTER_ZERO | PS_INPUTMAPPING_UNSIGNED_INVERT);
+					pixel_shader.PSRGBInputs[1] = PS_COMBINERINPUTS(PS_REGISTER_V0 | PS_CHANNEL_ALPHA | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_R0, PS_REGISTER_V0 | PS_CHANNEL_ALPHA, PS_REGISTER_ZERO | PS_INPUTMAPPING_HALFBIAS_NEGATE);
+					pixel_shader.PSAlphaInputs[1] = PS_COMBINERINPUTS(PS_REGISTER_V0 | PS_CHANNEL_ALPHA | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_R0 | PS_CHANNEL_ALPHA, PS_REGISTER_V0 | PS_CHANNEL_ALPHA, PS_REGISTER_ZERO | PS_INPUTMAPPING_HALFBIAS_NEGATE);
+					break;
+				case _shader_framebuffer_blend_function_alpha_blend:
+					pixel_shader.PSRGBInputs[0] = PS_COMBINERINPUTS(PS_REGISTER_T0, PS_REGISTER_V0, PS_REGISTER_ZERO, PS_REGISTER_ZERO);
+					pixel_shader.PSRGBInputs[1] = PS_COMBINERINPUTS(PS_REGISTER_ZERO | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_R0, PS_REGISTER_ZERO, PS_REGISTER_ZERO);
+					pixel_shader.PSAlphaInputs[1] = PS_COMBINERINPUTS(PS_REGISTER_V0 | PS_CHANNEL_ALPHA | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_T0 | PS_CHANNEL_ALPHA, PS_REGISTER_ZERO, PS_REGISTER_ZERO);
+					break;
+				case _shader_framebuffer_blend_function_alpha_multiply_add:
+					pixel_shader.PSRGBInputs[0] = PS_COMBINERINPUTS(PS_REGISTER_T0, PS_REGISTER_V0, PS_REGISTER_ZERO, PS_REGISTER_ZERO);
+					pixel_shader.PSRGBInputs[1] = PS_COMBINERINPUTS(PS_REGISTER_V0 | PS_CHANNEL_ALPHA | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_R0, PS_REGISTER_ZERO, PS_REGISTER_ZERO);
+					pixel_shader.PSAlphaInputs[1] = PS_COMBINERINPUTS(PS_REGISTER_V0 | PS_CHANNEL_ALPHA | PS_INPUTMAPPING_UNSIGNED_INVERT, PS_REGISTER_T0 | PS_CHANNEL_ALPHA, PS_REGISTER_ZERO, PS_REGISTER_ZERO);
+					break;
+				default:
+					match_vassert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 470, FALSE, "### ERROR unsupported framebuffer blend function");
+
+				}
+
+				rasterizer_set_framebuffer_blend_function(local_framebuffer_blend_function);
+				rasterizer_set_pixel_shader(&pixel_shader);
+
+				if (rasterizer_debug_options.statistics_mode == 2)
+				{
+					rasterizer_frame_statistics.decal_shader_count++;
+				}
+			}
+
+			if (local_bitmap_group_index != shader->map.index || local_bitmap_index != decal->bitmap_index)
+			{
+				local_bitmap_group_index = shader->map.index;
+				local_bitmap_index = decal->bitmap_index;
+
+				rasterizer_set_texture(0, _bitmap_type_2d, _bitmap_usage_multiplicative, local_bitmap_group_index, local_bitmap_index);
+
+				if (rasterizer_debug_options.statistics_mode == 2)
+				{
+					rasterizer_frame_statistics.decal_texture_count++;
+				}
+			}
+
+			vertex_data_offset = lruv_block_get_address(local_vertex_cache, decal_index);
+
+			color = decal->color;
+			intensity = ((color>>24)*decal->intensity+127)>>8;
+
+			match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 510, intensity<=PIXEL32_COMPONENT_MASK);
+			match_assert("c:\\halo\\SOURCE\\rasterizer\\xbox\\rasterizer_xbox_decals.c", 511, vertex_data_offset%sizeof(struct decal_vertex)==0);
+
+			IDirect3DDevice8_SetVertexData4ub(global_d3d_device, D3DVSDE_TEXCOORD0, (byte)(color>>16), (byte)(color>>8), (byte)color, (byte)(PIXEL32_COMPONENT_MASK-intensity));
+			IDirect3DDevice8_DrawPrimitive(global_d3d_device, D3DPT_QUADLIST, vertex_data_offset/sizeof(struct decal_vertex), decal->quad_count);
+
+			if (rasterizer_debug_options.statistics_mode == 2)
+			{
+				rasterizer_frame_statistics.decal_primitive_count++;
+				rasterizer_frame_statistics.decal_triangle_count += decal->quad_count*2;
+				rasterizer_frame_statistics.decal_vertex_count += decal->quad_count*4;
+			}
+		}
+	}
+
+	return;
+}
+
+void _rasterizer_decals_end(
+	void)
+{
+	if (local_layer == _decal_layer_alpha_tested)
+	{
+		rasterizer_set_stencil_mode(_rasterizer_stencil_mode_reject);
+	}
+	{
+		unsigned short decal_profiles[NUMBER_OF_DECAL_LAYERS] =
+		{
+			_rasterizer_profile_environment_decals_primary,
+			_rasterizer_profile_environment_decals_secondary,
+			_rasterizer_profile_environment_decals_light,
+			_rasterizer_profile_environment_decals_alpha_tested,
+			_rasterizer_profile_environment_decals_water
+		};
+		if (local_layer>=0 && local_layer<NUMBER_OF_DECAL_LAYERS)
+		{
+			rasterizer_profile_end(decal_profiles[local_layer]);
+		}
+	}
+
+	return;
+}

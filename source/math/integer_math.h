@@ -10,6 +10,12 @@ INTEGER_MATH.H
 
 enum
 {
+	PIXEL32_COMPONENT_BITS = 8,
+	PIXEL32_COMPONENT_MASK = (1<<PIXEL32_COMPONENT_BITS)-1
+};
+
+enum
+{
 	_adjust_rectangle_center = 0,
 	_adjust_rectangle_alert,
 	NUMBER_OF_ADJUST_RECTANGLE_MODES,

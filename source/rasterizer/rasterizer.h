@@ -124,6 +124,110 @@ struct rasterizer_window_begin_parameters
 	struct render_screen_effect screen_effect;
 };
 
+// Cachebeta prefix through the decal fog option.
+struct rasterizer_debug_options_struct
+{
+	boolean fps_accumulation;
+	short statistics_mode;
+	short drawing_mode;
+	boolean wireframe_enabled;
+	boolean debug_model_vertices_enabled;
+	short debug_model_lod;
+	boolean debug_transparent_geometry_enabled;
+	boolean debug_meter_shader_enabled;
+	boolean draw_models;
+	boolean draw_model_transparent_geometry;
+	boolean draw_first_person_weapon_first;
+	boolean stencil_mask_enabled;
+	boolean draw_environment;
+	boolean draw_environment_lightmaps;
+	boolean draw_environment_shadows;
+	boolean draw_environment_diffuse_lights;
+	boolean draw_environment_textures;
+	boolean draw_environment_decals;
+	boolean draw_environment_specular_lights;
+	boolean draw_environment_specular_lightmaps;
+	boolean draw_environment_reflection_lightmap_masks;
+	boolean draw_environment_reflection_mirrors;
+	boolean draw_environment_reflections;
+	boolean draw_environment_transparent_geometry;
+	boolean draw_environment_fog;
+	boolean draw_environment_fog_screen;
+	boolean draw_water;
+	boolean draw_lens_flares;
+	boolean draw_dynamic_unlit_geometry;
+	boolean draw_dynamic_lit_geometry;
+	boolean draw_dynamic_screen_geometry;
+	boolean draw_hud_motion_sensor;
+	boolean draw_detail_objects;
+	boolean draw_debug_geometry;
+	boolean debug_geometry_multipass;
+	boolean fog_atmospheric_enabled;
+	boolean fog_planar_enabled;
+	boolean bump_mapping_enabled;
+	real lightmap_ambient;
+	short _lightmap_mode;
+	short pad3;
+	boolean lightmap_incident_radiosity_enabled;
+	boolean lightmap_filtering_enabled;
+	real model_lighting_ambient;
+	boolean environment_alpha_testing_enabled;
+	boolean environment_specular_mask_enabled;
+	boolean shadow_convolution_enabled;
+	boolean shadow_debug_enabled;
+	boolean water_mipmapping_enabled;
+	boolean active_camouflage_enabled;
+	boolean active_camouflage_multipass_enabled;
+	boolean plasma_energy_enabled;
+	boolean lens_flare_occlusion_enabled;
+	boolean lens_flare_occlusion_debug;
+	boolean lens_flare_sun_glow_enabled;
+	boolean screen_flash_enabled;
+	boolean screen_effects_enabled;
+	boolean DXTC_noise_enabled;
+	boolean soft_filter_enabled;
+	boolean secondary_render_target_debug_enabled;
+	boolean profile_log_enabled;
+	real detail_object_screen_facing_offset_multiplier;
+	long zbias;
+	real zoffset;
+	boolean force_all_player_views_to_default_player;
+	boolean safe_frame_bounds_adjust_enabled;
+	short freeze_flying_camera;
+	boolean zsprite_enabled;
+	boolean filthy_decal_fog_hack_enabled;
+};
+
+// Reconstructed cachebeta statistics prefix; the Xbox 360 build keeps only FPS data.
+struct rasterizer_frame_statistics_s
+{
+	real fps;
+	short fps_sample_count;
+	short pad;
+	real fps_average;
+	real fps_min;
+	real fps_max;
+	long fogged_count;
+	long normal_count;
+	long fast_count;
+	long scenery_count;
+	long environment_lightmap_vertex_count;
+	long environment_lightmap_triangle_count;
+	long environment_lightmap_primitive_count;
+	long environment_shadow_count;
+	long environment_shadow_vertex_count;
+	long environment_shadow_triangle_count;
+	long environment_shadow_primitive_count;
+	long environment_light_vertex_count;
+	long environment_light_triangle_count;
+	long environment_light_primitive_count;
+	long decal_vertex_count;
+	long decal_triangle_count;
+	long decal_primitive_count;
+	long decal_shader_count;
+	long decal_texture_count;
+};
+
 /* ---------- prototypes/RASTERIZER.C */
 
 boolean rasterizer_initialize(void);
@@ -184,6 +288,10 @@ extern real_argb_color *global_rasterizer_model_ambient_reflection_tint;
 
 /* comm. not sure where this should be */
 struct rasterizer_frame_begin_parameters global_frame_parameters;
+
+extern struct rasterizer_frame_statistics_s rasterizer_frame_statistics;
+extern struct rasterizer_debug_options_struct rasterizer_debug_options;
+extern struct rasterizer_window_begin_parameters global_window_parameters;
 
 /* ---------- public code */
 

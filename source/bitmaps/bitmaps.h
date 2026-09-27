@@ -60,6 +60,15 @@ enum
 	NUMBER_OF_BITMAP_FLAGS
 };
 
+enum
+{
+	_bitmap_usage_additive = 0,
+	_bitmap_usage_multiplicative,
+	_bitmap_usage_detail,
+	_bitmap_usage_vector,
+	NUMBER_OF_BITMAP_USAGES
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
