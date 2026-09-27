@@ -126,6 +126,7 @@ enum
 #define PIN(n,floor,ceiling) ((n)<(floor) ? (floor) : CEILING((n),(ceiling)))
 
 #define FLAG(b) (1<<(b))
+#define MASK(b) (FLAG((b)) - 1)
 #define TEST_FLAG(flags, bit) (((flags)&(unsigned)FLAG(bit))!=0)
 #define SET_FLAG(f, b, v) ((v) ? ((f)|=(unsigned)FLAG(b)) : ((f)&=(unsigned)~FLAG(b)))
 
