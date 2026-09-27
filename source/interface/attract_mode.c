@@ -163,7 +163,7 @@ const char *attract_mode_get_localized_movie_path(
 			_snprintf(bss_00453ae8, NUMBEROF(bss_00453ae8), "d:\\bink\\attract3%s.bik", language_suffixes[language]);
 			break;
 		default:
-			match_assert("c:\\halo\\SOURCE\\interface\\attract_mode.c", 198, !"unreachable");
+			match_unreachable("c:\\halo\\SOURCE\\interface\\attract_mode.c", 198);
 			break;
 		}
 

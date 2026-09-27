@@ -45,7 +45,7 @@ void hud_play_sound(
 				}
 				break;
 			default:
-				match_assert("c:\\halo\\SOURCE\\interface\\hud_sounds.c", 47, !"unreachable");
+				match_unreachable("c:\\halo\\SOURCE\\interface\\hud_sounds.c", 47);
 				break;
 			}
 			SET_FLAG(*sound_flags, sound_index, TRUE);
@@ -62,7 +62,7 @@ void hud_play_sound(
 				break;
 
 			default:
-				match_assert("c:\\halo\\SOURCE\\interface\\hud_sounds.c", 64, !"unreachable");
+				match_unreachable("c:\\halo\\SOURCE\\interface\\hud_sounds.c", 64);
 				break;
 			}
 			sound_handles[sound_index] = NONE;

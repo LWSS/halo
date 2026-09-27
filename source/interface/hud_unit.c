@@ -283,7 +283,7 @@ void hud_render_damage_indicators(
 						theta = 3.f * _pi / 2.f;
 						break;
 					default:
-						match_assert("c:\\halo\\SOURCE\\interface\\hud_unit.c", 1024, !"unreachable");
+						match_unreachable("c:\\halo\\SOURCE\\interface\\hud_unit.c", 1024);
 						break;
 					}
 

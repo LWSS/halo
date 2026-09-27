@@ -477,7 +477,7 @@ void hud_render_nav_points(
 					position = game_engine_get_goal_position((short)nav->reference_index);
 					break;
 				default:
-					match_assert("c:\\halo\\SOURCE\\interface\\hud_nav_points.c", 725, !"unreachable");
+					match_unreachable("c:\\halo\\SOURCE\\interface\\hud_nav_points.c", 725);
 					break;
 				}
 				position.z += nav->z_offset;
