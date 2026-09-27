@@ -93,6 +93,7 @@ long local_player_get_player_index(short local_player_index);
 
 long player_index_from_unit_index(long unit_index);
 long local_player_get_player_index(short local_player_index);
+short local_player_get_next(short local_player_index);
 
 unsigned long const *players_get_combined_pvs_local(void);
 unsigned long const *players_get_combined_pvs(void);

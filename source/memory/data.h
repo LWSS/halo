@@ -33,6 +33,14 @@ struct data_array
 	void *data;
 };
 
+struct data_iterator
+{
+	struct data_array *data;
+	short absolute_index;
+	long index;
+	unsigned long signature;
+};
+
 struct datum_header
 {
 	short identifier;

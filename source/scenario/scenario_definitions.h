@@ -72,6 +72,15 @@ struct scenario_object_name
 	short runtime_scenario_datum_index;
 };
 
+struct scenario_cutscene_flag
+{
+	long flags;
+	char name[TAG_STRING_LENGTH+1];
+	real_point3d position;
+	real_euler_angles2d facing;
+	long unused[9];
+};
+
 struct scenario_cutscene_camera_point
 {
 	long flags;

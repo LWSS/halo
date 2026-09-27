@@ -90,6 +90,7 @@ struct render_fog
 
 /* ---------- prototypes/RENDER_CAMERAS.C */
 
+boolean render_camera_view_to_screen(struct render_camera const *camera, struct render_frustum const *frustum, real_point3d const *view_point, real_point2d *screen_point);
 void render_camera_build_frustum(const struct render_camera *camera, const real_rectangle2d *frustum_bounds, struct render_frustum *frustum, boolean build_projection);
 void render_frustum_get_projection_bounds(struct render_frustum const *frustum, real_rectangle2d *projection_bounds);
 

@@ -33,7 +33,43 @@ enum
 	NUMBER_OF_HUD_ANCHORS,
 };
 
+enum
+{
+	_waypoint_on_screen,
+	_waypoint_off_screen,
+	_waypoint_occluded,
+	NUMBER_OF_WAYPOINT_TYPES,
+};
+
+enum
+{
+	_hud_waypoint_dont_rotate_offscreen,
+	NUMBER_OF_WAYPOINT_FLAGS,
+};
+
+enum
+{
+	_hud_number_show_all_leading_zeros_bit,
+	_hud_number_show_only_when_zoomed,
+	_hud_number_show_trailing_m,
+	NUMBER_OF_HUD_NUMBER_FLAGS,
+};
+
 /* ---------- structures */
+
+struct hud_waypoint_arrow
+{
+	char name[TAG_STRING_LENGTH+1];
+	long unused0[2];
+	unsigned long color;
+	real opacity;
+	real fade;
+	short sequence_indices[NUMBER_OF_WAYPOINT_TYPES];
+	short pad;
+	long unused1[4];
+	unsigned long flags;
+	long unused2[6];
+};
 
 struct sound_hud_element_definition
 {
@@ -109,6 +145,17 @@ struct meter_hud_element_definition
 	unsigned long disabled_color;
 	struct tag_block multitexture_overlays;
 	long unused0[1];
+};
+
+struct number_hud_element_definition
+{
+	struct hud_placement_definition placement;
+	struct hud_color_definition colors;
+	char digits;
+	byte number_flags;
+	char fractional_digits;
+	byte pad;
+	long unused1[3];
 };
 
 struct hud_damage_indicators_definition

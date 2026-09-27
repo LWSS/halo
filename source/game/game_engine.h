@@ -132,6 +132,9 @@ boolean game_engine_has_shield(long player_index);
 boolean game_engine_has_teams(void);
 boolean game_engine_hud_draw_motion_sensor(long player_index);
 
+real_point3d game_engine_get_goal_position(short goal_index);
+void game_engine_render_nav_points(short local_player_index);
+
 boolean game_engine_infinite_grenades(long player_index);
 
 long game_engine_remap_object_definition(long definition_index);
