@@ -112,7 +112,7 @@ boolean collision_test_vector(
 	long ignore_object_index,
 	struct collision_result *collision)
 {
-	boolean result = FALSE;
+	boolean hit = FALSE;
 	boolean test = TEST_FLAG(flags, _collision_test_structure_bit) || TEST_FLAG(flags, _collision_test_media_bit) || TEST_FLAG(flags, _collision_test_objects_bit);
 
 	if (debug_collision_skip_vectors)
@@ -169,7 +169,7 @@ boolean collision_test_vector(
 				collision->flags = structure_result.flags;
 				collision->breakable_surface_index = structure_result.breakable_surface_index;
 				collision->material_index = structure_result.material_index;
-				result = TRUE;
+				hit = TRUE;
 			}
 			
 			if (structure_result.leaf_count > 0)
@@ -195,7 +195,7 @@ boolean collision_test_vector(
 				{
 					struct structure_fog_region *region = TAG_BLOCK_GET_ELEMENT(&structure->fog_regions, fog_plane->region_index, struct structure_fog_region);
 					struct structure_fog_palette_entry *palette = TAG_BLOCK_GET_ELEMENT(&structure->fog_palette, region->fog_palette_index, struct structure_fog_palette_entry);
-					struct fog_definition *fog = (struct fog_definition *)tag_get('fog ', palette->fog.index);
+					struct fog_definition *fog = fog_definition_get(palette->fog.index);
 					real_plane3d plane = fog_plane->plane;
 					real distance, projection, t;
 
@@ -220,7 +220,7 @@ boolean collision_test_vector(
 							}
 							
 							collision->material_type = below_plane ? _material_water : fog_plane->runtime_material_type;
-							result = TRUE;
+							hit = TRUE;
 						}
 					}
 				}
@@ -254,7 +254,7 @@ boolean collision_test_vector(
 					{
 						if (object_mark_function(object_index) && object_test_vector(object_index, flags, bsp_flags, point, vector, ignore_object_index, collision))
 						{
-							result = TRUE;
+							hit = TRUE;
 						}
 					}
 				}
@@ -265,14 +265,14 @@ boolean collision_test_vector(
 			collision_log_end_time(_collision_function_vector_objects, objects_start_time);
 		}
 
-		if (!result)
+		if (!hit)
 		{
 			collision->t = 1.f;
 		}
 
 		point_from_line3d(point, vector, collision->t, &collision->point);
 		
-		if (TEST_FLAG(flags, _collision_test_try_to_keep_location_valid_bit) && result && collision->location.leaf_index != NONE)
+		if (TEST_FLAG(flags, _collision_test_try_to_keep_location_valid_bit) && hit && collision->location.leaf_index != NONE)
 		{
 			if (scenario_leaf_index_from_point(&collision->point) != collision->location.leaf_index)
 			{
@@ -301,7 +301,7 @@ boolean collision_test_vector(
 		scenario_location_from_point(&collision->location, &collision->point);
 	}
 
-	return result;
+	return hit;
 }
 
 boolean collision_test_vector_exit(
@@ -310,7 +310,7 @@ boolean collision_test_vector_exit(
 	real_vector3d const *vector,
 	struct collision_result *exit_collision)
 {
-	boolean collision = FALSE;
+	boolean hit = FALSE;
 
 	exit_collision->type = NONE;
 	exit_collision->t = REAL_MAX;
@@ -319,10 +319,10 @@ boolean collision_test_vector_exit(
 	{
 	case _collision_result_object:
 	{
-		real_point3d p;
-		real_vector3d v;
 		struct collision_model_instance instance;
 		struct collision_model_test_vector_result result;
+		real_point3d p;
+		real_vector3d v;
 
 		set_real_point3d(&p, point->x + vector->i, point->y + vector->j, point->z + vector->k);
 		negate_vector3d(vector, &v);
@@ -349,7 +349,7 @@ boolean collision_test_vector_exit(
 			exit_collision->flags = result.bsp_result.flags;
 			exit_collision->breakable_surface_index = result.bsp_result.breakable_surface_index;
 			exit_collision->material_index = result.bsp_result.material_index;
-			collision = TRUE;
+			hit = TRUE;
 		}
 
 		break;
@@ -358,12 +358,12 @@ boolean collision_test_vector_exit(
 		break;
 	}
 
-	if (collision)
+	if (hit)
 	{
 		point_from_line3d(point, vector, exit_collision->t, &exit_collision->point);
 	}
 
-	return collision;
+	return hit;
 }
 
 boolean collision_test_pill(
@@ -376,7 +376,7 @@ boolean collision_test_pill(
 {
 	struct collision_bsp_test_pill_result structure_result;
 
-	boolean result = FALSE;
+	boolean hit = FALSE;
 
 	collision->type = NONE;
 	collision->t = REAL_MAX;
@@ -384,6 +384,7 @@ boolean collision_test_pill(
 	if (collision_bsp_test_pill(global_collision_bsp_get(), point, vector, radius, REAL_MAX, &structure_result))
 	{
 		collision->t = structure_result.t;
+		
 		if (TEST_FLAG(flags, _collision_test_structure_bit))
 		{
 			collision->type = _collision_result_structure;
@@ -394,7 +395,7 @@ boolean collision_test_pill(
 			collision->flags = 0;
 			collision->breakable_surface_index = 0;
 			collision->material_index = structure_result.material_index;
-			result = TRUE;
+			hit = TRUE;
 		}
 	}
 
@@ -406,7 +407,7 @@ boolean collision_test_pill(
 		collision->location.cluster_index = collision->location.leaf_index == NONE ? NONE : TAG_BLOCK_GET_ELEMENT(&global_structure_bsp_get()->leaves, collision->location.leaf_index & LONG_MAX, struct structure_leaf)->cluster_index;
 	}
 
-	if (!result)
+	if (!hit)
 	{
 		collision->t = 1.f;
 	}
@@ -414,7 +415,7 @@ boolean collision_test_pill(
 	point_from_line3d(point, vector, collision->t, &collision->point);
 	scenario_location_from_point(&collision->location, &collision->point);
 
-	return result;
+	return hit;
 }
 
 boolean collision_test_pill_new(
@@ -493,7 +494,7 @@ boolean collision_get_features_in_sphere(
 
 		if (test_objects && structure_result.leaf_count > 0)
 		{
-			short index;
+			short leaf_index_index;
 
 			if (!(flags & _collision_test_objects_all_types_flags))
 			{
@@ -503,9 +504,9 @@ boolean collision_get_features_in_sphere(
 			structure_cluster_marker_begin();
 			object_marker_begin();
 			
-			for (index = 0; index < structure_result.leaf_count; index++)
+			for (leaf_index_index = 0; leaf_index_index < structure_result.leaf_count; leaf_index_index++)
 			{
-				long leaf_index = structure_result.leaf_indices[index];
+				long leaf_index = structure_result.leaf_indices[leaf_index_index];
 				struct structure_leaf *leaf = TAG_BLOCK_GET_ELEMENT(&structure->leaves, leaf_index & LONG_MAX, struct structure_leaf);
 
 				if (structure_cluster_mark(leaf->cluster_index))
@@ -522,6 +523,7 @@ boolean collision_get_features_in_sphere(
 					}
 				}
 			}
+
 			object_marker_end();
 			structure_cluster_marker_end();
 		}
@@ -541,22 +543,25 @@ boolean collision_fix_pill(
 	real_point3d *new_position)
 {
 	struct collision_feature_list features;
-	struct collision_plane collision;
+	struct collision_plane initial_collision;
 
-	boolean result = FALSE;
+	boolean fixed_pill = FALSE;
 
 	match_assert("c:\\halo\\SOURCE\\physics\\collisions.c", 1272, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
 	global_current_collision_users[global_current_collision_user_depth++] = _collision_user_bipeds;
+	
 	{
 		real_point3d test_center;
+		real test_radius = height * 0.5f + width + distance;
 
 		set_real_point3d(&test_center, old_position->x, old_position->y, old_position->z + height * 0.5f);
-		collision_get_features_in_sphere(flags, &test_center, height * 0.5f + width + distance, height, width, ignore_object_index, &features);
+		collision_get_features_in_sphere(flags, &test_center, test_radius, height, width, ignore_object_index, &features);
 	}
-	if (collision_features_test_point(&features, old_position, &collision) || collision_test_point(flags, old_position, ignore_object_index))
+
+	if (collision_features_test_point(&features, old_position, &initial_collision) || collision_test_point(flags, old_position, ignore_object_index))
 	{
 		real_point3d valid_air_position;
-		short index;
+		short offset_index;
 
 		static real_vector3d offsets[] =
 		{
@@ -578,14 +583,14 @@ boolean collision_fix_pill(
 			{ 0.57735026, -0.57735026, 0.57735026 },
 			{ -0.57735026, 0.57735026, 0.57735026 },
 		};
-		boolean valid_air_position_found = FALSE;
+		boolean found_valid_air_position = FALSE;
 
-		for (index = 0; index < NUMBEROF(offsets); index++)
+		for (offset_index = 0; offset_index < NUMBEROF(offsets); offset_index++)
 		{
 			real_point3d position;
 			struct collision_plane collision;
 
-			point_from_line3d(old_position, &offsets[index], distance, &position);
+			point_from_line3d(old_position, &offsets[offset_index], distance, &position);
 			
 			if (!collision_features_test_point(&features, &position, &collision) && !collision_test_point(flags, &position, ignore_object_index))
 			{
@@ -597,19 +602,19 @@ boolean collision_fix_pill(
 				{
 					collision_fix_pill_nudge_collision(flags, &position, &vector, ignore_object_index, &collision);
 					*new_position = collision.point;
-					result = TRUE;
+					fixed_pill = TRUE;
 					break;
 				}
 
-				if (!valid_air_position_found)
+				if (!found_valid_air_position)
 				{
 					valid_air_position = position;
-					valid_air_position_found = TRUE;
+					found_valid_air_position = TRUE;
 				}
 			}
 		}
 
-		if (!result && valid_air_position_found)
+		if (!fixed_pill && found_valid_air_position)
 		{
 			real_vector3d vector;
 			struct collision_plane collision;
@@ -618,18 +623,19 @@ boolean collision_fix_pill(
 			collision_features_test_vector(&features, &valid_air_position, &vector, &collision);
 			collision_fix_pill_nudge_collision(flags, &valid_air_position, &vector, ignore_object_index, &collision);
 			*new_position = collision.point;
-			result = TRUE;
+			fixed_pill = TRUE;
 		}
 	}
 	else
 	{
 		*new_position = *old_position;
-		result = TRUE;
+		fixed_pill = TRUE;
 	}
+
 	match_assert("c:\\halo\\SOURCE\\physics\\collisions.c", 1378, global_current_collision_user_depth > 1);
 	global_current_collision_user_depth--;
 
-	return result;
+	return fixed_pill;
 }
 
 short collision_move_point(
@@ -674,8 +680,8 @@ short collision_move_point(
 
 		if (collision_features_test_vector(features, &clipped_position, &clipped_velocity, collision))
 		{
-			short new_clip_count;
 			short new_clip_collisions[3];
+			short new_clip_count;
 
 			collision_count++;
 			position = collision->point;
@@ -790,21 +796,21 @@ short collision_move_point(
 		short lowest_clip;
 		short index;
 
-		struct collision_plane *collision = &collisions[collision_count++];
+		struct collision_plane *composite = &collisions[collision_count++];
 
-		collision->t = collisions[clip_collisions[clip_count - 1]].t;
-		collision->point = collisions[clip_collisions[clip_count - 1]].point;
-		collision->object_index = NONE;
-		collision->surface_index = NONE;
-		collision->flags = 0;
-		collision->breakable_surface_index = 0;
-		collision->material_index = NONE;
+		composite->t = collisions[clip_collisions[clip_count - 1]].t;
+		composite->point = collisions[clip_collisions[clip_count - 1]].point;
+		composite->object_index = NONE;
+		composite->surface_index = NONE;
+		composite->flags = 0;
+		composite->breakable_surface_index = 0;
+		composite->material_index = NONE;
 
 		lowest_k = 0.f;
 		lowest_clip = NONE;
 		for (index = 0; index < clip_count; index++)
 		{
-			struct collision_plane *clip_collision = &collisions[clip_collisions[index]];
+			struct collision_plane const *clip_collision = &collisions[clip_collisions[index]];
 
 			if (lowest_k > clip_collision->plane.n.k)
 			{
@@ -817,25 +823,25 @@ short collision_move_point(
 		{
 			if (lowest_clip != NONE)
 			{
-				struct collision_plane *clip_collision = &collisions[clip_collisions[lowest_clip]];
+				struct collision_plane const *downmost_clip_collision = &collisions[clip_collisions[lowest_clip]];
 
 				if (lowest_clip == 0)
 				{
-					cross_product3d(&clip_line_vector, &clip_collision->plane.n, &collision->plane.n);
+					cross_product3d(&clip_line_vector, &downmost_clip_collision->plane.n, &composite->plane.n);
 				}
 				else
 				{
-					cross_product3d(&clip_collision->plane.n, &clip_line_vector, &collision->plane.n);
+					cross_product3d(&downmost_clip_collision->plane.n, &clip_line_vector, &composite->plane.n);
 				}
 			}
 			else
 			{
-				point_from_line3d((real_point3d const *)global_up3d, &clip_line_vector, -clip_line_vector.k / magnitude_squared3d(&clip_line_vector), (real_point3d *)&collision->plane.n);
+				point_from_line3d((real_point3d const *)global_up3d, &clip_line_vector, -clip_line_vector.k / magnitude_squared3d(&clip_line_vector), (real_point3d *)&composite->plane.n);
 			}
 
-			if (normalize3d(&collision->plane.n) != 0.f)
+			if (normalize3d(&composite->plane.n) != 0.f)
 			{
-				collision->plane.d = dot_product3d((real_vector3d const *)&clip_line_point, &collision->plane.n);
+				composite->plane.d = dot_product3d((real_vector3d const *)&clip_line_point, &composite->plane.n);
 			}
 			else
 			{
@@ -844,14 +850,14 @@ short collision_move_point(
 		}
 		else if (lowest_clip != NONE)
 		{
-			struct collision_plane *clip_collision = &collisions[clip_collisions[lowest_clip]];
-			real k = clip_collision->plane.n.k;
+			struct collision_plane *downmost_clip_collision = &collisions[clip_collisions[lowest_clip]];
+			real k = downmost_clip_collision->plane.n.k;
 
-			point_from_line3d((real_point3d const *)global_up3d, &clip_collision->plane.n, -k, (real_point3d *)&collision->plane.n);
+			point_from_line3d((real_point3d const *)global_up3d, &downmost_clip_collision->plane.n, -k, (real_point3d *)&composite->plane.n);
 
-			if (normalize3d(&collision->plane.n) != 0.f)
+			if (normalize3d(&composite->plane.n) != 0.f)
 			{
-				collision->plane.d = dot_product3d((real_vector3d const *)&clip_point, &collision->plane.n);
+				composite->plane.d = dot_product3d((real_vector3d const *)&clip_point, &composite->plane.n);
 			}
 			else
 			{
@@ -860,8 +866,8 @@ short collision_move_point(
 		}
 		else
 		{
-			collision->plane.n = *global_up3d;
-			collision->plane.d = dot_product3d((real_vector3d const *)&clip_point, &collision->plane.n);
+			composite->plane.n = *global_up3d;
+			composite->plane.d = dot_product3d((real_vector3d const *)&clip_point, &composite->plane.n);
 		}
 	}
 
@@ -885,6 +891,8 @@ short collision_move_pill(
 {
 	struct collision_feature_list features;
 	real_point3d test_center;
+	real test_radius;
+
 	short collision_count = 0;
 
 	match_assert("c:\\halo\\SOURCE\\physics\\collisions.c", 1214, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
@@ -892,8 +900,9 @@ short collision_move_pill(
 	global_current_collision_users[global_current_collision_user_depth++] = _collision_user_bipeds;
 	point_from_line3d(old_position, old_velocity, 0.5f, &test_center);
 	test_center.z += height * 0.5f;
-	
-	if (collision_get_features_in_sphere(flags, &test_center, magnitude3d(old_velocity) * 0.5f + height * 0.5f + width, height, width, ignore_object_index, &features))
+	test_radius = magnitude3d(old_velocity) * 0.5f + height * 0.5f + width;
+
+	if (collision_get_features_in_sphere(flags, &test_center, test_radius, height, width, ignore_object_index, &features))
 	{
 		collision_count = collision_move_point(old_position, old_velocity, &features, new_position, new_velocity, maximum_collision_count, collisions);
 	}
@@ -931,6 +940,8 @@ static boolean object_test_point(
 	real_point3d const *point,
 	long ignore_object_index)
 {
+	boolean hit = FALSE;
+
 	do
 	{
 		struct object_datum *object = object_get(object_index);
@@ -945,7 +956,8 @@ static boolean object_test_point(
 
 				if (physics_instance_new(&instance, object_index) && physics_test_point(&instance, point))
 				{
-					return TRUE;
+					hit = TRUE;
+					break;
 				}
 			}
 			else
@@ -954,12 +966,15 @@ static boolean object_test_point(
 
 				if (collision_model_instance_new(&instance, object_index) && collision_model_test_point(&instance, point))
 				{
-					return TRUE;
+					hit = TRUE;
+					break;
 				}
 			}
+
 			if (object->object.first_child_object_index != NONE && object_test_point(object->object.first_child_object_index, flags, point, ignore_object_index))
 			{
-				return TRUE;
+				hit = TRUE;
+				break;
 			}
 		}
 
@@ -967,7 +982,7 @@ static boolean object_test_point(
 	}
 	while (object_index != NONE);
 
-	return FALSE;
+	return hit;
 }
 
 static boolean object_test_vector(
@@ -1121,14 +1136,17 @@ static void object_get_features_in_sphere(
 						break;
 					}
 				}
+
 				if (object->object.first_child_object_index != NONE)
 				{
 					object_get_features_in_sphere(flags, object->object.first_child_object_index, center, radius, height, width, ignore_object_index, features);
 				}
 			}
 		}
+
 		object_index = object->object.next_object_index;
-	} while (object_index != NONE);
+	}
+	while (object_index != NONE);
 
 	return;
 }

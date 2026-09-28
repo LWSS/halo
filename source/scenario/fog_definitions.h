@@ -15,7 +15,15 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	PLANAR_FOG_DEFINITION_TAG = 'fog ',
+	PLANAR_FOG_DEFINITION_VERSION = 1,
+};
+
 /* ---------- macros */
+
+#define fog_definition_get(index) ((struct fog_definition *)tag_get(PLANAR_FOG_DEFINITION_TAG, index))
 
 /* ---------- structures */
 
