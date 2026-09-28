@@ -1,91 +1,12 @@
 /*
 COLLISION_BSP_DEFINITIONS.C
-
-symbols in this file:
-0028B098 0007:
-	??_C@_06EBBNEIN@point?$CK?$AA@ (0000)
-0028B0A0 0007:
-	??_C@_06HLKHCFCI@vertex?$AA@ (0000)
-0028B0A8 000a:
-	??_C@_09MDMJIKHH@vertices?$CK?$AA@ (0000)
-0028B0B4 000f:
-	??_C@_0P@NMHHINEP@right?5surface?$CK?$AA@ (0000)
-0028B0C4 000e:
-	??_C@_0O@HJALJEGK@left?5surface?$CK?$AA@ (0000)
-0028B0D4 000e:
-	??_C@_0O@DEEPODI@reverse?5edge?$CK?$AA@ (0000)
-0028B0E4 000e:
-	??_C@_0O@KENBEDCK@forward?5edge?$CK?$AA@ (0000)
-0028B0F4 000c:
-	??_C@_0M@KMPMFKHO@end?5vertex?$CK?$AA@ (0000)
-0028B100 000e:
-	??_C@_0O@GKJFIJMB@start?5vertex?$CK?$AA@ (0000)
-0028B110 0005:
-	??_C@_04IJFJNCMM@edge?$AA@ (0000)
-0028B118 0007:
-	??_C@_06DGEOLIMC@edges?$CK?$AA@ (0000)
-0028B120 000a:
-	??_C@_09PNBEKGHK@material?$CK?$AA@ (0000)
-0028B12C 0013:
-	??_C@_0BD@GCFCIGCE@breakable?5surface?$CK?$AA@ (0000)
-0028B140 000a:
-	??_C@_09KMPBHCFD@breakable?$AA@ (0000)
-0028B14C 000a:
-	??_C@_09JADBKOHN@climbable?$AA@ (0000)
-0028B158 000a:
-	??_C@_09MLILFJ@invisible?$AA@ (0000)
-0028B164 000a:
-	??_C@_09FDDODKJD@two?5sided?$AA@ (0000)
-0028B170 000c:
-	??_C@_0M@HOEBBLL@first?5edge?$CK?$AA@ (0000)
-0028B17C 0008:
-	??_C@_07IHELBNLD@surface?$AA@ (0000)
-0028B184 000a:
-	??_C@_09JFDCAMMI@surfaces?$CK?$AA@ (0000)
-0028B190 000d:
-	??_C@_0N@NMJAHBMO@bsp2d?5nodes?$CK?$AA@ (0000)
-0028B1A0 000d:
-	??_C@_0N@OLKADIIH@right?5child?$CK?$AA@ (0000)
-0028B1B0 000c:
-	??_C@_0M@JLKPIPMH@left?5child?$CK?$AA@ (0000)
-0028B1BC 000b:
-	??_C@_0L@NMLDHHAD@bsp2d?5node?$AA@ (0000)
-0028B1C8 000c:
-	??_C@_0M@PGLOCOOF@bsp2d?5node?$CK?$AA@ (0000)
-0028B1D4 0010:
-	??_C@_0BA@CPJOPKHG@bsp2d?5reference?$AA@ (0000)
-0028B1E4 0012:
-	??_C@_0BC@BNNBPAMN@bsp2d?5references?$CK?$AA@ (0000)
-0028B1F8 0017:
-	??_C@_0BH@LLALOJK@first?5bsp2d?5reference?$CK?$AA@ (0000)
-0028B210 0017:
-	??_C@_0BH@MBAEJDPN@bsp2d?5reference?5count?$CK?$AA@ (0000)
-0028B228 001f:
-	??_C@_0BP@BLGNMLGF@contains?5double?9sided?5surfaces?$AA@ (0000)
-0028B248 0005:
-	??_C@_04BDFFPIKJ@leaf?$AA@ (0000)
-0028B250 0008:
-	??_C@_07EEAJCCKA@leaves?$CK?$AA@ (0000)
-0028B258 0006:
-	??_C@_05MAIECAHP@plane?$AA@ (0000)
-0028B260 0008:
-	??_C@_07KKBFJPFE@planes?$CK?$AA@ (0000)
-0028B268 000d:
-	??_C@_0N@FFEJCMDL@front?5child?$CK?$AA@ (0000)
-0028B278 000c:
-	??_C@_0M@FHBHGJLP@back?5child?$CK?$AA@ (0000)
-0028B284 0007:
-	??_C@_06KPBBCEKF@plane?$CK?$AA@ (0000)
-0028B28C 000b:
-	??_C@_0L@BABJHHJN@bsp3d?5node?$AA@ (0000)
-0028B298 000d:
-	??_C@_0N@DDFCBKPA@bsp3d?5nodes?$CK?$AA@ (0000)
-0030C9C0 0384:
-	_data_0030c9c0 (0000)
-	_global_collision_bsp_fields (0318)
 */
 
 /* ---------- headers */
+
+#include "cseries.h"
+#include "collision_bsp_definitions.h"
+#include "tag_files/tag_groups.h"
 
 /* ---------- constants */
 
@@ -96,6 +17,198 @@ symbols in this file:
 /* ---------- prototypes */
 
 /* ---------- globals */
+
+static struct tag_block_definition bsp3d_node_block;
+static struct tag_block_definition plane_block;
+static struct tag_block_definition collision_leaf_block;
+static struct tag_block_definition bsp2d_reference_block;
+static struct tag_block_definition bsp2d_node_block;
+static struct tag_block_definition collision_surface_block;
+static struct tag_block_definition collision_edge_block;
+static struct tag_block_definition collision_vertex_block;
+
+struct tag_field global_collision_bsp_fields[] =
+{
+	{ _field_block, "bsp3d nodes*", &bsp3d_node_block },
+	{ _field_block, "planes*", &plane_block },
+	{ _field_block, "leaves*", &collision_leaf_block },
+	{ _field_block, "bsp2d references*", &bsp2d_reference_block },
+	{ _field_block, "bsp2d nodes*", &bsp2d_node_block },
+	{ _field_block, "surfaces*", &collision_surface_block },
+	{ _field_block, "edges*", &collision_edge_block },
+	{ _field_block, "vertices*", &collision_vertex_block },
+	{ _field_terminator }
+};
+
+static struct tag_field bsp3d_node_fields[] =
+{
+	{ _field_long_integer, "plane*" },
+	{ _field_long_integer, "back child*" },
+	{ _field_long_integer, "front child*" },
+	{ _field_terminator }
+};
+
+static struct tag_block_definition bsp3d_node_block =
+{
+	"bsp3d node",
+	0,
+	MAXIMUM_NODES_PER_BSP3D,
+	sizeof(struct bsp3d_node),
+	NULL,
+	bsp3d_node_fields
+};
+
+static struct tag_field plane_fields[] =
+{
+	{ _field_real_plane3d, "plane*" },
+	{ _field_terminator }
+};
+
+static struct tag_block_definition plane_block =
+{
+	"plane",
+	0,
+	MAXIMUM_PLANES_PER_BSP3D,
+	sizeof(real_plane3d),
+	NULL,
+	plane_fields
+};
+
+static char *collision_leaf_flags_strings[] =
+{
+	"contains double-sided surfaces"
+};
+
+static struct flags_definition collision_leaf_flags =
+{
+	NUMBEROF(collision_leaf_flags_strings),
+	collision_leaf_flags_strings
+};
+
+static struct tag_field collision_leaf_fields[] =
+{
+	{ _field_word_flags, "flags*", &collision_leaf_flags },
+	{ _field_short_integer, "bsp2d reference count*" },
+	{ _field_long_integer, "first bsp2d reference*" },
+	{ _field_terminator }
+};
+
+static struct tag_block_definition collision_leaf_block =
+{
+	"leaf",
+	0,
+	MAXIMUM_LEAVES_PER_BSP3D,
+	sizeof(struct collision_leaf),
+	NULL,
+	collision_leaf_fields
+};
+
+static struct tag_field bsp2d_reference_fields[] =
+{
+	{ _field_long_integer, "plane*", &plane_block },
+	{ _field_long_integer, "bsp2d node*", &bsp2d_node_block },
+	{ _field_terminator }
+};
+
+static struct tag_block_definition bsp2d_reference_block =
+{
+	"bsp2d reference",
+	0,
+	MAXIMUM_BSP2D_REFERENCES_PER_COLLISION_BSP,
+	sizeof(struct bsp2d_reference),
+	NULL,
+	bsp2d_reference_fields
+};
+
+static struct tag_field bsp2d_node_fields[] =
+{
+	{ _field_real_plane2d, "plane*" },
+	{ _field_long_integer, "left child*" },
+	{ _field_long_integer, "right child*" },
+	{ _field_terminator }
+};
+
+static struct tag_block_definition bsp2d_node_block =
+{
+	"bsp2d node",
+	0,
+	UNSIGNED_SHORT_MAX,
+	sizeof(struct bsp2d_node),
+	NULL,
+	bsp2d_node_fields
+};
+
+static char *collision_surface_flags_strings[] =
+{
+	"two sided",
+	"invisible",
+	"climbable",
+	"breakable"
+};
+
+static struct flags_definition collision_surface_flags =
+{
+	NUMBEROF(collision_surface_flags_strings),
+	collision_surface_flags_strings
+};
+
+static struct tag_field collision_surface_fields[] =
+{
+	{ _field_long_integer, "plane*" },
+	{ _field_long_integer, "first edge*" },
+	{ _field_byte_flags, "flags*", &collision_surface_flags },
+	{ _field_char_integer, "breakable surface*" },
+	{ _field_short_integer, "material*" },
+	{ _field_terminator }
+};
+
+static struct tag_block_definition collision_surface_block =
+{
+	"surface",
+	0,
+	MAXIMUM_SURFACES_PER_COLLISION_BSP,
+	sizeof(struct collision_surface),
+	NULL,
+	collision_surface_fields
+};
+
+static struct tag_field collision_edge_fields[] =
+{
+	{ _field_long_integer, "start vertex*" },
+	{ _field_long_integer, "end vertex*" },
+	{ _field_long_integer, "forward edge*" },
+	{ _field_long_integer, "reverse edge*" },
+	{ _field_long_integer, "left surface*" },
+	{ _field_long_integer, "right surface*" },
+	{ _field_terminator }
+};
+
+static struct tag_block_definition collision_edge_block =
+{
+	"edge",
+	0,
+	MAXIMUM_EDGES_PER_COLLISION_BSP,
+	sizeof(struct collision_edge),
+	NULL,
+	collision_edge_fields
+};
+
+static struct tag_field collision_vertex_fields[] =
+{
+	{ _field_real_point3d, "point*" },
+	{ _field_long_integer, "first edge*" },
+	{ _field_terminator }
+};
+
+static struct tag_block_definition collision_vertex_block =
+{
+	"vertex",
+	0,
+	MAXIMUM_VERTICES_PER_COLLISION_BSP,
+	sizeof(struct collision_vertex),
+	NULL,
+	collision_vertex_fields
+};
 
 /* ---------- public code */
 

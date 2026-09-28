@@ -108,6 +108,8 @@ struct collision_node
 
 /* ---------- globals */
 
+extern struct tag_field global_collision_bsp_fields[];
+
 /* ---------- public code */
 
 #endif // __COLLISION_BSP_DEFINITIONS_H

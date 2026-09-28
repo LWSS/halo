@@ -14,6 +14,56 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	_field_string = 0,
+	_field_char_integer,
+	_field_short_integer,
+	_field_long_integer,
+	_field_angle,
+	_field_tag,
+	_field_enum,
+	_field_flags,
+	_field_word_flags,
+	_field_byte_flags,
+	_field_point2d,
+	_field_rectangle2d,
+	_field_rgb_pixel32,
+	_field_argb_pixel32,
+	_field_real,
+	_field_real_fraction,
+	_field_real_point2d,
+	_field_real_point3d,
+	_field_real_vector2d,
+	_field_real_vector3d,
+	_field_real_quaternion,
+	_field_real_euler_angles2d,
+	_field_real_euler_angles3d,
+	_field_real_plane2d,
+	_field_real_plane3d,
+	_field_real_rgb_color,
+	_field_real_argb_color,
+	_field_real_hsv_color,
+	_field_real_ahsv_color,
+	_field_short_integer_bounds,
+	_field_angle_bounds,
+	_field_real_bounds,
+	_field_real_fraction_bounds,
+	_field_tag_reference,
+	_field_block,
+	_field_short_block_index,
+	_field_long_block_index,
+	_field_data,
+	_field_start_array,
+	_field_end_array,
+	_field_pad,
+	_field_skip,
+	_field_explanation,
+	_field_custom,
+	_field_terminator,
+	NUMBER_OF_TAG_FIELD_TYPES
+};
+
 /* ---------- macros */
 
 #define TAG_BLOCK_GET_ELEMENT(block_address, index, type) ((type *)tag_block_get_element_with_size((block_address), (index), sizeof(type)))
@@ -24,6 +74,19 @@ typedef void (*byte_swap_block_proc)(void *);
 typedef boolean (*postprocess_block_proc)(void *, boolean);
 typedef byte *(*format_block_proc)(long, struct tag_block *, long, byte *);
 typedef void (*delete_block_proc)(struct tag_block *, long);
+
+struct tag_field
+{
+	short type;
+	char *name;
+	void *definition;
+};
+
+struct flags_definition
+{
+	short count;
+	char **strings;
+};
 
 struct tag_block_definition
 {
