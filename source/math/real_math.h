@@ -479,6 +479,10 @@ void angular_accelerate_to_position(
 /* ---------- prototypes/MATRIX_MATH.C */
 
 void matrix4x3_identity(real_matrix4x3 *matrix);
+real_matrix3x3 *matrix3x3_transpose(real_matrix3x3 const *matrix, real_matrix3x3 *result);
+real_matrix3x3 *matrix3x3_multiply(real_matrix3x3 const *a, real_matrix3x3 const *b, real_matrix3x3 *result);
+real_vector3d *matrix3x3_transform_vector(real_matrix3x3 const *matrix, real_vector3d const *vector, real_vector3d *result);
+real_matrix3x3 *matrix3x3_from_forward_and_up(real_matrix3x3 *matrix, real_vector3d const *forward, real_vector3d const *up);
 void matrix4x3_transpose(real_matrix4x3 *matrix);
 void matrix4x3_inverse(real_matrix4x3 const *matrix, real_matrix4x3 *result);
 void matrix4x3_scale(real_matrix4x3 *matrix, real scale);
@@ -1500,16 +1504,7 @@ __inline boolean valid_real_vector3d_axes2(
 	real_vector3d const *forward,
 	real_vector3d const *up)
 {
-	boolean result = FALSE;
-	if (valid_real_normal3d(forward) && valid_real_normal3d(up))
-	{
-		real product = dot_product3d(forward, up);
-		if (valid_realcmp(product, 0.f))
-		{
-			result = TRUE;
-		}
-	}
-	return result;
+	return valid_real_normal3d(forward) && valid_real_normal3d(up) && valid_realcmp(dot_product3d(forward, up), 0.f);
 }
 
 __inline boolean valid_real_vector3d_axes3(

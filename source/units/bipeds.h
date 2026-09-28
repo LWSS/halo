@@ -75,6 +75,7 @@ void biped_get_sight_position(
 	real_vector3d const *desired_gun_offset,
 	real_point3d *sight_position);
 void biped_get_physics_pill(long biped_index, real_point3d *base, real *height, real *width);
+void biped_accelerate(long biped_index, real_vector3d *acceleration);
 
 void biped_stop_limp_body_physics(long biped_index);
 

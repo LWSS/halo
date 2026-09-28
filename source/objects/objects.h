@@ -21,6 +21,12 @@ file has inline function assertions.
 
 enum
 {
+	_object_class_collideable = 0,
+	_object_class_noncollideable,
+};
+
+enum
+{
 	OBJECT_ITERATOR_SIGNATURE = 0x86868686,
 	MAXIMUM_CLUSTERS_PER_OBJECT = 32,
 	OBJECT_MEMORY_POOL_SIZE = 0x100000,

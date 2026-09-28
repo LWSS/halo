@@ -14,6 +14,18 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	_damage_area_of_effect_bit = 0,
+	_damage_create_localized_effect_bit,
+	_damage_kill_instantly_bit,
+	_damage_from_weapon_bit,
+	_damage_silent_bit,
+	_damage_bypasses_shields_bit,
+	_damage_damaged_one_object_bit,
+	_damage_no_statistics_bit,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */

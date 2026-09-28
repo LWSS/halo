@@ -152,6 +152,25 @@ struct game_globals_multiplayer_information
 	long unused[14];
 };
 
+struct game_globals_falling_damage
+{
+	long falling_unused[2];
+	real falling_distance_lower_bound;
+	real falling_distance_upper_bound;
+	struct tag_reference falling_damage;
+	long terminal_velocity_unused[2];
+	real maximum_distance;
+	struct tag_reference maximum_distance_damage;
+	struct tag_reference vehicle_hit_environment_damage_effect;
+	struct tag_reference vehicle_killed_unit_damage_effect;
+	struct tag_reference vehicle_collision_damage;
+	struct tag_reference flaming_death_damage;
+	long unused2[4];
+	real runtime_maximum_falling_velocity;
+	real runtime_minimum_damage_velocity;
+	real runtime_maximum_damage_velocity;
+};
+
 struct game_globals
 {
 	unsigned long flags;
