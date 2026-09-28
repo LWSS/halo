@@ -19,6 +19,7 @@ HUD_NAV_POINTS.C
 #include "collisions.h"
 #include "collision_usage.h"
 #include "bitmaps.h"
+#include "bitmaps_inlines.h"
 #include "texture_cache.h"
 
 /* ---------- constants */
@@ -278,8 +279,7 @@ short hud_get_nav_point_render_type(
 	struct collision_result collision;
 	short result;
 
-	match_assert("c:\\halo\\SOURCE\\interface\\hud_nav_points.c", 510, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
-	global_current_collision_users[global_current_collision_user_depth++] = _collision_user_ui;
+	match_collision_log_begin_user("c:\\halo\\SOURCE\\interface\\hud_nav_points.c", 510, _collision_user_ui);
 
 	if (!collision_test_line(
 		_collision_test_for_line_of_sight_flags,
@@ -296,8 +296,7 @@ short hud_get_nav_point_render_type(
 		result = _waypoint_occluded;
 	}
 
-	match_assert("c:\\halo\\SOURCE\\interface\\hud_nav_points.c", 528, global_current_collision_user_depth > 1);
-	global_current_collision_user_depth--;
+	match_collision_log_end_user("c:\\halo\\SOURCE\\interface\\hud_nav_points.c", 528);
 
 	return result;
 }
@@ -318,7 +317,7 @@ void custom_render_nav_point(
 	real a, b, ab, bx, ay;
 	real theta;
 
-	memset(stack_buffer, HUD_STACK_BUFFER_BYTE, HUD_STACK_BUFFER_LONG_COUNT * sizeof(long));
+	memset(stack_buffer, HUD_STACK_BUFFER_BYTE, sizeof(stack_buffer));
 	arrow = TAG_BLOCK_GET_ELEMENT(&hud_globals->waypoint.arrows, nav_index, struct hud_waypoint_arrow);
 	position = *position_pointer;
 
@@ -711,7 +710,7 @@ static void hud_update_nav_point_local_player(
 	long unit_index;
 	short index;
 
-	memset(stack_buffer, HUD_STACK_BUFFER_BYTE, HUD_STACK_BUFFER_LONG_COUNT * sizeof(long));
+	memset(stack_buffer, HUD_STACK_BUFFER_BYTE, sizeof(stack_buffer));
 	data = get_nav_point_datum(local_player_index);
 	unit_index = local_player_get_player_index(local_player_index) == NONE ? NONE : player_get(local_player_get_player_index(local_player_index))->unit_index;
 	for (index = 0; index < MAXIMUM_ACTIVE_NAV_POINTS; index++)

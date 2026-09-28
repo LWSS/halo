@@ -3448,8 +3448,7 @@ boolean object_force_inside_bsp(
 	struct object_datum *object = object_get(object_index);
 	boolean result = FALSE;
 
-	match_assert("c:\\halo\\SOURCE\\objects\\objects.c", 2365, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
-	global_current_collision_users[global_current_collision_user_depth++] = _collision_user_objects;
+	match_collision_log_begin_user("c:\\halo\\SOURCE\\objects\\objects.c", 2365, _collision_user_objects);
 	
 	if (collision_test_line(_collision_test_for_projectiles_flags, known_good_point, &object->object.position, NONE, &collision) ||
 		object->object.location.cluster_index==NONE)
@@ -3466,8 +3465,7 @@ boolean object_force_inside_bsp(
 		result = TRUE;
 	}
 
-	match_assert("c:\\halo\\SOURCE\\objects\\objects.c", 2387, global_current_collision_user_depth > 1);
-	--global_current_collision_user_depth;
+	match_collision_log_end_user("c:\\halo\\SOURCE\\objects\\objects.c", 2387);
 
 	return result;
 }

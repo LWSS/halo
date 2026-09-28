@@ -117,10 +117,6 @@ union real_rgb_color *rgb_colors_interpolate_and_scale(
 
 union real_rgb_color *pixel32_to_real_rgb_color(pixel32 color, union real_rgb_color *result);
 
-/* ---------- prototypes/BITMAPS_INLINES.H */
-
-pixel32 real_rgb_color_to_pixel32(union real_rgb_color const *color);
-
 /* ---------- globals */
 
 /* ---------- public code */

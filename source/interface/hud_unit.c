@@ -18,6 +18,7 @@ HUD_UNIT.C
 #include "render.h"
 #include "player_effects.h"
 #include "motion_sensor.h"
+#include "bitmaps_inlines.h"
 
 /* ---------- constants */
 

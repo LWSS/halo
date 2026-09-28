@@ -113,9 +113,7 @@ void collision_log_initialize(
 {
 	memset(&collision_usage_buffer, 0, sizeof(collision_usage_buffer));
 	
-	match_assert("c:\\halo\\SOURCE\\physics\\collision_usage.c", 150, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
-
-	global_current_collision_users[global_current_collision_user_depth++] = _collision_user_unknown;
+	match_collision_log_begin_user("c:\\halo\\SOURCE\\physics\\collision_usage.c", 150, _collision_user_unknown);
 
 	return;
 }

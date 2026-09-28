@@ -166,8 +166,7 @@ unsigned long point_physics_update(
 		SET_FLAG(collision_flags, _collision_test_media_bit, TEST_FLAG(definition->flags, _point_physics_water_collisions_bit) && !TEST_FLAG(flags, _point_physics_force_no_collisions_bit));
 		SET_FLAG(collision_flags, _collision_test_structure_bit, TEST_FLAG(definition->flags, _point_physics_structure_collisions_bit) && !TEST_FLAG(flags, _point_physics_force_no_collisions_bit));
 
-		match_assert("c:\\halo\\SOURCE\\physics\\point_physics.c", 269, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
-		global_current_collision_users[global_current_collision_user_depth++] = _collision_user_point_physics;
+		match_collision_log_begin_user("c:\\halo\\SOURCE\\physics\\point_physics.c", 269, _collision_user_point_physics);
 
 		for (i = 0; dt != 0.0f && i < MAXIMUM_POINT_PHYSICS_COLLISIONS; i++)
 		{
@@ -224,8 +223,7 @@ unsigned long point_physics_update(
 			dt -= collision.t * dt;
 		}
 
-		match_assert("c:\\halo\\SOURCE\\physics\\point_physics.c", 312, global_current_collision_user_depth > 1);
-		--global_current_collision_user_depth;
+		match_collision_log_end_user("c:\\halo\\SOURCE\\physics\\point_physics.c", 312);
 	}
 
 	if (debug_point_physics)

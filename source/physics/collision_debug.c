@@ -105,8 +105,7 @@ void collision_debug_render(void)
 	real_point3d point;
 	real_vector3d vector;
 
-	match_assert("c:\\halo\\SOURCE\\physics\\collision_debug.c", 76, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
-	global_current_collision_users[global_current_collision_user_depth++] = _collision_user_debugging;
+	match_collision_log_begin_user("c:\\halo\\SOURCE\\physics\\collision_debug.c", 76, _collision_user_debugging);
 
 	if (collision_debug || collision_debug_spray || collision_debug_features || collision_debug_phantom_bsp)
 	{
@@ -416,8 +415,7 @@ void collision_debug_render(void)
 			render_debug_collision_features(&features);
 	}
 
-	match_assert("c:\\halo\\SOURCE\\physics\\collision_debug.c", 443, global_current_collision_user_depth > 1);
-	--global_current_collision_user_depth;
+	match_collision_log_end_user("c:\\halo\\SOURCE\\physics\\collision_debug.c", 443);
 
 	return;
 }
