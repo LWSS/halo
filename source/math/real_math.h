@@ -14,6 +14,7 @@ file has inline function assertions.
 
 #define _real_epsilon 0.0001f
 #define _pi ((real)M_PI)
+#define _half_pi ((real)M_PI_2) // [fake name?]
 
 #define REAL_MIN -3.4028235e38f
 #define REAL_MAX 3.4028235e38f

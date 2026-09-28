@@ -42,8 +42,9 @@ static real global_water_mass_over_radius_cubed = 0.0f;
 void point_physics_initialize_for_new_map(
 	void)
 {
-	global_air_mass_over_radius_cubed = global_air_density * 118613.34f;
-	global_water_mass_over_radius_cubed = global_water_density * 118613.34f;
+	// /*118613.34f*/ kilograms of water (1000 kg/m^3) in a sphere with a radius of one world unit, scaled by density relative to water
+	global_air_mass_over_radius_cubed = global_air_density * ((4.f/3.f*_pi)*(METERS_PER_UNIT*METERS_PER_UNIT*METERS_PER_UNIT)*1000.f);
+	global_water_mass_over_radius_cubed = global_water_density * ((4.f/3.f*_pi)*(METERS_PER_UNIT*METERS_PER_UNIT*METERS_PER_UNIT)*1000.f);
 
 	return;
 }

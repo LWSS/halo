@@ -44,7 +44,7 @@ static void physics_compute_unit_collisions(long vehicle_index);
 static void physics_update_old(long object_index, struct powered_mass_point_datum *powered_mass_points, struct mass_point_datum *mass_points, real_vector3d const *magic_force, real_vector3d const *magic_torque);
 /* ---------- globals */
 
-real global_gravity = 0.0035651792f;
+real global_gravity = /*0.0035651792f*/(GRAVITY/METERS_PER_UNIT)*(SECONDS_PER_TICK*SECONDS_PER_TICK);
 real global_water_density = 1.f;
 real global_air_density = 0.0011f;
 real global_physics_collision_depth = 0.2f;
@@ -405,7 +405,7 @@ void physics_compute_new(
 			point_from_line3d((real_point3d *)&mass_point->powered_force, &mass_point->up, lift, (real_point3d *)&mass_point->powered_force);
 		}
 
-		SET_FLAG(mass_point->flags, _point_at_rest_bit, magnitude_squared3d(&mass_point->velocity) < 0.0011111111f);
+		SET_FLAG(mass_point->flags, _point_at_rest_bit, magnitude_squared3d(&mass_point->velocity) < SECONDS_PER_TICK*SECONDS_PER_TICK);
 		SET_FLAG(mass_point->flags, _point_on_ground_bit, mass_point->ground_depth > 0.f);
 		SET_FLAG(mass_point->flags, _point_in_water_bit, mass_point->water_depth > 0.f);
 		if (powered_mass_point_definition)
@@ -580,8 +580,10 @@ void physics_update_new(
 	}
 
 	SET_FLAG(object->object.flags, _object_at_rest_bit, mass_points_at_rest_count == instance->physics->mass_points.count && mass_points_on_ground_count >= 3 && !mass_points_on_volatile_surface_count &&
-		magnitude_squared3d(&linear_velocity) <= 0.0011111111f && magnitude_squared3d(&angular_velocity) <= 0.0027415568f &&
-		magnitude_squared3d(&linear_acceleration) <= 0.00000030864197f && magnitude_squared3d(&angular_acceleration) <= 0.0000030461742f);
+		magnitude_squared3d(&linear_velocity) <= SECONDS_PER_TICK*SECONDS_PER_TICK &&
+		magnitude_squared3d(&angular_velocity) <= (_half_pi*SECONDS_PER_TICK)*(_half_pi*SECONDS_PER_TICK) &&
+		magnitude_squared3d(&linear_acceleration) <= (0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK)*(0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK) &&
+		magnitude_squared3d(&angular_acceleration) <= (_half_pi*SECONDS_PER_TICK*SECONDS_PER_TICK)*(_half_pi*SECONDS_PER_TICK*SECONDS_PER_TICK));
 	SET_FLAG(object->object.flags, _object_on_ground_bit, mass_points_on_ground_count > 0);
 	SET_FLAG(object->object.flags, _object_on_media_bit, mass_points_in_water_count > 0);
 	SET_FLAG(object->object.flags, _object_partially_under_media_bit, mass_points_in_water_count > 0);
@@ -809,7 +811,7 @@ static boolean physics_compute_biped_collision(
 		}
 
 		if (!fixed || ((instance->object_index != biped->unit.last_vehicle_index || game_time_get() > biped->unit.game_time_at_last_vehicle_exit+3*TICKS_PER_SECOND) &&
-			(speed > 0.06666667f || distance_squared3d((real_point3d *)&vehicle->object.translational_velocity, (real_point3d *)&biped->object.translational_velocity) > 0.0011111111f)))
+			(speed > 2.f*SECONDS_PER_TICK || distance_squared3d((real_point3d *)&vehicle->object.translational_velocity, (real_point3d *)&biped->object.translational_velocity) > SECONDS_PER_TICK*SECONDS_PER_TICK)))
 		{
 			struct game_globals_falling_damage *falling_damage = TAG_BLOCK_GET_ELEMENT(&scenario_get_game_globals()->falling_damage, 0, struct game_globals_falling_damage);
 
@@ -1131,7 +1133,7 @@ static void physics_update_old(
 			point_from_line3d((real_point3d *)&mass_point->powered_force, &mass_point->up, lift, (real_point3d *)&mass_point->powered_force);
 		}
 
-		SET_FLAG(mass_point->flags, _point_at_rest_bit, dot_product3d(&mass_point->velocity, &mass_point->velocity) < 0.0011111111f);
+		SET_FLAG(mass_point->flags, _point_at_rest_bit, dot_product3d(&mass_point->velocity, &mass_point->velocity) < SECONDS_PER_TICK*SECONDS_PER_TICK);
 		SET_FLAG(mass_point->flags, _point_on_ground_bit, mass_point->ground_depth > 0.f);
 		SET_FLAG(mass_point->flags, _point_in_water_bit, mass_point->water_depth > 0.f);
 		mass_points_at_rest_count += TEST_FLAG(mass_point->flags, _point_at_rest_bit);
@@ -1235,10 +1237,10 @@ static void physics_update_old(
 	}
 
 	{
-		real const translational_velocity_threshold = 0.0011111111f;
-		real const angular_velocity_threshold = 0.0027415568f;
-		real const translational_acceleration_threshold = 0.00000030864197f;
-		real const angular_acceleration_threshold = 0.0000030461742f;
+		real const translational_velocity_threshold = SECONDS_PER_TICK*SECONDS_PER_TICK;
+		real const angular_velocity_threshold = (_half_pi*SECONDS_PER_TICK)*(_half_pi*SECONDS_PER_TICK);
+		real const translational_acceleration_threshold = (0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK)*(0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK);
+		real const angular_acceleration_threshold = (_half_pi*SECONDS_PER_TICK*SECONDS_PER_TICK)*(_half_pi*SECONDS_PER_TICK*SECONDS_PER_TICK);
 		real translational_velocity_squared = magnitude_squared3d(&object->object.translational_velocity);
 		real angular_velocity_squared = magnitude_squared3d(&object->object.angular_velocity);
 		real translational_acceleration_squared = magnitude_squared3d(&translational_acceleration);

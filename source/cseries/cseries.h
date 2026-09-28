@@ -90,6 +90,9 @@ enum
 
 /* ---------- macros */
 
+#define SECONDS_PER_TICK (1.f/TICKS_PER_SECOND) // [fake name]
+#define METERS_PER_UNIT 3.048f // [fake name] 1 Halo world Unit = 10ft = 3.048m
+
 #define STRINGIFY_DETAIL(x) #x
 #define STRINGIFY(x) STRINGIFY_DETAIL(x)
 
