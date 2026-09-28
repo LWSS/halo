@@ -540,10 +540,10 @@ boolean collision_fix_pill(
 			{ M_SQRT1_2, 0.f, M_SQRT1_2 },
 			{ 0.f, -M_SQRT1_2, M_SQRT1_2 },
 			{ 0.f, M_SQRT1_2, M_SQRT1_2 },
-			{ -M_SQRT1_3, -M_SQRT1_3, M_SQRT1_3 },
-			{ M_SQRT1_3, M_SQRT1_3, M_SQRT1_3 },
-			{ M_SQRT1_3, -M_SQRT1_3, M_SQRT1_3 },
-			{ -M_SQRT1_3, M_SQRT1_3, M_SQRT1_3 },
+			{ -0.57735026, -0.57735026, 0.57735026 },
+			{ 0.57735026, 0.57735026, 0.57735026 },
+			{ 0.57735026, -0.57735026, 0.57735026 },
+			{ -0.57735026, 0.57735026, 0.57735026 },
 		};
 		boolean valid_air_position_found = FALSE;
 		real_point3d valid_air_position;
