@@ -52,6 +52,10 @@ enum
 
 short structure_clusters_in_sphere(short cluster_index, real_point3d const *position, real radius, short maximum_count, short *intersected_indices);
 
+void structure_cluster_marker_begin(void);
+boolean structure_cluster_mark(short cluster_index);
+void structure_cluster_marker_end(void);
+
 /* ---------- prototypes/STRUCTURE_DETAIL_OBJECTS.C */
 
 void structure_detail_objects_flush(void);

@@ -14,6 +14,11 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	_biped_movement_passes_through_bipeds_bit = 4,
+};
+
 /* ---------- macros */
 
 #define biped_get(index)			((struct biped_datum *)object_get_and_verify_type((index), _object_mask_biped))

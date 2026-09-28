@@ -8,6 +8,10 @@ header included in hcex build.
 #define __COLLISION_MODELS_H
 #pragma once
 
+/* ---------- headers */
+
+#include "collision_model_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */
@@ -23,6 +27,8 @@ struct collision_model_instance
 };
 
 /* ---------- prototypes/COLLISION_MODELS.C */
+
+__inline short collision_model_get_material_type(struct collision_model const *model, short material_index);
 
 boolean collision_model_instance_new(struct collision_model_instance *instance, long object_index);
 
@@ -64,5 +70,12 @@ void render_debug_collision_model(struct collision_model_instance const *instanc
 /* ---------- globals */
 
 /* ---------- public code */
+
+__inline short collision_model_get_material_type(
+	struct collision_model const *model,
+	short material_index)
+{
+	return material_index != NONE ? TAG_BLOCK_GET_ELEMENT(&model->resistance.materials, material_index, struct damage_material)->type : NONE;
+}
 
 #endif // __COLLISION_MODELS_H

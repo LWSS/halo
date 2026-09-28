@@ -25,9 +25,21 @@ struct physics_instance
 	real_matrix4x3 world_matrix;
 };
 
+struct physics_test_vector_result
+{
+	real t;
+	real_plane3d plane;
+};
+
 /* ---------- prototypes/PHYSICS.C */
 
+struct collision_feature_list;
+
 boolean physics_instance_new(struct physics_instance *instance, long object_index);
+boolean physics_test_point(struct physics_instance const *instance, real_point3d const *point);
+boolean physics_test_vector(struct physics_instance const *instance, real_point3d const *point, real_vector3d const *vector, struct physics_test_vector_result *result);
+
+void physics_get_features_in_sphere(struct physics_instance const *instance, real_point3d const *center, real radius, real height, real width, struct collision_feature_list *features);
 
 void render_debug_physics(struct physics_instance *instance);
 

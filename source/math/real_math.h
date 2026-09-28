@@ -158,6 +158,18 @@ match_vassert(													\
 	)															\
 )
 
+#define match_assert_valid_real_plane3d(file, line, plane)		\
+match_vassert(													\
+	file,														\
+	line,														\
+	valid_real_plane3d(plane),								\
+	csprintf(													\
+		temporary,												\
+		"%s: assert_valid_real_plane3d(%f, %f, %f / %f)",	\
+		#plane, (plane)->n.i, (plane)->n.j, (plane)->n.k, (plane)->d\
+	)															\
+)
+
 #define match_assert_valid_real_normal3d(file, line, vector)	\
 match_vassert(													\
 	file,														\
@@ -449,6 +461,9 @@ real_vector3d *vector3d_from_euler_angles2d(real_vector3d *vector, real_euler_an
 
 boolean point_in_pill2d(real_point2d const *point, real_point2d const *base, real_vector2d const *height, real width);
 real point_to_line_distance_squared3d(real_point3d const *point, real_point3d const *base, real_vector3d const *height);
+
+boolean line_from_planes3d(real_plane3d const *plane0, real_plane3d const *plane1, real_point3d *point, real_vector3d *vector);
+boolean point_from_planes3d(real_plane3d const *plane0, real_plane3d const *plane1, real_plane3d const *plane2, real_point3d *point);
 
 boolean sphere_test_vector3d(real_point3d const *center, real radius, real_point3d const *point, real_vector3d const *vector, real *t, real_vector3d *normal);
 
@@ -1473,6 +1488,12 @@ __inline boolean valid_real_normal3d(
 	real_vector3d const *n)
 {
 	return valid_realcmp(magnitude_squared3d(n), 1.f);
+}
+
+__inline boolean valid_real_plane3d(
+	real_plane3d const *plane)
+{
+	return valid_real_normal3d(&plane->n) && valid_real(plane->d);
 }
 
 __inline boolean valid_real_vector3d_axes2(
