@@ -55,6 +55,16 @@ vassert(												\
 	)													\
 )
 
+#define assert_valid_real_plane3d(plane)								\
+vassert(																\
+	valid_real_plane3d(plane),											\
+	csprintf(															\
+		temporary,														\
+		"%s: assert_valid_real_plane3d(%f, %f, %f / %f)",				\
+		#plane, (*plane).n.i, (*plane).n.j, (*plane).n.k, (*plane).d	\
+	)																	\
+)
+
 #define assert_valid_real_normal3d(vector)				\
 vassert(												\
 	valid_real_normal3d(vector),						\

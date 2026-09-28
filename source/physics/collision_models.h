@@ -28,8 +28,6 @@ struct collision_model_instance
 
 /* ---------- prototypes/COLLISION_MODELS.C */
 
-__inline short collision_model_get_material_type(struct collision_model const *model, short material_index);
-
 boolean collision_model_instance_new(struct collision_model_instance *instance, long object_index);
 
 

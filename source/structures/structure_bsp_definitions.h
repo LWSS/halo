@@ -34,13 +34,13 @@ struct structure_cluster
 	short first_runtime_decal_index;
 	unsigned short runtime_decal_count;
 	long unused1[6];
-	struct tag_block predicted_resources;
-	struct tag_block subclusters;
+	struct tag_block predicted_resources;	// predicted_resource
+	struct tag_block subclusters;			// structure_subcluster
 	unsigned short first_lens_flare_marker_index;
 	unsigned short lens_flare_marker_count;
-	struct tag_block surface_indices;
-	struct tag_block mirrors;
-	struct tag_block portal_indices;
+	struct tag_block surface_indices;		// long
+	struct tag_block mirrors;				// structure_mirror
+	struct tag_block portal_indices;		// short
 };
 
 struct structure_fog_plane
@@ -48,7 +48,7 @@ struct structure_fog_plane
 	short region_index;
 	short runtime_material_type;
 	real_plane3d plane;
-	struct tag_block vertices;
+	struct tag_block vertices;	// real_point3d
 };
 
 struct structure_fog_region

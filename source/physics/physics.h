@@ -92,8 +92,6 @@ struct physics_test_vector_result
 
 /* ---------- prototypes/PHYSICS.C */
 
-struct collision_feature_list;
-
 real pin_fraction(real value, real value0, real value1);
 boolean physics_instance_new(struct physics_instance *instance, long object_index);
 boolean physics_test_point(struct physics_instance const *instance, real_point3d const *point);
