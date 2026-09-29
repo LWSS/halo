@@ -1112,13 +1112,14 @@ __inline real_plane3d *plane3d_from_points(
 
 	cross_product3d(&v0, &v1, &plane->n);
 
-	if (normalize3d(&plane->n) == 0.0f)
+	if (normalize3d(&plane->n) != 0.0f)
 	{
-		plane->d = 0.0f;
+		plane->d = dot_product3d(&plane->n, (real_vector3d const *)point0);
 	}
 	else
 	{
-		plane->d = dot_product3d(&plane->n, (real_vector3d const *)point0);
+		plane->d = 0.0f;
+		return NULL;
 	}
 
 	return plane;
