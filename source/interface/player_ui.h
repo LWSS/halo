@@ -14,7 +14,11 @@ header included in hcex build.
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/PLAYER_UI.C */
+
+short player_ui_get_single_player_local_player_controller(short local_player_index);
+boolean player_ui_local_player_wants_to_play_multiplayer(short local_player_index);
+boolean player_ui_rumble_disabled(short local_player_index);
 
 /* ---------- globals */
 

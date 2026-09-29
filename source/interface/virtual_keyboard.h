@@ -14,7 +14,10 @@ header included in hcex build.
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/VIRTUAL_KEYBOARD.C */
+
+boolean virtual_keyboard_active(void);
+boolean virtual_keyboard_close(void);
 
 /* ---------- globals */
 

@@ -21,6 +21,7 @@ header included in hcex build.
 /* ---------- prototypes/NETWORK_GAME_GLOBALS.C */
 
 boolean network_game_is_active(void);
+struct network_game_client *global_network_game_client_get(void);
 
 /* ---------- globals */
 

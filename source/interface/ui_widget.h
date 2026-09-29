@@ -14,6 +14,31 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	_error_unknown = 0,
+	_error_network_generic,
+	_error_network_join_game_closed,
+	_error_network_join_game_generic,
+	_error_network_server_shut_down,
+	_error_network_connected_play_no_network,
+	_error_network_connection_lost,
+	_error_network_failed_to_join_game,
+	_error_network_out_of_sync_alert,
+	_error_network_trouble_is_brewing,
+	_error_network_unused10,
+	_error_controller_generic,
+	_error_controller_unplugged_start_to_continue,
+	_error_controller_unplugged,
+	_error_controller_memory_card,
+	_error_controller_saving_file_warning,
+	_error_controller_creating_player_profile_warning,
+	_error_controller_creating_game_settings_file_warning,
+	_error_controller_coop_controller_conflict,
+	_error_controller_coop_requires_two_controllers,
+	_error_controller_unused10,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
