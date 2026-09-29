@@ -28,6 +28,10 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "event_manager.h"
+#include "input.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -82,6 +82,17 @@ symbols in this file:
 
 #include "cseries.h"
 #include "rasterizer.h"
+#include "rasterizer_console_vars.h"
+#include "rasterizer_widgets.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "bitmaps_inlines.h"
+#include "light_definitions.h"
+#include "shaders.h"
+#include "rasterizer/common/rasterizer_common.h"
+#include "main.h"
+#include "widgets.h"
 
 /* ---------- constants */
 
@@ -93,21 +104,6 @@ struct lens_flare_occlusion_test_results
 {
 	short light_identifier;
 	byte data[8][MAXIMUM_WINDOWS];
-};
-
-struct rasterizer_lens_flare_submit_parameters
-{
-	struct lens_flare_definition *definition;
-	real_point3d position;
-	unsigned long compressed_direction;
-	unsigned long compressed_up;
-	unsigned long compressed_light_color;
-	short light_identifier;
-	short light_index;
-	short lens_flare_index;
-	byte compressed_window_index;
-	byte compressed_light_scale;
-	long internal__occlusion_pixels;
 };
 
 /* ---------- prototypes */

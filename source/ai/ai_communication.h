@@ -10,7 +10,8 @@ header included in hcex build.
 
 /* ---------- headers */
 
-#include "math/real_math.h"
+#include "ai.h"
+#include "ai_constants.h"
 
 /* ---------- constants */
 

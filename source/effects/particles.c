@@ -74,6 +74,29 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "particles.h"
+#include "effects.h"
+#include "material_effects.h"
+#include "particle_definitions.h"
+#include "material_effect_definitions.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "unit_definitions.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "game_state.h"
+#include "sound_manager.h"
+#include "game_sound.h"
+#include "sound_definitions.h"
+#include "structures.h"
+#include "physics_constants.h"
+#include "object_lights.h"
+#include "physics.h"
+#include "first_person_weapons.h"
+#include "point_physics.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

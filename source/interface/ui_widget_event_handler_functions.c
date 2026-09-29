@@ -907,6 +907,35 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "ui_widget_event_handler_functions.h"
+#include "ui_widget.h"
+#include "player_ui.h"
+#include "virtual_keyboard.h"
+#include "attract_mode.h"
+#include "marketing_and_strategic_business_development.h"
+#include "ui_widget_game_data_input_functions.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "network_game_manager.h"
+#include "rasterizer.h"
+#include "input.h"
+#include "console.h"
+#include "game_state.h"
+#include "network_messages.h"
+#include "text_group.h"
+#include "main.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "draw_string.h"
+#include "network_client_manager.h"
+#include "game_engine_list.h"
+#include "network_server_manager.h"
+#include "playlist_profile.h"
+#include "network_connection.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -99,6 +99,21 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "structures.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "light_definitions.h"
+#include "render_debug.h"
+#include "structures/radiosity/radiosity.h"
+#include "vector_tree.h"
+#include "sky_definitions.h"
+#include "structures/radiosity/radiosity_io.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

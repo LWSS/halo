@@ -18,6 +18,10 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "recorded_animation_definitions.h"
+#include "units.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

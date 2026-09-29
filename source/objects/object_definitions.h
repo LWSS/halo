@@ -10,9 +10,6 @@ header included in hcex build.
 
 /* ---------- headers */
 
-#include "math/real_math.h"
-#include "tag_files/tag_files.h"
-#include "tag_files/tag_groups.h"
 
 /* ---------- constants */
 
@@ -55,6 +52,73 @@ enum
 	_object_function_clip_to_bounds_and_normalize,
 	_object_function_scale_to_fit_bounds,
 	NUMBER_OF_OBJECT_FUNCTION_BOUNDS_MODES,
+};
+
+enum
+{
+	_object_function_none = 0,
+	_object_function_body_vitality,
+	_object_function_shield_vitality,
+	_object_function_recent_body_damage,
+	_object_function_recent_shield_damage,
+	_object_function_random_constant,
+	_object_function_umbrella_shield_vitality,
+	_object_function_shield_stun,
+	_object_function_recent_umbrella_shield_vitality,
+	_object_function_umbrella_shield_stun,
+	_object_function_first_region_damage,
+	_object_function_last_region_damage = 17,
+	_object_function_alive,
+	_object_function_compass,
+	NUMBER_OF_OBJECT_FUNCTION_MODES,
+};
+
+enum
+{
+	_object_type_biped = 0,
+	_object_type_vehicle,
+	_object_type_weapon,
+	_object_type_equipment,
+	_object_type_garbage,
+	_object_type_projectile,
+	_object_type_scenery,
+	_object_type_machine,
+	_object_type_control,
+	_object_type_light_fixture,
+	_object_type_placeholder,
+	_object_type_sound_scenery,
+	NUMBER_OF_OBJECT_TYPES,
+
+	_object_mask_all =						UNSIGNED_LONG_MAX,
+	_object_mask_unit =						(FLAG(_object_type_biped)|FLAG(_object_type_vehicle)),
+	_object_mask_biped =					FLAG(_object_type_biped),
+	_object_mask_vehicle =					FLAG(_object_type_vehicle),
+	_object_mask_item =						(FLAG(_object_type_weapon)|FLAG(_object_type_equipment)|FLAG(_object_type_garbage)),
+	_object_mask_weapon =					FLAG(_object_type_weapon),
+	_object_mask_equipment =				FLAG(_object_type_equipment),
+	_object_mask_garbage =					FLAG(_object_type_garbage),
+	_object_mask_projectile =				FLAG(_object_type_projectile),
+	_object_mask_scenery =					FLAG(_object_type_scenery),
+	_object_mask_sound_scenery =			FLAG(_object_type_sound_scenery),
+	_object_mask_device =					(FLAG(_object_type_machine)|FLAG(_object_type_control)|FLAG(_object_type_light_fixture)),
+	_object_mask_machine =					FLAG(_object_type_machine),
+	_object_mask_control =					FLAG(_object_type_control),
+	_object_mask_light_fixture =			FLAG(_object_type_light_fixture),
+	_object_mask_placeholder =				FLAG(_object_type_placeholder),
+
+	_object_mask_sightblocking =			(FLAG(_object_type_vehicle)|FLAG(_object_type_scenery)|FLAG(_object_type_machine)),
+	_object_mask_cannot_interpolate =		(FLAG(_object_type_projectile)|FLAG(_object_type_scenery)|FLAG(_object_type_machine)|FLAG(_object_type_control)|
+											FLAG(_object_type_light_fixture)|FLAG(_object_type_placeholder)|FLAG(_object_type_sound_scenery)),
+	_object_mask_remove_on_bsp_switch =		(FLAG(_object_type_scenery)|FLAG(_object_type_light_fixture))
+};
+
+enum
+{
+	_object_change_color_a = 0,
+	_object_change_color_b,
+	_object_change_color_c,
+	_object_change_color_d,
+	NUMBER_OF_OBJECT_CHANGE_COLORS,
 };
 
 /* ---------- macros */

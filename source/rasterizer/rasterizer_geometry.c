@@ -96,6 +96,10 @@ symbols in this file:
 
 #include "cseries.h"
 #include "rasterizer_geometry.h"
+#include "rasterizer.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
 
 /* ---------- constants */
 

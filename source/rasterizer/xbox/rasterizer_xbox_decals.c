@@ -5,18 +5,18 @@ RASTERIZER_XBOX_DECALS.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "cseries_windows.h"
-#include "errors.h"
-#include "real_math.h"
-#include "bitmaps.h"
-#include "bitmaps/bitmap_macros.h"
-#include "effects/decals.h"
-#include "effects/decal_definitions.h"
-#include "memory/lruv_cache.h"
-#include "game_state.h"
+#include "rasterizer_xbox.h"
+#include "objects.h"
+#include "render.h"
 #include "rasterizer.h"
-#include "rasterizer_geometry.h"
-#include "xbox/rasterizer_xbox.h"
+#include "bitmaps_inlines.h"
+#include "rasterizer_console_vars.h"
+#include "game_state.h"
+#include "light_definitions.h"
+#include "shaders.h"
+#include "rasterizer/common/rasterizer_common.h"
+#include "collisions.h"
+#include "decals.h"
 
 /* ---------- prototypes */
 

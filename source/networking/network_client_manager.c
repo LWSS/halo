@@ -365,6 +365,27 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "cseries_windows.h"
+#include "network_client_manager.h"
+#include "network_client_message_handler.h"
+#include "network_server_manager.h"
+#include "network_game_manager.h"
+#include "network_game_globals.h"
+#include "network_connection.h"
+#include "input.h"
+#include "game.h"
+#include "game_engine.h"
+#include "game_engine_list.h"
+#include "players.h"
+#include "units.h"
+#include "player_profile.h"
+#include "player_ui.h"
+#include "main.h"
+#include "cache_files.h"
+#include "ui_widget.h"
+#include "saved_films.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

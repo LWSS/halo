@@ -75,6 +75,23 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "particle_systems.h"
+#include "particle_system_definitions.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "rasterizer_console_vars.h"
+#include "game_state.h"
+#include "render_debug.h"
+#include "physics_constants.h"
+#include "object_lights.h"
+#include "physics.h"
+#include "first_person_weapons.h"
+#include "point_physics.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

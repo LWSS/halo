@@ -334,6 +334,27 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "ui_widget_game_data_input_functions.h"
+#include "ui_widget.h"
+#include "hud.h"
+#include "player_ui.h"
+#include "hud_messaging.h"
+#include "marketing_and_strategic_business_development.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "network_game_manager.h"
+#include "input.h"
+#include "network_messages.h"
+#include "text_group.h"
+#include "main.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "network_client_manager.h"
+#include "game_engine_list.h"
+#include "build_number.h"
+#include "playlist_profile.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

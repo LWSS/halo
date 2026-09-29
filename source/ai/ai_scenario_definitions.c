@@ -30,6 +30,14 @@ symbols in this file:
 
 #include "cseries.h"
 #include "ai_scenario_definitions.h"
+#include "actors.h"
+#include "encounters.h"
+#include "actor_types.h"
+#include "ai_script.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "units.h"
+#include "sound_definitions.h"
 
 /* ---------- constants */
 

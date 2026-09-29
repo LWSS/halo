@@ -444,6 +444,21 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "ai_script.h"
+#include "actors.h"
+#include "ai_debug.h"
+#include "encounters.h"
+#include "props.h"
+#include "actor_types.h"
+#include "ai_globals.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "console.h"
+#include "bipeds.h"
+#include "hs.h"
+#include "object_lists.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

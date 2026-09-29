@@ -8,13 +8,19 @@ file has inline function assertions.
 #define __BITMAPS_INLINES_H
 #pragma once
 
+/* ---------- headers */
+
+#include "bitmap_macros.h"
+
 /* ---------- constants */
 
 /* ---------- macros */
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/BITMAPS_INLINES.H */
+
+pixel32 real_rgb_color_to_pixel32(union real_rgb_color const *color);
 
 /* ---------- globals */
 

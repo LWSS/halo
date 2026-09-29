@@ -124,6 +124,29 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "rasterizer_xbox.h"
+#include "objects.h"
+#include "render.h"
+#include "bungie_net/common/message_header.h"
+#include "unicode.h"
+#include "rasterizer.h"
+#include "input.h"
+#include "bitmaps_inlines.h"
+#include "rasterizer_console_vars.h"
+#include "light_definitions.h"
+#include "shaders.h"
+#include "rasterizer/common/rasterizer_common.h"
+#include "collisions.h"
+#include "input_windows.h"
+#include "texture_cache.h"
+#include "strings/resource.h"
+#include "shell.h"
+#include "decals.h"
+#include "fog_definitions.h"
+#include "rasterizer_cinematics.h"
+#include "shell_windows.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

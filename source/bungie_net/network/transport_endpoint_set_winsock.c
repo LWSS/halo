@@ -102,6 +102,18 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "transport_endpoint_winsock.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "network_game_manager.h"
+#include "network_messages.h"
+#include "main.h"
+#include "network_client_manager.h"
+#include "network_server_manager.h"
+#include "bungie_net/common/memory_manager.h"
+#include <assert.h>
+
 /* ---------- constants */
 
 /* ---------- macros */

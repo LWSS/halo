@@ -36,6 +36,13 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "fog_definitions.h"
+#include "wind_definitions.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

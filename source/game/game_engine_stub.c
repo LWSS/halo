@@ -5,8 +5,15 @@ GAME_ENGINE_STUB.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "game_engine.h"
+#include "players.h"
 #include "game_engine_list.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "rasterizer.h"
+#include "font_group.h"
+#include "scenery.h"
 
 /* ---------- prototypes */
 

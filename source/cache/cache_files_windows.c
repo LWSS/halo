@@ -180,6 +180,27 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "texture_cache.h"
+#include "physical_memory_map.h"
+#include "cache_files_decompress_windows.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "unicode.h"
+#include "rasterizer.h"
+#include "input.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "ui_widget.h"
+#include "strings/resource.h"
+#include "shell.h"
+#include "build_number.h"
+#include "shell_windows.h"
+#include "rasterizer_hardware_format_utilities.h"
+#include <io.h>
+
 /* ---------- constants */
 
 /* ---------- macros */

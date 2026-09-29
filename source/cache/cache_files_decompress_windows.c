@@ -219,6 +219,9 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "cache_files_decompress_windows.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

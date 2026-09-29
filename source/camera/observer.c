@@ -100,6 +100,16 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "observer.h"
+#include "director.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "collisions.h"
+#include "predicted_resources.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -78,6 +78,20 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "virtual_keyboard.h"
+#include "ui_widget.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "input.h"
+#include "text_group.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "font_group.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

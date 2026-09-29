@@ -82,6 +82,11 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "recorded_animation_playback.h"
+#include "recorded_animations.h"
+#include "recorded_animation_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

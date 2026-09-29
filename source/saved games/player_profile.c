@@ -108,6 +108,25 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "input.h"
+#include "console.h"
+#include "text_group.h"
+#include "main.h"
+#include "ui_widget.h"
+#include "player_ui.h"
+#include "strings/resource.h"
+#include "shell.h"
+#include "bungie_net/common/thread.h"
+#include "input_device_defaults.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

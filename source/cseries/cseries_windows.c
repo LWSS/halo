@@ -84,6 +84,10 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "build_number.h"
+#include "strings/resource.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

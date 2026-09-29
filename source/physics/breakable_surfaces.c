@@ -7,24 +7,25 @@ BREAKABLE_SURFACES.C
 
 #include "cseries.h"
 #include "breakable_surfaces.h"
+#include "collision_bsp.h"
+#include "objects.h"
+#include "render.h"
+#include "unit_definitions.h"
+#include "network_game_globals.h"
+#include "game_state.h"
+#include "sound_manager.h"
+#include "item_definitions.h"
+#include "game_sound.h"
+#include "damage_effect_definitions.h"
+#include "projectile_definitions.h"
+#include "particles.h"
 
-#include "collision_bsp_definitions.h"
+/* ---------- constants */
 
-#include "bitmaps/bitmaps.h"
-#include "cseries/errors.h"
-#include "effects/material_effect_definitions.h"
-#include "effects/particles.h"
-#include "game/game_globals.h"
-#include "math/geometry.h"
-#include "math/real_math.h"
-#include "objects/damage.h"
-#include "objects/damage_effect_definitions.h"
-#include "objects/objects.h"
-#include "saved games/game_state.h"
-#include "scenario/scenario.h"
-#include "sound/game_sound.h"
-#include "structures/structure_bsp_definitions.h"
-#include "tag_files/tag_groups.h"
+enum
+{
+	MAXIMUM_BREAKABLE_SURFACE_QUEUE_SIZE = 1024,
+};
 
 /* ---------- structures */
 

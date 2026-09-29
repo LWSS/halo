@@ -140,6 +140,30 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "player_ui.h"
+#include "ui_widget.h"
+#include "hud.h"
+#include "hud_messaging.h"
+#include "virtual_keyboard.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "input.h"
+#include "console.h"
+#include "rasterizer_console_vars.h"
+#include "sound_manager.h"
+#include "text_group.h"
+#include "main.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "texture_cache.h"
+#include "strings/resource.h"
+#include "playlist_profile.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

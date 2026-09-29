@@ -52,6 +52,32 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "cinematics.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "ai_communication.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "bitmap_macros.h"
+#include "input.h"
+#include "game_state.h"
+#include "sound_manager.h"
+#include "items.h"
+#include "text_group.h"
+#include "main.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "ui_widget.h"
+#include "draw_string.h"
+#include "texture_cache.h"
+#include "editor_stubs.h"
+#include "hud.h"
+#include "projectiles.h"
+#include "ai_globals.h"
+#include "rasterizer_cinematics.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -75,6 +75,15 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "render.h"
+#include "render_debug.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "rasterizer.h"
+#include "bitmaps_inlines.h"
+#include "texture_cache.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

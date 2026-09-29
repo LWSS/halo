@@ -82,6 +82,20 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "devices.h"
+#include "device_definitions.h"
+#include "network_game_globals.h"
+#include "game_state.h"
+#include "collisions.h"
+#include "sound_manager.h"
+#include "game_sound.h"
+#include "sound_definitions.h"
+#include "physics_constants.h"
+#include "editor_stubs.h"
+#include "effects.h"
+#include "object_lights.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

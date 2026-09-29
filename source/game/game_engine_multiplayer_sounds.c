@@ -6,12 +6,15 @@ GAME_ENGINE_MULTIPLAYER_SOUNDS.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "game_engine.h"
-#include "objects.h"
-#include "game_globals.h"
-#include "scenario.h"
+#include "players.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "network_messages.h"
+#include "sound_manager.h"
 #include "game_sound.h"
 #include "sound_definitions.h"
+#include "network_server_message_handler.h"
+#include "network_server_manager.h"
 
 /* ---------- structures */
 
@@ -77,7 +80,7 @@ static boolean sound_is_queueable[NUMBER_OF_MULTIPLAYER_SOUNDS] =
 };
 
 static long mp_sound_queue_count = 0;
-static struct queued_mp_sound mp_sound_queue[5];
+static struct queued_mp_sound mp_sound_queue[5] = {0};
 
 /* ---------- public code */
 

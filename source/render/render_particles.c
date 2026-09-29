@@ -14,6 +14,22 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "render.h"
+#include "render_debug.h"
+#include "collision_bsp.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "console.h"
+#include "director.h"
+#include "structures.h"
+#include "physics_constants.h"
+#include "object_lights.h"
+#include "first_person_weapons.h"
+#include "particles.h"
+#include "particle_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

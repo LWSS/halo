@@ -76,6 +76,19 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "network_game_manager.h"
+#include "network_game_globals.h"
+#include "network_messages.h"
+#include "network_client_manager.h"
+#include "network_server_message_handler.h"
+#include "network_server_manager.h"
+#include "network_game_ui.h"
+#include "units.h"
+#include "players.h"
+#include "main.h"
+#include "game_engine_list.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

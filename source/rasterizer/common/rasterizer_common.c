@@ -5,14 +5,16 @@ RASTERIZER_COMMON.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "real_math.h"
-#include "integer_math.h"
-#include "rasterizer.h"
-#include "byte_swapping.h"
-#include "tag_groups.h"
-#include "game_globals.h"
-#include "scenario.h"
 #include "rasterizer_common.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "rasterizer.h"
+#include "bitmaps_inlines.h"
+#include "rasterizer_console_vars.h"
+#include "game_state.h"
+#include "light_definitions.h"
+#include "shaders.h"
 #include "rasterizer_cinematics.h"
 
 /* ---------- constants */

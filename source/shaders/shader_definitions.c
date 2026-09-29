@@ -15,6 +15,13 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "shader_definitions.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "light_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

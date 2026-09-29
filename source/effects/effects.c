@@ -139,6 +139,33 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "effects.h"
+#include "decals.h"
+#include "particles.h"
+#include "particle_definitions.h"
+#include "particle_systems.h"
+#include "particle_system_definitions.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "rasterizer_console_vars.h"
+#include "game_state.h"
+#include "light_definitions.h"
+#include "collisions.h"
+#include "sound_manager.h"
+#include "items.h"
+#include "render_debug.h"
+#include "director.h"
+#include "game_sound.h"
+#include "sound_definitions.h"
+#include "bipeds.h"
+#include "structures.h"
+#include "editor_stubs.h"
+#include "object_lights.h"
+#include "damage_effect_definitions.h"
+#include "first_person_weapons.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -72,9 +72,10 @@ symbols in this file:
 /* ---------- headers */
 
 #include "cseries.h"
-#include "real_math.h"
-#include "game.h"
 #include "shaders.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
 
 /* ---------- constants */
 

@@ -7,11 +7,8 @@ SCENERY.C
 
 #include "cseries.h"
 #include "scenery.h"
-
-#include "main/console.h"
-#include "models/models.h"
-#include "models/model_animation_definitions.h"
-#include "scenario/scenario_definitions.h"
+#include "console.h"
+#include "editor_stubs.h"
 
 /* ---------- constants */
 

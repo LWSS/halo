@@ -233,6 +233,40 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "bipeds.h"
+#include "vehicles.h"
+#include "biped_limp_noodle.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "network_messages.h"
+#include "actors.h"
+#include "collisions.h"
+#include "sound_manager.h"
+#include "ai_debug.h"
+#include "meter_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "weapons.h"
+#include "game_sound.h"
+#include "sound_definitions.h"
+#include "structures.h"
+#include "observer.h"
+#include "physics_constants.h"
+#include "network_client_manager.h"
+#include "effects.h"
+#include "object_lights.h"
+#include "object_types.h"
+#include "cinematics.h"
+#include "devices.h"
+#include "physics.h"
+#include "first_person_weapons.h"
+#include "recorded_animations.h"
+#include "device_definitions.h"
+#include "material_effects.h"
+#include "material_effect_definitions.h"
+#include "collision_models.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

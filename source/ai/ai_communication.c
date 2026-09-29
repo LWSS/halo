@@ -541,6 +541,27 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "ai_communication.h"
+#include "actors.h"
+#include "ai_debug.h"
+#include "encounters.h"
+#include "props.h"
+#include "actor_types.h"
+#include "ai_profile.h"
+#include "ai_script.h"
+#include "ai_globals.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "console.h"
+#include "game_state.h"
+#include "collisions.h"
+#include "sound_manager.h"
+#include "game_sound.h"
+#include "damage_effect_definitions.h"
+#include "dialogue_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

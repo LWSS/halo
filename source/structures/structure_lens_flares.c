@@ -49,9 +49,13 @@ symbols in this file:
 /* ---------- headers */
 
 #include "cseries.h"
+#include "structures.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "connected_geometry.h"
+#include "intermediate_geometry.h"
 
-#include "structure_bsp_definitions.h"
-#include "physics/collision_bsp_definitions.h"
 
 /* ---------- constants */
 

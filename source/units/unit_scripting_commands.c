@@ -28,6 +28,18 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "units.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "actor_definitions.h"
+#include "console.h"
+#include "network_messages.h"
+#include "meter_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "weapons.h"
+#include "object_lists.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

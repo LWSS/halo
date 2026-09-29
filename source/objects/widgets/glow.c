@@ -78,6 +78,17 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "glow.h"
+#include "widgets.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "rasterizer.h"
+#include "game_state.h"
+#include "render_debug.h"
+#include "rasterizer_widgets.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

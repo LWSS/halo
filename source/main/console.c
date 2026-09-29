@@ -53,14 +53,22 @@ symbols in this file:
 
 #include "cseries.h"
 #include "console.h"
-
-#include "cseries/errors.h"
-#include "cseries/profile.h"
-#include "editor/editor_stubs.h"
-#include "hs/hs.h"
-#include "input/input.h"
-#include "interface/terminal.h"
-#include "math/real_math.h"
+#include "main.h"
+#include "cheats.h"
+#include "game.h"
+#include "network_game_globals.h"
+#include "game_engine.h"
+#include "text_group.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "editor_stubs.h"
+#include "terminal.h"
+#include "player_ui.h"
+#include "shell.h"
+#include "hs.h"
+#include "build_number.h"
+#include "virtual_keyboard.h"
+#include "shell_windows.h"
 
 /* ---------- constants */
 

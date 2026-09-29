@@ -5,27 +5,39 @@ HUD_UNIT.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "game.h"
-#include "players.h"
-#include "game_state.h"
+#include "meter_definitions.h"
+#include "ui_widget.h"
 #include "hud.h"
-#include "units.h"
-#include "network_connection.h"
-#include "unit_definitions.h"
-#include "unit_hud_interface_definition.h"
-#include "cinematics.h"
-#include "game_engine.h"
-#include "render.h"
-#include "player_effects.h"
+#include "hud_messaging.h"
+#include "weapon_hud_interface_definition.h"
 #include "motion_sensor.h"
+#include "interface_panels.h"
+#include "inventory_displays.h"
+#include "unit_hud_interface_definition.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "actor_definitions.h"
+#include "input.h"
+#include "bitmaps_inlines.h"
+#include "game_state.h"
+#include "network_messages.h"
+#include "weapon_interface_definitions.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "render_debug.h"
+#include "director.h"
+#include "weapons.h"
+#include "texture_cache.h"
+#include "font_group.h"
+#include "game_engine_list.h"
+#include "cinematics.h"
+#include "player_effects.h"
 
 /* ---------- constants */
-
-enum
-{
-	NUMBER_OF_UNIT_AUXILARY_METERS = 1,
-	MAXIMUM_NUMBER_OF_HUD_SOUNDS = 12,
-};
 
 enum
 {
@@ -283,7 +295,7 @@ void hud_render_damage_indicators(
 						theta = 3.f * _half_pi;
 						break;
 					default:
-						match_assert("c:\\halo\\SOURCE\\interface\\hud_unit.c", 1024, !"unreachable");
+						match_unreachable("c:\\halo\\SOURCE\\interface\\hud_unit.c", 1024);
 						break;
 					}
 

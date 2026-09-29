@@ -6,11 +6,20 @@ MARKETING_AND_STRATEGIC_BUSINESS_DEVELOPMENT.C
 
 #include "cseries.h"
 #include "marketing_and_strategic_business_development.h"
-#include "errors.h"
-#include "files.h"
+#include "interface.h"
 #include "ui_widget.h"
-#include "cache_files.h"
+#include "ai_scenario_definitions.h"
+#include "game_globals.h"
+#include "damage.h"
+#include "breakable_surfaces.h"
+#include "scenario.h"
+#include "network_game_globals.h"
+#include "unicode.h"
+#include "input.h"
+#include "sound_manager.h"
+#include "player_profile.h"
 #include "saved_game_files.h"
+#include "physical_memory_map.h"
 
 /* ---------- prototypes */
 
@@ -45,7 +54,6 @@ boolean xbox_demos_available(
 }
 
 /* must include here to preserve order */
-#include "cseries_windows.h"
 #include "rasterizer/xbox/rasterizer_xbox.h"
 
 void xbox_demos_launch(

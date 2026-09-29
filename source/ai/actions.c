@@ -229,9 +229,15 @@ symbols in this file:
 
 #include "cseries.h"
 #include "actions.h"
-
 #include "actors.h"
 #include "ai_debug.h"
+#include "encounters.h"
+#include "props.h"
+#include "actor_types.h"
+#include "ai_profile.h"
+#include "ai_script.h"
+#include "ai_globals.h"
+#include "vehicles.h"
 
 /* ---------- constants */
 

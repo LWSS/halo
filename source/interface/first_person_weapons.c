@@ -96,6 +96,35 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "first_person_weapons.h"
+#include "meter_definitions.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "actor_definitions.h"
+#include "bitmaps_inlines.h"
+#include "console.h"
+#include "rasterizer_console_vars.h"
+#include "game_state.h"
+#include "light_definitions.h"
+#include "shaders.h"
+#include "network_messages.h"
+#include "rasterizer/common/rasterizer_common.h"
+#include "sound_manager.h"
+#include "weapon_interface_definitions.h"
+#include "director.h"
+#include "weapons.h"
+#include "game_sound.h"
+#include "bipeds.h"
+#include "observer.h"
+#include "effects.h"
+#include "player_effects.h"
+#include "predicted_resources.h"
+#include "particles.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

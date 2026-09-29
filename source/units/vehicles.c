@@ -142,6 +142,25 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "vehicles.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "network_messages.h"
+#include "collisions.h"
+#include "sound_manager.h"
+#include "game_sound.h"
+#include "observer.h"
+#include "physics_constants.h"
+#include "network_client_manager.h"
+#include "effects.h"
+#include "game_engine_list.h"
+#include "object_types.h"
+#include "physics.h"
+#include "material_effects.h"
+#include "material_effect_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -83,6 +83,29 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "render.h"
+#include "render_debug.h"
+#include "collision_bsp.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "console.h"
+#include "rasterizer_console_vars.h"
+#include "game_state.h"
+#include "shaders.h"
+#include "director.h"
+#include "structures.h"
+#include "editor_stubs.h"
+#include "object_lights.h"
+#include "cinematics.h"
+#include "devices.h"
+#include "physics.h"
+#include "first_person_weapons.h"
+#include "widgets.h"
+#include "camera_scripting.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

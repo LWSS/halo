@@ -92,6 +92,27 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "texture_cache.h"
+#include "physical_memory_map.h"
+#include "cache_files_decompress_windows.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "bitmaps_inlines.h"
+#include "console.h"
+#include "lruv_cache.h"
+#include "rasterizer_console_vars.h"
+#include "light_definitions.h"
+#include "shaders.h"
+#include "rasterizer/common/rasterizer_common.h"
+#include "sound_manager.h"
+#include "terminal.h"
+#include "rasterizer_swizzle.h"
+#include "rasterizer/xbox/rasterizer_xbox.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

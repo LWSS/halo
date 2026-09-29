@@ -87,6 +87,21 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "editor_flying_camera.h"
+#include "director.h"
+#include "observer.h"
+#include "camera_scripting.h"
+#include "flying_camera.h"
+#include "orbiting_camera.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "console.h"
+#include "collisions.h"
+#include "terminal.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

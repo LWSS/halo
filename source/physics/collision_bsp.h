@@ -8,8 +8,9 @@ header included in hcex build.
 #define __COLLISION_BSP_H
 #pragma once
 
-#include "bsp2d.h"
-#include "bsp3d.h"
+/* ---------- headers */
+
+#include "collision_bsp_definitions.h"
 
 /* ---------- constants */
 
@@ -46,14 +47,6 @@ struct collision_bsp_test_vector_result
 	long leaf_indices[MAXIMUM_COLLISION_LEAVES_PER_TEST];
 };
 
-struct collision_model_test_vector_result
-{
-	short node_index;
-	short region_index;
-	short bsp_index;
-	struct collision_bsp_test_vector_result bsp_result;
-};
-
 struct collision_bsp_test_pill_result
 {
 	real t;
@@ -64,14 +57,6 @@ struct collision_bsp_test_pill_result
 	short material_index;
 	long leaf_count;
 	long leaf_indices[MAXIMUM_COLLISION_LEAVES_PER_TEST];
-};
-
-struct collision_model_test_pill_result
-{
-	short node_index;
-	short region_index;
-	short bsp_index;
-	struct collision_bsp_test_pill_result bsp_result;
 };
 
 struct collision_surface_test_line2d_result

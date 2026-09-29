@@ -11,41 +11,32 @@ file has inline function assertions.
 /* ---------- headers */
 
 #include "object_definitions.h"
-#include "object_types.h"
-
-#include "math/real_math.h"
-#include "memory/data.h"
-#include "structures/cluster_partitions.h"
+#include "ai_scenario_definitions.h"
+#include "game_globals.h"
+#include "interface.h"
+#include "damage.h"
+#include "breakable_surfaces.h"
+#include "scenario.h"
+#include "model_animation_definitions.h"
+#include "model_definitions.h"
+#include "models.h"
+#include "damage_resistances.h"
+#include "shader_definitions.h"
 
 /* ---------- constants */
-
-enum
-{
-	_object_class_collideable = 0,
-	_object_class_noncollideable,
-};
-
-enum
-{
-	OBJECT_ITERATOR_SIGNATURE = 0x86868686,
-	MAXIMUM_CLUSTERS_PER_OBJECT = 32,
-	OBJECT_MEMORY_POOL_SIZE = 0x100000,
-	GARBAGE_LIMIT_FREE_MEMORY_CRITICAL = 52428,
-	GARBAGE_LIMIT_FREE_MEMORY_TRIGGER = 104857,
-	GARBAGE_LIMIT_FREE_MEMORY_TARGET = 209715,
-	GARBAGE_LIMIT_FREE_OBJECTS_CRITICAL = 51,
-	GARBAGE_LIMIT_FREE_OBJECTS_TRIGGER = 102,
-	GARBAGE_LIMIT_FREE_OBJECTS_TARGET = 204,
-	GARBAGE_LIMIT_ACTIVE_GARBAGE_CRITICAL = 75,
-	GARBAGE_LIMIT_ACTIVE_GARBAGE_TRIGGER = 50,
-	GARBAGE_LIMIT_ACTIVE_GARBAGE_TARGET = 30,
-};
 
 enum
 {
 	MAXIMUM_MARKERS_PER_OBJECT = 64,
 	MAXIMUM_OBJECTS_PER_MAP = 2048,
 	MAXIMUM_RENDERED_OBJECTS = 256,
+};
+
+enum
+{
+	_object_class_collideable = 0,
+	_object_class_noncollideable,
+	NUMBER_OF_OBJECT_CLASSES,
 };
 
 enum
@@ -101,7 +92,6 @@ enum
 	NUMBER_OF_NEW_OBJECT_DATA_FLAGS,
 };
 
-
 enum
 {
 	_object_passed_body_damage_threshold_bit = 0,
@@ -141,51 +131,6 @@ enum
 	NUMBER_OF_OBJECT_FUNCTION_REFERENCES,
 };
 
-enum
-{
-	_object_function_none = 0,
-	_object_function_body_vitality,
-	_object_function_shield_vitality,
-	_object_function_recent_body_damage,
-	_object_function_recent_shield_damage,
-	_object_function_random_constant,
-	_object_function_umbrella_shield_vitality,
-	_object_function_shield_stun,
-	_object_function_recent_umbrella_shield_vitality,
-	_object_function_umbrella_shield_stun,
-	_object_function_first_region_damage,
-	_object_function_last_region_damage = 17,
-	_object_function_alive,
-	_object_function_compass,
-	NUMBER_OF_OBJECT_FUNCTION_MODES,
-};
-
-enum
-{
-	_object_change_color_a = 0,
-	_object_change_color_b,
-	_object_change_color_c,
-	_object_change_color_d,
-	NUMBER_OF_OBJECT_CHANGE_COLORS,
-};
-
-enum
-{
-	_pvs_activation_normal = 0,
-	_pvs_activation_object,
-	_pvs_activation_cluster,
-	NUMBER_OF_OBJECT_PVS_ACTIVATION_TYPES,
-};
-
-enum
-{
-	_garbage_collect_everything = 0,
-	_garbage_collect_active_objects,
-	_garbage_collect_for_space,
-	NUMBER_OF_GARBAGE_COLLECTION_MODES,
-};
-
-
 /* ---------- macros */
 
 #define object_header_get(index)			((struct object_header_datum*)datum_get(object_header_data, (index)))
@@ -197,7 +142,6 @@ enum
 /* ---------- structures */
 
 typedef void (*object_deleted_proc)(long);
-
 
 struct object_cluster_iterator
 {
@@ -213,19 +157,6 @@ struct object_header_datum
 	short cluster_index;
 	short data_size;
 	struct object_datum *datum;
-};
-
-struct location
-{
-	long leaf_index;
-	short cluster_index;
-	word bonus;
-};
-
-struct animation_state
-{
-	short index;
-	short frame_index;
 };
 
 struct object_animation_state
@@ -453,7 +384,6 @@ void objects_garbage_collection(void);
 void objects_update(void);
 void objects_memory_compact(void);
 
-
 /* ---------- prototypes/OBJECT_DELETED_PROCS.C */
 
 void object_deleted_procs_call(long deleted_object_index);
@@ -517,6 +447,5 @@ __inline void object_get_render_bounding_sphere(
 
 	return;
 }
-
 
 #endif // __OBJECTS_H

@@ -8,6 +8,13 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "font_group.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "rasterizer.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

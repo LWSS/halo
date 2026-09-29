@@ -6,8 +6,7 @@ PLACEHOLDER_DEFINITIONS.C
 
 #include "cseries.h"
 #include "placeholder_definitions.h"
-#include "real_math.h"
-#include "scenario_definitions.h"
+#include "objects.h"
 
 /* ---------- public code */
 

@@ -95,27 +95,29 @@ symbols in this file:
 /* ---------- headers */
 
 #include "cseries.h"
-#include "cseries_windows.h"
-#include "real_math.h"
-#include "console.h"
 #include "game_state.h"
-#include "game.h"
-#include "tag_files.h"
-#include "cache_files.h"
-#include "scenario.h"
-#include "main.h"
-#include "objects.h"
-#include "game_sound.h"
-#include "sound_manager.h"
-#include "observer.h"
-#include "players.h"
+#include "game_state_procs.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
 #include "rasterizer.h"
-#include "recorded_animations.h"
+#include "players.h"
+#include "console.h"
+#include "actors.h"
+#include "sound_manager.h"
 #include "ai_debug.h"
-#include "structures.h"
+#include "main.h"
 #include "director.h"
+#include "game_sound.h"
+#include "structures.h"
+#include "observer.h"
+#include "hud.h"
 #include "hud_messaging.h"
-#include "crc.h"
+#include "physical_memory_map.h"
+#include "build_number.h"
+#include "recorded_animations.h"
+#include "saved_films.h"
+#include "rasterizer_hardware_format_utilities.h"
 
 /* ---------- constants */
 
@@ -137,7 +139,7 @@ static void game_state_set_revert_time(void);
 
 boolean recover_saved_games_hack;
 
-static FILE* bss_004d27b0;
+static FILE* bss_004d27b0 = NULL;
 
 static struct
 {
@@ -149,7 +151,7 @@ static struct
 	boolean saved_game_valid; // 0x11
 	long revert_time; // 0x14
 	struct game_state_header *header; // 0x18
-} game_state_globals;
+} game_state_globals = {0};
 
 typedef void (*game_state_before_load_proc)();
 typedef void (*game_state_after_load_proc)();

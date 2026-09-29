@@ -10,7 +10,7 @@ header included in hcex build.
 
 /* ---------- headers */
 
-#include "shaders/shader_definitions.h"
+#include "shader_definitions.h"
 
 /* ---------- constants */
 

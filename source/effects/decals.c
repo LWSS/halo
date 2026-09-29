@@ -212,6 +212,18 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "decals.h"
+#include "objects.h"
+#include "render.h"
+#include "rasterizer.h"
+#include "bitmaps_inlines.h"
+#include "rasterizer_console_vars.h"
+#include "game_state.h"
+#include "collisions.h"
+#include "render_debug.h"
+#include "texture_cache.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

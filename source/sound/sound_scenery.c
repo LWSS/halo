@@ -10,6 +10,9 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "sound_scenery.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

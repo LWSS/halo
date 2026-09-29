@@ -16,6 +16,11 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "players.h"
+#include "network_game_globals.h"
+#include "units.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

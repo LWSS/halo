@@ -10,7 +10,7 @@ header included in hcex build.
 
 /* ---------- headers */
 
-#include "objects/object_definitions.h"
+#include "object_definitions.h"
 
 /* ---------- constants */
 

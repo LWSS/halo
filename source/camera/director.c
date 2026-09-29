@@ -105,6 +105,28 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "director.h"
+#include "observer.h"
+#include "camera_scripting.h"
+#include "dead_camera.h"
+#include "first_person_camera.h"
+#include "flying_camera.h"
+#include "orbiting_camera.h"
+#include "editor_flying_camera.h"
+#include "following_camera.h"
+#include "static_camera.h"
+#include "bored_camera.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "input.h"
+#include "console.h"
+#include "game_state.h"
+#include "input_abstraction.h"
+#include "main.h"
+#include "editor_stubs.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

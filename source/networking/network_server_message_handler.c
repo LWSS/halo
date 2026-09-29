@@ -246,6 +246,21 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "network_server_message_handler.h"
+#include "network_game_globals.h"
+#include "network_messages.h"
+#include "network_client_manager.h"
+#include "network_server_manager.h"
+#include "network_connection.h"
+#include "units.h"
+#include "players.h"
+#include "input.h"
+#include "console.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "game_engine_list.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

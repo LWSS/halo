@@ -6,6 +6,20 @@ STRUCTURE_BSP_DEFINITIONS.C
 
 #include "cseries.h"
 #include "structure_bsp_definitions.h"
+#include "detail_object_definitions.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "light_definitions.h"
+#include "shaders.h"
+#include "sound_environment_definitions.h"
+#include "sound_definitions.h"
+#include "editor_stubs.h"
+#include "predicted_resources.h"
+#include "scenery.h"
+#include "fog_definitions.h"
+#include "rasterizer_hardware_format_utilities.h"
+#include "weather_particle_definitions.h"
+#include "wind_definitions.h"
 
 /* ---------- constants */
 

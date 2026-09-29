@@ -30,6 +30,13 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "bipeds.h"
+#include "console.h"
+#include "collisions.h"
+#include "render_debug.h"
+#include "physics_constants.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

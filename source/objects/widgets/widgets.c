@@ -44,6 +44,22 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "widgets.h"
+#include "antenna.h"
+#include "flags.h"
+#include "glow.h"
+#include "light_volumes.h"
+#include "lightning.h"
+#include "aleph.h"
+#include "cellular_automata.h"
+#include "cellular_automata2d.h"
+#include "widget_types.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "game_state.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

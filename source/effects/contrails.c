@@ -66,6 +66,14 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "contrails.h"
+#include "contrail_definitions.h"
+#include "objects.h"
+#include "game_state.h"
+#include "physics.h"
+#include "point_physics.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

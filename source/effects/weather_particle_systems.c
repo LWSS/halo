@@ -66,6 +66,18 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "weather_particle_systems.h"
+#include "weather_particle_definitions.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "physics.h"
+#include "point_physics.h"
+#include "fog_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

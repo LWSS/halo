@@ -102,6 +102,18 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "players.h"
+#include "network_game_globals.h"
+#include "input.h"
+#include "console.h"
+#include "vehicles.h"
+#include "main.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "ui_widget.h"
+#include "saved_films.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

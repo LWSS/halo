@@ -5,15 +5,21 @@ RASTERIZER_MEMORY_POOL.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "errors.h"
-#include "real_math.h"
 #include "rasterizer.h"
+#include "rasterizer_console_vars.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "bitmaps_inlines.h"
+#include "light_definitions.h"
+#include "shaders.h"
+#include "rasterizer/common/rasterizer_common.h"
 
 /* ---------- globals */
 
 /* swapped? */
-static void *global_memory_pool;
-static long global_memory_index;
+static void *global_memory_pool = NULL;
+static long global_memory_index = 0;
 
 /* ---------- public code */
 

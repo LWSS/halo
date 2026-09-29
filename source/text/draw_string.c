@@ -98,6 +98,17 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "draw_string.h"
+#include "text_group.h"
+#include "font_group.h"
+#include "international_strings.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "rasterizer.h"
+#include "bitmap_macros.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

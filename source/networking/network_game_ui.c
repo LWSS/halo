@@ -8,6 +8,16 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "network_game_ui.h"
+#include "network_game_globals.h"
+#include "network_messages.h"
+#include "network_client_manager.h"
+#include "units.h"
+#include "players.h"
+#include "text_group.h"
+#include "game_engine_list.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -10,8 +10,7 @@ header included in hcex build.
 
 /* ---------- headers */
 
-#include "integer_math.h"
-#include "real_math.h"
+#include "ui_widget_group.h"
 
 /* ---------- constants */
 

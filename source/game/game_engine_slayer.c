@@ -74,6 +74,21 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "players.h"
+#include "game_engine_list.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "rasterizer.h"
+#include "console.h"
+#include "network_messages.h"
+#include "text_group.h"
+#include "font_group.h"
+#include "network_server_message_handler.h"
+#include "scenery.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

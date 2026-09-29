@@ -11,7 +11,9 @@ header included in hcex build.
 
 /* ---------- headers */
 
-#include "real_math.h"
+#include "cheats.h"
+#include "game.h"
+#include "scenario_definitions.h"
 
 /* ---------- constants */
 

@@ -38,6 +38,17 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "director.h"
+#include "observer.h"
+#include "dead_camera.h"
+#include "first_person_camera.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "units.h"
+#include "console.h"
+#include "player_effects.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

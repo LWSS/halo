@@ -10,6 +10,10 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "garbage.h"
+#include "items.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

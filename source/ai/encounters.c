@@ -281,6 +281,21 @@ symbols in this file:
 
 #include "cseries.h"
 #include "encounters.h"
+#include "actors.h"
+#include "ai_debug.h"
+#include "props.h"
+#include "actor_types.h"
+#include "ai_profile.h"
+#include "ai_script.h"
+#include "ai_globals.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "console.h"
+#include "game_state.h"
+#include "editor_stubs.h"
 
 /* ---------- constants */
 

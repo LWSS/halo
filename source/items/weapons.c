@@ -202,17 +202,25 @@ symbols in this file:
 
 #include "cseries.h"
 #include "weapons.h"
-
-#include "weapon_definitions.h"
-
-#include "cache/cache_files.h"
-#include "cseries/profile.h"
-#include "effects/effect_definitions.h"
-#include "effects/effects.h"
-#include "interface/first_person_weapons.h"
-#include "sound/game_sound.h"
-#include "sound/sound_definitions.h"
-#include "units/units.h"
+#include "weapon_interface_definitions.h"
+#include "projectiles.h"
+#include "projectile_definitions.h"
+#include "equipment.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "console.h"
+#include "network_messages.h"
+#include "actors.h"
+#include "sound_manager.h"
+#include "vehicles.h"
+#include "meter_definitions.h"
+#include "game_sound.h"
+#include "sound_definitions.h"
+#include "physics_constants.h"
+#include "effects.h"
+#include "network_server_message_handler.h"
+#include "object_types.h"
+#include "first_person_weapons.h"
 
 /* ---------- constants */
 

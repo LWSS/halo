@@ -80,6 +80,28 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "game_globals.h"
+#include "game_engine.h"
+#include "actor_definitions.h"
+#include "text_group.h"
+#include "vehicles.h"
+#include "meter_definitions.h"
+#include "weapon_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "sound_definitions.h"
+#include "hud_definitions.h"
+#include "effect_definitions.h"
+#include "physics_constants.h"
+#include "font_group.h"
+#include "damage_effect_definitions.h"
+#include "equipment_definitions.h"
+#include "projectile_definitions.h"
+#include "weapon_hud_interface_definition.h"
+#include "particle_definitions.h"
+#include "camera_track_definitions.h"
+#include "color_table_group.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

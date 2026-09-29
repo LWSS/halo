@@ -96,6 +96,25 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "game_sound.h"
+#include "sound_manager.h"
+#include "sound_definitions.h"
+#include "sound_classes.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "game_state.h"
+#include "collisions.h"
+#include "director.h"
+#include "structures.h"
+#include "observer.h"
+#include "object_types.h"
+#include "cinematics.h"
+#include "predicted_resources.h"
+#include "sound_cache.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

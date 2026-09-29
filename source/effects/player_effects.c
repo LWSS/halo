@@ -86,6 +86,24 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "player_effects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "console.h"
+#include "game_state.h"
+#include "network_messages.h"
+#include "sound_manager.h"
+#include "director.h"
+#include "game_sound.h"
+#include "observer.h"
+#include "network_server_message_handler.h"
+#include "network_server_manager.h"
+#include "damage_effect_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

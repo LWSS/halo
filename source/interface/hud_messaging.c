@@ -114,6 +114,36 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "hud_messaging.h"
+#include "meter_definitions.h"
+#include "hud.h"
+#include "hud_messaging_definitions.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "actor_definitions.h"
+#include "input.h"
+#include "bitmaps_inlines.h"
+#include "game_state.h"
+#include "network_messages.h"
+#include "sound_manager.h"
+#include "input_abstraction.h"
+#include "text_group.h"
+#include "weapon_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "render_debug.h"
+#include "game_sound.h"
+#include "bipeds.h"
+#include "texture_cache.h"
+#include "font_group.h"
+#include "network_server_message_handler.h"
+#include "network_server_manager.h"
+#include "cinematics.h"
+#include "equipment_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

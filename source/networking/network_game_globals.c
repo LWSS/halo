@@ -98,6 +98,20 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "network_game_globals.h"
+#include "network_messages.h"
+#include "network_client_manager.h"
+#include "network_server_manager.h"
+#include "players.h"
+#include "input.h"
+#include "vehicles.h"
+#include "main.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "ui_widget.h"
+#include "bipeds.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

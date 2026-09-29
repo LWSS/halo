@@ -5,13 +5,40 @@ DEBUG_KEYS.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "debug_keys.h"
+#include "objects.h"
+#include "ai.h"
+#include "ai_constants.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "input.h"
 #include "ai_debug.h"
+#include "encounters.h"
+#include "director.h"
 #include "ai_profile.h"
 #include "ai_script.h"
-#include "profile.h"
-#include "integer_math.h"
-#include "input.h"
+
+/* ---------- constants */
+
+enum
+{
+	_debug_key_no_modifier = 0,
+	_debug_key_shift,
+	_debug_key_ctrl,
+	_debug_key_shift_ctrl,
+	NUMBER_OF_DEBUG_KEY_MODIFIERS,
+};
+
+/* ---------- structures */
+
+struct debug_key
+{
+	const char *name;
+	short key_code;
+	short modifier;
+	void (*function)(boolean down);
+	boolean toggle_variable;
+	boolean *variable;
+};
 
 /* ---------- prototypes */
 

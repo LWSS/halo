@@ -6,8 +6,7 @@ OBJECT_LISTS.C
 
 #include "cseries.h"
 #include "object_lists.h"
-
-#include "data.h"
+#include "game_state.h"
 #include "reference_lists.h"
 
 /* ---------- constants */
@@ -20,7 +19,18 @@ enum
 
 /* ---------- macros */
 
+#define object_list_header_get(index)	((struct object_list_header_datum*)(datum_get(object_list_header_data, (index))))
+
 /* ---------- structures */
+
+struct object_list_header_datum
+{
+	short identifier;
+	word pad;
+	short reference_count;
+	short count;
+	long first_reference_index;
+};
 
 /* ---------- prototypes */
 

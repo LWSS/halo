@@ -408,6 +408,22 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "hs_library_internal.h"
+#include "hs_scenario_definitions.h"
+#include "hs_library_internal_compile.h"
+#include "ai.h"
+#include "ai_constants.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "input.h"
+#include "encounters.h"
+#include "hud_definitions.h"
+#include "devices.h"
+#include "ai_script.h"
+#include "recorded_animation_definitions.h"
+#include "hud_messaging_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

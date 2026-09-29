@@ -282,6 +282,28 @@ symbols in this file:
 
 #include "cseries.h"
 #include "actors.h"
+#include "ai_debug.h"
+#include "encounters.h"
+#include "props.h"
+#include "actor_types.h"
+#include "ai_profile.h"
+#include "ai_script.h"
+#include "ai_globals.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "game_state.h"
+#include "network_messages.h"
+#include "sound_manager.h"
+#include "vehicles.h"
+#include "meter_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "weapons.h"
+#include "game_sound.h"
+#include "bipeds.h"
+#include "projectiles.h"
+#include "equipment_definitions.h"
 
 /* ---------- constants */
 

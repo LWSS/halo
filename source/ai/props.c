@@ -68,6 +68,10 @@ symbols in this file:
 
 #include "cseries.h"
 #include "props.h"
+#include "actors.h"
+#include "actor_types.h"
+#include "units.h"
+#include "game_state.h"
 
 /* ---------- constants */
 

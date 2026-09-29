@@ -52,6 +52,33 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "meter_definitions.h"
+#include "hud.h"
+#include "hud_messaging.h"
+#include "weapon_hud_interface_definition.h"
+#include "motion_sensor.h"
+#include "interface_panels.h"
+#include "inventory_displays.h"
+#include "unit_hud_interface_definition.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "actor_definitions.h"
+#include "bitmaps_inlines.h"
+#include "game_state.h"
+#include "network_messages.h"
+#include "collisions.h"
+#include "weapon_interface_definitions.h"
+#include "render_debug.h"
+#include "director.h"
+#include "weapons.h"
+#include "texture_cache.h"
+#include "physics_constants.h"
+#include "font_group.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

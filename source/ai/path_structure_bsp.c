@@ -30,6 +30,13 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "ai_constants.h"
+#include "path.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

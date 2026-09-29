@@ -62,6 +62,20 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "rasterizer.h"
+#include "rasterizer_console_vars.h"
+#include "rasterizer_hardware_format_utilities.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "unicode.h"
+#include "bitmaps_inlines.h"
+#include "light_definitions.h"
+#include "shaders.h"
+#include "rasterizer/common/rasterizer_common.h"
+#include "font_group.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

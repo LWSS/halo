@@ -14,8 +14,6 @@ header included in hcex build.
 #include "bsp2d.h"
 #include "bsp3d.h"
 
-#include "math/real_math.h"
-
 /* ---------- constants */
 
 enum

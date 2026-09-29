@@ -264,6 +264,8 @@ symbols in this file:
 
 #include "cseries.h"
 #include "model_animation_definitions.h"
+#include "vehicles.h"
+#include "sound_definitions.h"
 
 /* ---------- constants */
 

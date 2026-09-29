@@ -114,6 +114,30 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "projectiles.h"
+#include "item_definitions.h"
+#include "items.h"
+#include "projectile_definitions.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "console.h"
+#include "bungie_net/network/transport.h"
+#include "collisions.h"
+#include "sound_manager.h"
+#include "render_debug.h"
+#include "director.h"
+#include "game_sound.h"
+#include "sound_definitions.h"
+#include "bipeds.h"
+#include "physics_constants.h"
+#include "effects.h"
+#include "network_server_message_handler.h"
+#include "object_types.h"
+#include "physics.h"
+#include "contrails.h"
+#include "contrail_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

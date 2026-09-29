@@ -81,9 +81,18 @@ symbols in this file:
 /* ---------- headers */
 
 #include "cseries.h"
-#include "actions.h"
-
-#include "math/real_math.h"
+#include "actors.h"
+#include "ai_debug.h"
+#include "encounters.h"
+#include "props.h"
+#include "actor_types.h"
+#include "units.h"
+#include "collisions.h"
+#include "items.h"
+#include "meter_definitions.h"
+#include "weapon_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "projectiles.h"
 
 /* ---------- constants */
 

@@ -71,6 +71,12 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "actor_types.h"
+#include "actors.h"
+#include "actor_type_definitions.h"
+#include "units.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

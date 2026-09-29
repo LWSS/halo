@@ -10,7 +10,6 @@ file has inline function assertions.
 
 /* ---------- headers */
 
-#include "math/real_math.h"
 
 /* ---------- constants */
 
@@ -18,14 +17,6 @@ enum
 {
 	PATH_NODE_LIST_SIZE = 0x400,
 	PATH_HASH_TABLE_SIZE = 0x1000,
-};
-
-enum
-{
-	PATH_HASH_TABLE_SIZE_PER_KEY = 8,
-	PATH_HASH_KEY_MASK = 511,
-	PATH_HASH_TABLE_MASK = 4095,
-	MAXIMUM_PATH_EDGES_PER_COLLISION_SURFACE = 64
 };
 
 enum

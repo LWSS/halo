@@ -11,9 +11,9 @@ CSERIES.H
 #include <StdDef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <malloc.h>
 #include <math.h>
 #include <string.h>
-#include <stdarg.h>
 
 /* ---------- constants */
 
@@ -85,8 +85,19 @@ enum
 	NUMBER_OF_POINTS_PER_RECTANGLE = 4,
 };
 
-
 #define NONE -1
+
+enum
+{
+	_german = 0,
+	_french,
+	_spanish,
+	_italian,
+	_english,
+	_japanese,
+	_unknown,
+	NUMBER_OF_SUPPORTED_LANGUAGES,
+};
 
 /* ---------- macros */
 
@@ -111,6 +122,7 @@ enum
 #define match_vassert(file, line, expr, string) if (!(expr)) { display_assert(string, MATCH_FILE(file), MATCH_LINE(line), TRUE); system_exit(-1); }
 #define match_warn(file, line, expr) if (!(expr)) { display_assert(#expr, MATCH_FILE(file), MATCH_LINE(line), FALSE); }
 #define match_vwarn(file, line, expr, string) if (!(expr)) { display_assert(string, MATCH_FILE(file), MATCH_LINE(line), FALSE); }
+#define match_unreachable(file, line) match_assert(file, line, !"unreachable")
 
 #define halt() match_halt(__FILE__, __LINE__)
 #define vhalt(string) match_vhalt(__FILE__, __LINE__, string)
@@ -118,6 +130,7 @@ enum
 #define vassert(expr, string) match_vassert(__FILE__, __LINE__, expr, string)
 #define warn(expr) match_warn(__FILE__, __LINE__, expr)
 #define vwarn(expr, string) match_vwarn(__FILE__, __LINE__, expr, string)
+#define unreachable() match_assert(__FILE__, __LINE__, !"unreachable")
 
 #define ABS(x) ((x>=0) ? (x) : -(x))
 
@@ -161,6 +174,15 @@ typedef unsigned short word;
 typedef byte boolean;
 
 typedef unsigned long tag;
+
+/* ---------- structures */
+
+struct location
+{
+	long leaf_index;
+	short cluster_index;
+	word bonus;
+};
 
 /* ---------- prototypes/CSERIES.C */
 
@@ -218,7 +240,6 @@ void stack_walk_disregard_symbol_names(boolean disregard);
 
 /* ---------- macros */
 
-#ifndef BUILDING_CSERIES
 #define memcmp csmemcmp
 #define memmove csmemmove
 #define memset csmemset
@@ -239,7 +260,6 @@ void stack_walk_disregard_symbol_names(boolean disregard);
 #define malloc(size) match_malloc(__FILE__, __LINE__, size)
 #define free(ptr) match_free(__FILE__, __LINE__, ptr)
 #define realloc(ptr, size) match_realloc(__FILE__, __LINE__, ptr, size)
-#endif
 
 /* ---------- globals */
 

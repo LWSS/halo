@@ -6,18 +6,18 @@ COLLISIONS.C
 
 #include "cseries.h"
 #include "collisions.h"
-#include "collision_bsp.h"
-#include "collision_features.h"
-#include "collision_models.h"
-#include "collision_usage.h"
-#include "breakable_surfaces.h"
 #include "physics.h"
-#include "scenario.h"
+#include "collision_models.h"
 #include "structure_bsp_definitions.h"
+#include "bipeds.h"
 #include "structures.h"
 #include "fog_definitions.h"
-#include "game_globals.h"
-#include "bipeds.h"
+
+/* ---------- constants */
+
+/* ---------- macros */
+
+/* ---------- structures */
 
 /* ---------- prototypes */
 

@@ -22,6 +22,16 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "first_person_camera.h"
+#include "director.h"
+#include "observer.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "console.h"
+#include "vehicles.h"
+#include "player_effects.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -10,7 +10,6 @@ header included in hcex build.
 
 /* ---------- headers */
 
-#include "integer_math.h"
 
 /* ---------- constants */
 
@@ -120,6 +119,10 @@ union real_rgb_color *rgb_colors_interpolate_and_scale(
 	union real_argb_color const *argb_upper_bound,
 	union real_rgb_color const *rgb_scale,
 	real u);
+
+/* ---------- prototypes/BITMAP_UTILITIES.C */
+
+union real_rgb_color *pixel32_to_real_rgb_color(pixel32 color, union real_rgb_color *result);
 
 /* ---------- globals */
 

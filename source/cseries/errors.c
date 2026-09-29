@@ -59,15 +59,26 @@ symbols in this file:
 /* ---------- headers */
 
 #include "cseries.h"
-#include "errors.h"
-
-#include <time.h>
+#include "build_number.h"
+#include "terminal.h"
 
 /* ---------- constants */
 
 /* ---------- macros */
 
 /* ---------- structures */
+
+struct error_global_data
+{
+	boolean delayed;
+	boolean output_to_debug_file;
+	boolean display_state;
+	boolean recursion_lock;
+	boolean overflow_suppression;
+	boolean suppress_all;
+	short message_buffer_size;
+	char message_buffer[ERROR_MESSAGE_BUFFER_MAXIMUM_SIZE];
+};
 
 /* ---------- prototypes */
 

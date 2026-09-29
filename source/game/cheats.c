@@ -50,6 +50,18 @@ symbols in this file:
 
 #include "cseries.h"
 #include "cheats.h"
+#include "players.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "actor_definitions.h"
+#include "console.h"
+#include "vehicle_definitions.h"
+#include "meter_definitions.h"
+#include "weapon_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "observer.h"
+#include "terminal.h"
+#include "equipment_definitions.h"
 
 /* ---------- constants */
 

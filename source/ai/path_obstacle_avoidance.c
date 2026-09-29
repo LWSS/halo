@@ -106,6 +106,17 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "ai_scenario_definitions.h"
+#include "ai_constants.h"
+#include "path.h"
+#include "game_globals.h"
+#include "interface.h"
+#include "damage.h"
+#include "breakable_surfaces.h"
+#include "scenario.h"
+#include "collision_bsp.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

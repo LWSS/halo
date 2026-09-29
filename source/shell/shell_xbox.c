@@ -31,11 +31,21 @@ symbols in this file:
 /* ---------- headers */
 
 #include "cseries.h"
-#include "cseries_windows.h"
 #include "shell.h"
-#include "physical_memory_map.h"
-#include "xbox/rasterizer_xbox.h"
+#include "shell_windows.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "input.h"
+#include "game_state.h"
+#include "sound_manager.h"
 #include "main.h"
+#include "physical_memory_map.h"
+#include "attract_mode.h"
+#include "marketing_and_strategic_business_development.h"
+#include "rasterizer/xbox/rasterizer_xbox.h"
 
 /* ---------- prototypes */
 

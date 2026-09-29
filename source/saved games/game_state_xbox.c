@@ -94,6 +94,20 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "game_state.h"
+#include "ai_scenario_definitions.h"
+#include "game_globals.h"
+#include "interface.h"
+#include "damage.h"
+#include "breakable_surfaces.h"
+#include "scenario.h"
+#include "network_game_globals.h"
+#include "sound_manager.h"
+#include "text_group.h"
+#include "player_ui.h"
+#include "physical_memory_map.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

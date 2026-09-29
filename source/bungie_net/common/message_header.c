@@ -26,6 +26,13 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "message_header.h"
+#include "memory_manager.h"
+#include "64bit_math.h"
+#include "random_numbers.h"
+#include "bungie_net/network/transport.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

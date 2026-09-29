@@ -182,8 +182,29 @@ symbols in this file:
 
 #include "cseries.h"
 #include "players.h"
-
-#include "real_math.h"
+#include "network_game_globals.h"
+#include "actor_definitions.h"
+#include "input.h"
+#include "console.h"
+#include "game_state.h"
+#include "network_messages.h"
+#include "collisions.h"
+#include "input_abstraction.h"
+#include "text_group.h"
+#include "vehicles.h"
+#include "meter_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "main.h"
+#include "director.h"
+#include "weapons.h"
+#include "bipeds.h"
+#include "observer.h"
+#include "physics_constants.h"
+#include "hud.h"
+#include "player_ui.h"
+#include "damage_effect_definitions.h"
+#include "cinematics.h"
+#include "static_camera.h"
 
 /* ---------- constants */
 

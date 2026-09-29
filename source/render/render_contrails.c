@@ -24,6 +24,16 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "render.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "rasterizer.h"
+#include "bitmaps_inlines.h"
+#include "texture_cache.h"
+#include "contrails.h"
+#include "contrail_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

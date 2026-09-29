@@ -150,6 +150,20 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "actors.h"
+#include "ai_debug.h"
+#include "encounters.h"
+#include "props.h"
+#include "actor_types.h"
+#include "ai_profile.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "vehicles.h"
+#include "meter_definitions.h"
+#include "weapon_definitions.h"
+#include "weapon_interface_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -77,6 +77,15 @@ symbols in this file:
 
 #include "cseries.h"
 #include "units.h"
+#include "dialogue_definitions.h"
+#include "network_game_globals.h"
+#include "console.h"
+#include "actors.h"
+#include "sound_manager.h"
+#include "ai_debug.h"
+#include "game_sound.h"
+#include "sound_definitions.h"
+#include "damage_effect_definitions.h"
 
 /* ---------- constants */
 

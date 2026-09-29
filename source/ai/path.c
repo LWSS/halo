@@ -154,7 +154,25 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "path.h"
+#include "ai_constants.h"
+#include "ai_debug.h"
+#include "ai_profile.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "console.h"
+
 /* ---------- constants */
+
+enum
+{
+	PATH_HASH_TABLE_SIZE_PER_KEY = 8,
+	PATH_HASH_KEY_MASK = 511,
+	PATH_HASH_TABLE_MASK = 4095,
+	MAXIMUM_PATH_EDGES_PER_COLLISION_SURFACE = 64
+};
 
 /* ---------- macros */
 

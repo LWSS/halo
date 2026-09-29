@@ -8,6 +8,17 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "projectile_definitions.h"
+#include "item_definitions.h"
+#include "objects.h"
+#include "ai.h"
+#include "unit_definitions.h"
+#include "sound_definitions.h"
+#include "effect_definitions.h"
+#include "physics_constants.h"
+#include "damage_effect_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

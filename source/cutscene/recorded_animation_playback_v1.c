@@ -74,6 +74,10 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "recorded_animation_playback_v1.h"
+#include "recorded_animations.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

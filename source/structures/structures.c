@@ -58,6 +58,21 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "structures.h"
+#include "objects.h"
+#include "render.h"
+#include "rasterizer.h"
+#include "console.h"
+#include "light_definitions.h"
+#include "sound_environment_definitions.h"
+#include "collisions.h"
+#include "fog_definitions.h"
+#include "structures/radiosity/radiosity.h"
+#include "vector_tree.h"
+#include "sky_definitions.h"
+#include "structures/radiosity/radiosity_io.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

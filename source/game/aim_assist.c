@@ -42,6 +42,23 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "aim_assist.h"
+#include "players.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "actor_definitions.h"
+#include "network_messages.h"
+#include "collisions.h"
+#include "meter_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "director.h"
+#include "weapons.h"
+#include "bipeds.h"
+#include "structures.h"
+#include "observer.h"
+#include "physics_constants.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

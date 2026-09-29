@@ -90,9 +90,20 @@ symbols in this file:
 /* ---------- headers */
 
 #include "cseries.h"
-#include "real_math.h"
 #include "motion_sensor.h"
+#include "hud.h"
+#include "interface_panels.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "bitmap_macros.h"
 #include "game_state.h"
+#include "vehicles.h"
+#include "render_debug.h"
+#include "director.h"
+#include "texture_cache.h"
 
 /* ---------- constants */
 

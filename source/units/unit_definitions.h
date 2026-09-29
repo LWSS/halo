@@ -8,7 +8,7 @@ UNIT_DEFINITIONS.H
 
 /* ---------- headers */
 
-#include "objects/object_definitions.h"
+#include "object_definitions.h"
 
 /* ---------- constants */
 

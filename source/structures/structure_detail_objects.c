@@ -48,6 +48,19 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "structures.h"
+#include "detail_object_definitions.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "bitmap_macros.h"
+#include "game_state.h"
+#include "render_debug.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

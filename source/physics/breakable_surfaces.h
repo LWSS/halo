@@ -10,15 +10,8 @@ header included in hcex build.
 
 /* ---------- headers */
 
-#include "math/real_math.h"
-#include "tag_files/tag_groups.h"
 
 /* ---------- constants */
-
-enum
-{
-	MAXIMUM_BREAKABLE_SURFACE_QUEUE_SIZE = 1024,
-};
 
 enum
 {

@@ -8,17 +8,11 @@ header included in hcex build.
 #define __TEXT_GROUP_H
 #pragma once
 
-/* ---------- constants */
+/* ---------- headers */
 
-enum
-{
-	_text_style_plain = NONE,
-	_text_style_bold = 0,
-	_text_style_italic,
-	_text_style_condense,
-	_text_style_underline,
-	NUMBER_OF_TEXT_STYLES
-};
+#include "unicode.h"
+
+/* ---------- constants */
 
 /* ---------- macros */
 

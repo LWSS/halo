@@ -28,6 +28,17 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "structures.h"
+#include "objects.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "game_state.h"
+#include "collisions.h"
+#include "decals.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

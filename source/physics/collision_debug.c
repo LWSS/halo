@@ -5,23 +5,13 @@ COLLISION_DEBUG.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "game/game.h"
-#include "game/players.h"
-#include "math/real_math.h"
-#include "physics/breakable_surfaces.h"
-#include "physics/collision_bsp.h"
-#include "physics/collision_bsp_definitions.h"
-#include "physics/collision_debug.h"
-#include "physics/collision_features.h"
-#include "physics/collision_model_definitions.h"
-#include "physics/collision_models.h"
-#include "physics/collision_usage.h"
-#include "physics/collisions.h"
-#include "render/render.h"
-#include "render/render_debug.h"
-#include "scenario/scenario.h"
-#include "tag_files/tag_groups.h"
-#include "game_globals.h"
+#include "collision_debug.h"
+#include "collisions.h"
+#include "collision_models.h"
+#include "objects.h"
+#include "render.h"
+#include "players.h"
+#include "render_debug.h"
 
 /* ---------- constants */
 
@@ -75,9 +65,9 @@ boolean collision_debug_flag_objects = TRUE;
 real collision_debug_length = 100.f;
 long collision_debug_ignore_object_index = NONE;
 
-static real_vector3d collision_debug_spray_vectors[COLLISION_DEBUG_SPRAY_ROWS][COLLISION_DEBUG_SPRAY_COLUMNS];
-static real_point3d collision_debug_spray_points[COLLISION_DEBUG_SPRAY_ROWS][COLLISION_DEBUG_SPRAY_COLUMNS];
-static unsigned long collision_debug_spray_hits[BIT_VECTOR_SIZE_IN_LONGS(COLLISION_DEBUG_SPRAY_COUNT)];
+static real_vector3d collision_debug_spray_vectors[COLLISION_DEBUG_SPRAY_ROWS][COLLISION_DEBUG_SPRAY_COLUMNS] = {0};
+static real_point3d collision_debug_spray_points[COLLISION_DEBUG_SPRAY_ROWS][COLLISION_DEBUG_SPRAY_COLUMNS] = {0};
+static unsigned long collision_debug_spray_hits[BIT_VECTOR_SIZE_IN_LONGS(COLLISION_DEBUG_SPRAY_COUNT)] = {0};
 
 real collision_debug_width = 0.f;
 real collision_debug_height = 0.f;
@@ -105,8 +95,7 @@ void collision_debug_render(void)
 	real_point3d point;
 	real_vector3d vector;
 
-	match_assert("c:\\halo\\SOURCE\\physics\\collision_debug.c", 76, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
-	global_current_collision_users[global_current_collision_user_depth++] = _collision_user_debugging;
+	match_collision_log_begin_user("c:\\halo\\SOURCE\\physics\\collision_debug.c", 76, _collision_user_debugging);
 
 	if (collision_debug || collision_debug_spray || collision_debug_features || collision_debug_phantom_bsp)
 	{
@@ -416,8 +405,7 @@ void collision_debug_render(void)
 			render_debug_collision_features(&features);
 	}
 
-	match_assert("c:\\halo\\SOURCE\\physics\\collision_debug.c", 443, global_current_collision_user_depth > 1);
-	--global_current_collision_user_depth;
+	match_collision_log_end_user("c:\\halo\\SOURCE\\physics\\collision_debug.c", 443);
 
 	return;
 }

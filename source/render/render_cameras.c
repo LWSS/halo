@@ -128,6 +128,16 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "render_cameras.h"
+#include "render.h"
+#include "render_debug.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "rasterizer.h"
+#include "input.h"
+#include "editor_stubs.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

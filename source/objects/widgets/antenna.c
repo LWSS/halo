@@ -32,6 +32,15 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "antenna.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "rasterizer.h"
+#include "game_state.h"
+#include "point_physics.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

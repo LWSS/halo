@@ -31,6 +31,22 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "sound_definitions.h"
+#include "sound_manager.h"
+#include "sound_classes.h"
+#include "ima_adpcm.h"
+#include "ai_scenario_definitions.h"
+#include "interface.h"
+#include "damage.h"
+#include "breakable_surfaces.h"
+#include "scenario.h"
+#include "network_game_globals.h"
+#include "text_group.h"
+#include "damage_effect_definitions.h"
+#include "predicted_resources.h"
+#include "sound_cache.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -12,6 +12,16 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "equipment.h"
+#include "equipment_definitions.h"
+#include "unit_definitions.h"
+#include "network_game_globals.h"
+#include "index_resolution.h"
+#include "sound_manager.h"
+#include "game_sound.h"
+#include "object_types.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

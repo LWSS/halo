@@ -14,6 +14,20 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "material_effects.h"
+#include "effects.h"
+#include "material_effect_definitions.h"
+#include "objects.h"
+#include "unit_definitions.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "collisions.h"
+#include "sound_manager.h"
+#include "render_debug.h"
+#include "game_sound.h"
+#include "observer.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

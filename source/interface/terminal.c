@@ -50,20 +50,18 @@ symbols in this file:
 
 #include "cseries.h"
 #include "terminal.h"
-
-#include "cache_files.h"
-#include "game.h"
-#include "data.h"
-#include "interface.h"
-#include "console.h"
-#include "telnet_console.h"
-#include "rasterizer.h"
+#include "objects.h"
+#include "collision_bsp.h"
 #include "render.h"
-#include "draw_string.h"
-#include "byte_swapping.h"
-#include "tag_groups.h"
-#include "text_group.h"
+#include "unicode.h"
+#include "rasterizer.h"
+#include "console.h"
+#include "input_abstraction.h"
+#include "input_windows.h"
 #include "font_group.h"
+#include "cinematics.h"
+#include "shell.h"
+#include "telnet_console.h"
 
 /* ---------- constants */
 

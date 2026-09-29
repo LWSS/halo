@@ -6,10 +6,9 @@ COLLISION_FEATURES.C
 
 #include "cseries.h"
 #include "collision_features.h"
-#include "collision_bsp.h"
-#include "collision_bsp_definitions.h"
-#include "render/render_debug.h"
-#include "tag_files/tag_groups.h"
+#ifdef DEBUG
+#include "render_debug.h"
+#endif
 
 /* ---------- constants */
 

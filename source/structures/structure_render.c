@@ -84,7 +84,16 @@ symbols in this file:
 /* ---------- headers */
 
 #include "cseries.h"
-#include "structure_render.h"
+#include "structures.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "rasterizer.h"
+#include "rasterizer_console_vars.h"
+#include "shaders.h"
+#include "render_debug.h"
+#include "object_lights.h"
+#include "structures/radiosity/radiosity.h"
 
 /* ---------- constants */
 

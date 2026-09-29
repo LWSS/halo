@@ -38,6 +38,21 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "rasterizer_xbox.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "bitmaps_inlines.h"
+#include "rasterizer_console_vars.h"
+#include "light_definitions.h"
+#include "shaders.h"
+#include "rasterizer/common/rasterizer_common.h"
+#include "texture_cache.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

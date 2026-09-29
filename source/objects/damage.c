@@ -100,6 +100,30 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "damage.h"
+#include "object_types.h"
+#include "damage_effect_definitions.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "console.h"
+#include "bungie_net/network/transport.h"
+#include "collisions.h"
+#include "items.h"
+#include "vehicles.h"
+#include "bipeds.h"
+#include "structures.h"
+#include "physics_constants.h"
+#include "hud.h"
+#include "effects.h"
+#include "network_server_message_handler.h"
+#include "devices.h"
+#include "projectiles.h"
+#include "player_effects.h"
+#include "object_lists.h"
+#include "collision_model_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

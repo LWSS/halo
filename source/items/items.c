@@ -58,6 +58,28 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "items.h"
+#include "weapon_interface_definitions.h"
+#include "weapons.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "actor_definitions.h"
+#include "network_messages.h"
+#include "collisions.h"
+#include "sound_manager.h"
+#include "meter_definitions.h"
+#include "game_sound.h"
+#include "structures.h"
+#include "physics_constants.h"
+#include "editor_stubs.h"
+#include "effects.h"
+#include "physics.h"
+#include "material_effects.h"
+#include "material_effect_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

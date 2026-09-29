@@ -450,6 +450,25 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "network_server_manager.h"
+#include "network_server_message_handler.h"
+#include "network_client_manager.h"
+#include "network_connection.h"
+#include "network_game_manager.h"
+#include "network_game_globals.h"
+#include "network_game_ui.h"
+#include "bungie_net/network/transport.h"
+#include "tag_groups.h"
+#include "bungie_net/common/message_header.h"
+#include "players.h"
+#include "game_engine_list.h"
+#include "game_engine.h"
+#include "player_profile.h"
+#include "main.h"
+#include "ui_widget.h"
+#include "cache_files.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

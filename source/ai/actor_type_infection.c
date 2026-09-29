@@ -40,6 +40,15 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "actors.h"
+#include "ai_debug.h"
+#include "props.h"
+#include "actor_types.h"
+#include "items.h"
+#include "bipeds.h"
+#include "projectiles.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

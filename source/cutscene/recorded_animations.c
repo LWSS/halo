@@ -86,6 +86,16 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "recorded_animations.h"
+#include "recorded_animation_definitions.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "game_state.h"
+#include "vehicles.h"
+#include "editor_stubs.h"
+#include "hs_library_external.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -76,6 +76,19 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "playlist_profile.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "cheats.h"
+#include "game.h"
+#include "network_game_globals.h"
+#include "game_engine.h"
+#include "input.h"
+#include "text_group.h"
+#include "ui_widget.h"
+#include "bungie_net/common/thread.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

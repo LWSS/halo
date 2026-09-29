@@ -123,7 +123,21 @@ symbols in this file:
 /* ---------- headers */
 
 #include "cseries.h"
-#include "cache_files.h"
+#include "texture_cache.h"
+#include "sound_cache.h"
+#include "physical_memory_map.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "unicode.h"
+#include "input.h"
+#include "sound_manager.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "ui_widget.h"
+#include "strings/resource.h"
+#include "build_number.h"
 
 /* ---------- constants */
 

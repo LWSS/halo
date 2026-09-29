@@ -64,6 +64,11 @@ symbols in this file:
 
 #include "cseries.h"
 #include "path.h"
+#include "collision_bsp_definitions.h"
+#include "object_lights.h"
+#include "devices.h"
+#include "device_definitions.h"
+#include "collision_model_definitions.h"
 
 /* ---------- constants */
 

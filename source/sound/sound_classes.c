@@ -107,6 +107,10 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "sound_classes.h"
+#include "game_state.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

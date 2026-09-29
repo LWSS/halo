@@ -14,6 +14,15 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "flying_camera.h"
+#include "director.h"
+#include "observer.h"
+#include "objects.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "collisions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

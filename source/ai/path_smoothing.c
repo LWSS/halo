@@ -36,6 +36,12 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "path.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

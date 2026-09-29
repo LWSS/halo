@@ -52,6 +52,25 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "input_abstraction.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "console.h"
+#include "network_messages.h"
+#include "text_group.h"
+#include "vehicles.h"
+#include "main.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "ui_widget.h"
+#include "network_client_manager.h"
+#include "terminal.h"
+#include "player_ui.h"
+#include "shell.h"
+#include "bink_playback.h"
+#include "virtual_keyboard.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

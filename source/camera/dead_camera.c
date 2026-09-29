@@ -18,6 +18,14 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "dead_camera.h"
+#include "director.h"
+#include "observer.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

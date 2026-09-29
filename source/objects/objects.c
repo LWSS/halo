@@ -6,55 +6,81 @@ OBJECTS.C
 
 #include "cseries.h"
 #include "objects.h"
-
-#include "damage.h"
 #include "light_definitions.h"
 #include "object_lights.h"
 #include "object_types.h"
-
-#include "ai/ai_debug.h"
-#include "bitmaps/bitmaps.h"
-#include "cache/predicted_resources.h"
-#include "cseries/errors.h"
-#include "cseries/profile.h"
-#include "devices/device_definitions.h"
-#include "devices/devices.h"
-#include "editor/editor_stubs.h"
-#include "effects/contrail_definitions.h"
-#include "effects/contrails.h"
-#include "effects/effect_definitions.h"
-#include "effects/effects.h"
-#include "effects/particle_system_definitions.h"
-#include "effects/particle_systems.h"
-#include "game/game.h"
-#include "game/game_engine.h"
-#include "game/players.h"
-#include "items/weapons.h"
-#include "main/console.h"
-#include "math/periodic_functions.h"
-#include "memory/memory_pool.h"
-#include "models/model_animation_definitions.h"
-#include "models/model_definitions.h"
-#include "models/models.h"
-#include "objects/widgets/widgets.h"
-#include "physics/collision_bsp.h"
-#include "physics/collision_model_definitions.h"
-#include "physics/collision_models.h"
-#include "physics/collision_usage.h"
-#include "physics/collisions.h"
-#include "physics/physics.h"
-#include "physics/physics_definitions.h"
-#include "render/render_debug.h"
-#include "saved games/game_state.h"
-#include "scenario/scenario.h"
-#include "scenario/scenario_definitions.h"
-#include "sound/sound_definitions.h"
-#include "sound/game_sound.h"
-#include "structures/structure_bsp_definitions.h"
-#include "units/units.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "actor_definitions.h"
+#include "console.h"
+#include "game_state.h"
+#include "network_messages.h"
+#include "collisions.h"
+#include "sound_manager.h"
+#include "meter_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "render_debug.h"
+#include "weapons.h"
+#include "game_sound.h"
+#include "sound_definitions.h"
+#include "structures.h"
+#include "physics_constants.h"
+#include "editor_stubs.h"
+#include "network_client_manager.h"
+#include "effects.h"
+#include "network_server_message_handler.h"
+#include "physics_definitions.h"
+#include "predicted_resources.h"
+#include "widgets.h"
+#include "contrails.h"
+#include "particle_systems.h"
+#include "contrail_definitions.h"
+#include "particle_system_definitions.h"
+#include "scenario_placement.h"
+#ifdef DEBUG
+#include "collision_model_definitions.h"
+#include "collision_models.h"
+#include "physics.h"
+#include "device_definitions.h"
+#include "devices.h"
+#include "ai_debug.h"
+#endif
 
 /* ---------- constants */
 
+enum
+{
+	OBJECT_ITERATOR_SIGNATURE = 0x86868686,
+	MAXIMUM_CLUSTERS_PER_OBJECT = 32,
+	OBJECT_MEMORY_POOL_SIZE = 0x100000,
+	GARBAGE_LIMIT_FREE_MEMORY_CRITICAL = 52428,
+	GARBAGE_LIMIT_FREE_MEMORY_TRIGGER = 104857,
+	GARBAGE_LIMIT_FREE_MEMORY_TARGET = 209715,
+	GARBAGE_LIMIT_FREE_OBJECTS_CRITICAL = 51,
+	GARBAGE_LIMIT_FREE_OBJECTS_TRIGGER = 102,
+	GARBAGE_LIMIT_FREE_OBJECTS_TARGET = 204,
+	GARBAGE_LIMIT_ACTIVE_GARBAGE_CRITICAL = 75,
+	GARBAGE_LIMIT_ACTIVE_GARBAGE_TRIGGER = 50,
+	GARBAGE_LIMIT_ACTIVE_GARBAGE_TARGET = 30,
+};
+
+enum
+{
+	_pvs_activation_normal = 0,
+	_pvs_activation_object,
+	_pvs_activation_cluster,
+	NUMBER_OF_OBJECT_PVS_ACTIVATION_TYPES,
+};
+
+enum
+{
+	_garbage_collect_everything = 0,
+	_garbage_collect_active_objects,
+	_garbage_collect_for_space,
+	NUMBER_OF_GARBAGE_COLLECTION_MODES,
+};
 
 /* ---------- macros */
 
@@ -3448,8 +3474,7 @@ boolean object_force_inside_bsp(
 	struct object_datum *object = object_get(object_index);
 	boolean result = FALSE;
 
-	match_assert("c:\\halo\\SOURCE\\objects\\objects.c", 2365, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
-	global_current_collision_users[global_current_collision_user_depth++] = _collision_user_objects;
+	match_collision_log_begin_user("c:\\halo\\SOURCE\\objects\\objects.c", 2365, _collision_user_objects);
 	
 	if (collision_test_line(_collision_test_for_projectiles_flags, known_good_point, &object->object.position, NONE, &collision) ||
 		object->object.location.cluster_index==NONE)
@@ -3466,8 +3491,7 @@ boolean object_force_inside_bsp(
 		result = TRUE;
 	}
 
-	match_assert("c:\\halo\\SOURCE\\objects\\objects.c", 2387, global_current_collision_user_depth > 1);
-	--global_current_collision_user_depth;
+	match_collision_log_end_user("c:\\halo\\SOURCE\\objects\\objects.c", 2387);
 
 	return result;
 }

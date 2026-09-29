@@ -68,6 +68,15 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "actors.h"
+#include "ai_debug.h"
+#include "encounters.h"
+#include "props.h"
+#include "actor_types.h"
+#include "collisions.h"
+#include "vehicles.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

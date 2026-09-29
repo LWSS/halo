@@ -204,6 +204,17 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "network_connection.h"
+#include "network_game_globals.h"
+#include "network_game_manager.h"
+#include "network_messages.h"
+#include "network_server_manager.h"
+#include "units.h"
+#include "bungie_net/common/64bit_math.h"
+#include "bungie_net/common/message_encryption.h"
+#include "bungie_net/common/public_key_crypt.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

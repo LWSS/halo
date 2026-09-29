@@ -8,30 +8,15 @@ header included in hcex build.
 #define __DEBUG_KEYS_H
 #pragma once
 
-/* ---------- constants */
+/* ---------- headers */
 
-enum
-{
-	_debug_key_no_modifier = 0,
-	_debug_key_shift,
-	_debug_key_ctrl,
-	_debug_key_shift_ctrl,
-	NUMBER_OF_DEBUG_KEY_MODIFIERS,
-};
+#include "input_windows.h"
+
+/* ---------- constants */
 
 /* ---------- macros */
 
 /* ---------- structures */
-
-struct debug_key
-{
-	const char *name;
-	short key_code;
-	short modifier;
-	void (*function)(boolean down);
-	boolean toggle_variable;
-	boolean *variable;
-};
 
 /* ---------- prototypes/DEBUG_KEYS.C */
 

@@ -34,6 +34,10 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "physical_memory_map.h"
+#include "sound_cache.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

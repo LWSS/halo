@@ -92,6 +92,26 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "texture_cache.h"
+#include "sound_cache.h"
+#include "physical_memory_map.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "rasterizer.h"
+#include "console.h"
+#include "lruv_cache.h"
+#include "sound_manager.h"
+#include "render_debug.h"
+#include "sound_definitions.h"
+#include "draw_string.h"
+#include "terminal.h"
+#include "platform_sound.h"
+#include "sound_preferences.h"
+#include "sound/sound_import/sound_import.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -5,17 +5,11 @@ COLLISION_MODELS.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "collisions.h"
-
-#include "collision_bsp.h"
-#include "collision_bsp_definitions.h"
-#include "collision_model_definitions.h"
 #include "collision_models.h"
-#include "collision_usage.h"
+#include "collisions.h"
+#include "objects.h"
 
-#include "objects/object_types.h"
-#include "objects/objects.h"
-#include "tag_files/tag_groups.h"
+
 
 /* ---------- constants */
 

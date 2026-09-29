@@ -261,6 +261,27 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "object_lists.h"
+#include "hs_library_external.h"
+#include "hs_library_internal.h"
+#include "hs_scenario_definitions.h"
+#include "hs_library_internal_runtime.h"
+#include "objects.h"
+#include "render.h"
+#include "ai.h"
+#include "ai_constants.h"
+#include "console.h"
+#include "game_state.h"
+#include "collisions.h"
+#include "ai_debug.h"
+#include "encounters.h"
+#include "render_debug.h"
+#include "draw_string.h"
+#include "editor_stubs.h"
+#include "terminal.h"
+#include "ai_script.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

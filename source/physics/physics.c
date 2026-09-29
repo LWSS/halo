@@ -6,25 +6,15 @@ PHYSICS.C
 
 #include "cseries.h"
 #include "physics.h"
-#include "physics_definitions.h"
-#include "collision_features.h"
-#include "collision_bsp_definitions.h"
-#include "collision_model_definitions.h"
 #include "collisions.h"
-#include "scenario.h"
-#include "structure_bsp_definitions.h"
-#include "game_globals.h"
-#include "effects/material_effect_definitions.h"
-#include "objects.h"
-#include "object_definitions.h"
-#include "render_debug.h"
-#include "vehicles.h"
-#include "bipeds.h"
-#include "unit_definitions.h"
+#include "physics_constants.h"
 #include "collision_models.h"
-#include "damage.h"
-#include "game.h"
-#include <float.h>
+#include "terrain_definitions.h"
+#include "render.h"
+#include "vehicles.h"
+#include "render_debug.h"
+#include "bipeds.h"
+#include "structures.h"
 
 /* ---------- constants */
 

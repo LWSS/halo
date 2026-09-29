@@ -40,6 +40,16 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "following_camera.h"
+#include "director.h"
+#include "observer.h"
+#include "camera_track_definitions.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "console.h"
+#include "vehicles.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

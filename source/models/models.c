@@ -62,11 +62,15 @@ symbols in this file:
 
 #include "cseries.h"
 #include "models.h"
-
-#include "model_definitions.h"
-
-#include "math/real_math.h"
-#include "objects/objects.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "rasterizer.h"
+#include "console.h"
+#include "rasterizer_console_vars.h"
+#include "shaders.h"
+#include "render_debug.h"
+#include "triangle_strips.h"
 
 /* ---------- constants */
 

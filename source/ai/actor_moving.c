@@ -204,6 +204,19 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "actors.h"
+#include "ai_debug.h"
+#include "encounters.h"
+#include "props.h"
+#include "actor_types.h"
+#include "console.h"
+#include "collisions.h"
+#include "vehicles.h"
+#include "bipeds.h"
+#include "physics_constants.h"
+#include "collision_model_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

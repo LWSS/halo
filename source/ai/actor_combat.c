@@ -126,6 +126,23 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "actors.h"
+#include "ai_debug.h"
+#include "encounters.h"
+#include "props.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "console.h"
+#include "network_messages.h"
+#include "collisions.h"
+#include "vehicles.h"
+#include "meter_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "weapons.h"
+#include "projectiles.h"
+#include "projectile_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

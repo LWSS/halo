@@ -218,6 +218,29 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "sound_manager.h"
+#include "game_sound.h"
+#include "sound_definitions.h"
+#include "sound_classes.h"
+#include "platform_sound.h"
+#include "sound_preferences.h"
+#include "ima_adpcm.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "console.h"
+#include "render_debug.h"
+#include "structures.h"
+#include "observer.h"
+#include "physics_constants.h"
+#include "terminal.h"
+#include "cinematics.h"
+#include "player_effects.h"
+#include "sound_cache.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

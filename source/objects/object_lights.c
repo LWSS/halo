@@ -140,6 +140,26 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "object_lights.h"
+#include "light_definitions.h"
+#include "cluster_partitions.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "rasterizer.h"
+#include "players.h"
+#include "bitmaps_inlines.h"
+#include "game_state.h"
+#include "collisions.h"
+#include "render_debug.h"
+#include "director.h"
+#include "texture_cache.h"
+#include "structures.h"
+#include "devices.h"
+#include "first_person_weapons.h"
+#include "device_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -247,6 +247,27 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "actors.h"
+#include "ai_debug.h"
+#include "encounters.h"
+#include "props.h"
+#include "actor_types.h"
+#include "ai_profile.h"
+#include "ai_script.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "network_game_manager.h"
+#include "network_messages.h"
+#include "vehicles.h"
+#include "meter_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "weapons.h"
+#include "bipeds.h"
+#include "projectiles.h"
+#include "projectile_definitions.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

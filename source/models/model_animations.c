@@ -149,6 +149,9 @@ symbols in this file:
 
 #include "cseries.h"
 #include "model_animation_definitions.h"
+#include "models.h"
+#include "damage_resistances.h"
+#include "shader_definitions.h"
 
 /* ---------- constants */
 

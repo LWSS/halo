@@ -88,6 +88,19 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "hs_library_external.h"
+#include "object_lists.h"
+#include "network_game_globals.h"
+#include "units.h"
+#include "players.h"
+#include "console.h"
+#include "items.h"
+#include "sound_definitions.h"
+#include "effects.h"
+#include "terminal.h"
+#include "object_types.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

@@ -234,6 +234,20 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "sound_manager.h"
+#include "sound_definitions.h"
+#include "platform_sound.h"
+#include "sound_preferences.h"
+#include "ai_scenario_definitions.h"
+#include "game_globals.h"
+#include "interface.h"
+#include "damage.h"
+#include "breakable_surfaces.h"
+#include "scenario.h"
+#include "network_game_globals.h"
+#include "sound_cache.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

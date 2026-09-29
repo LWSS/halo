@@ -5,13 +5,19 @@ RASTERIZER_XBOX_HARDWARE_BITMAPS.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "cseries_windows.h"
-#include "errors.h"
-#include "real_math.h"
-#include "bitmaps.h"
-#include "texture_cache.h"
+#include "rasterizer_xbox.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
 #include "rasterizer.h"
-#include "xbox/rasterizer_xbox.h"
+#include "bitmaps_inlines.h"
+#include "rasterizer_console_vars.h"
+#include "light_definitions.h"
+#include "shaders.h"
+#include "rasterizer/common/rasterizer_common.h"
+#include "texture_cache.h"
+#include "bitmaps/s3tc/s3tc.h"
+#include "rasterizer_swizzle.h"
 
 /* ---------- prototypes */
 

@@ -645,33 +645,43 @@ symbols in this file:
 
 #include "cseries.h"
 #include "units.h"
-
+#include "vehicles.h"
 #include "bipeds.h"
-#include "unit_definitions.h"
+#include "dialogue_definitions.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "players.h"
+#include "console.h"
+#include "game_state.h"
+#include "network_messages.h"
+#include "actors.h"
+#include "collisions.h"
+#include "sound_manager.h"
+#include "ai_debug.h"
+#include "meter_definitions.h"
+#include "weapon_interface_definitions.h"
+#include "render_debug.h"
+#include "weapons.h"
+#include "game_sound.h"
+#include "structures.h"
+#include "physics_constants.h"
+#include "network_client_manager.h"
+#include "effects.h"
+#include "network_server_message_handler.h"
+#include "object_lights.h"
+#include "object_types.h"
+#include "damage_effect_definitions.h"
+#include "devices.h"
+#include "physics_definitions.h"
+#include "projectiles.h"
+#include "first_person_weapons.h"
+#include "equipment_definitions.h"
+#include "predicted_resources.h"
+#include "equipment.h"
+#include "object_lists.h"
+#include "collision_models.h"
 
-#include "ai/actors.h"
-#include "ai/ai_debug.h"
-#include "bitmaps/bitmaps.h"
-#include "cseries/errors.h"
-#include "cseries/profile.h"
-#include "effects/effects.h"
-#include "game/cheats.h"
-#include "game/game_globals.h"
-#include "game/game_engine.h"
-#include "game/players.h"
-#include "items/projectiles.h"
-#include "items/weapon_definitions.h"
-#include "items/weapons.h"
-#include "main/console.h"
-#include "models/model_animation_definitions.h"
-#include "objects/damage.h"
-#include "objects/object_lights.h"
-#include "physics/collision_bsp.h"
-#include "physics/collision_models.h"
-#include "physics/collision_usage.h"
-#include "physics/collisions.h"
-#include "scenario/scenario.h"
-#include "sound/game_sound.h"
+
 
 /* ---------- constants */
 
@@ -2708,9 +2718,7 @@ static void unit_cause_continuous_melee_damage(
 
 		if (unit->unit.melee_continuous_damage_effect_timer==0)
 		{
-			match_assert("c:\\halo\\SOURCE\\units\\units.c", 8941, global_current_collision_user_depth < MAXIMUM_COLLISION_USER_STACK_DEPTH);
-
-			global_current_collision_users[global_current_collision_user_depth++] = _collision_user_melee;
+			match_collision_log_begin_user("c:\\halo\\SOURCE\\units\\units.c", 8941, _collision_user_melee);
 
 			if (collision_model_instance_new(&instance, unit->object.parent_object_index))
 			{
@@ -2737,8 +2745,7 @@ static void unit_cause_continuous_melee_damage(
 				}
 			}
 
-			match_assert("c:\\halo\\SOURCE\\units\\units.c", 8965, global_current_collision_user_depth > 1);
-			--global_current_collision_user_depth;
+			match_collision_log_end_user("c:\\halo\\SOURCE\\units\\units.c", 8965);
 		}
 		
 		damage_data_new(&damage_data, unit_definition->unit.melee_damage.index);

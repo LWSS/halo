@@ -6,11 +6,12 @@ COLLISION_BSP.C
 
 #include "cseries.h"
 #include "collision_bsp.h"
-#include "collision_bsp_definitions.h"
-
+#include "collisions.h"
+#include "objects.h"
+#ifdef DEBUG
 #include "render_debug.h"
-#include "collision_usage.h"
-#include "scenario.h"
+#endif
+
 
 /* ---------- structures */
 
@@ -105,8 +106,8 @@ static boolean collision_bsp_test_pill_new_recursive(struct test_pill_new_data *
 
 /* ---------- globals */
 
-static __int64 vector_start_time;
-static __int64 sphere_start_time;
+static __int64 vector_start_time = 0;
+static __int64 sphere_start_time = 0;
 
 /* ---------- public code */
 

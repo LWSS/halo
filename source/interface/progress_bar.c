@@ -171,6 +171,20 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "progress_bar.h"
+#include "ui_widget.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "network_game_globals.h"
+#include "unicode.h"
+#include "rasterizer.h"
+#include "input.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "ima_adpcm.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

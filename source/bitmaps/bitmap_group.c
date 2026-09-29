@@ -298,6 +298,13 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
+#include "rasterizer.h"
+#include "texture_cache.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

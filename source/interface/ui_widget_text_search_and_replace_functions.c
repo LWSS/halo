@@ -20,6 +20,18 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "ui_widget_text_search_and_replace_functions.h"
+#include "ui_widget.h"
+#include "cheats.h"
+#include "game.h"
+#include "network_game_globals.h"
+#include "unicode.h"
+#include "input.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "build_number.h"
+
 /* ---------- constants */
 
 /* ---------- macros */

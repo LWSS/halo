@@ -10,8 +10,7 @@ header included in hcex build.
 
 /* ---------- headers */
 
-#include "math/real_math.h"
-#include "objects/objects.h"
+#include "physics_definitions.h"
 
 /* ---------- constants */
 

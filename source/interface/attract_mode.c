@@ -5,18 +5,20 @@ ATTRACT_MODE.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "cseries_windows.h"
 #include "attract_mode.h"
-#include "real_math.h"
-#include "cache_files.h"
-#include "bink_playback.h"
 #include "ui_widget.h"
-#include "sound_manager.h"
-#include "international_strings.h"
-#include "files.h"
-#include "errors.h"
-#include "event_manager.h"
+#include "objects.h"
+#include "collision_bsp.h"
+#include "render.h"
 #include "network_game_globals.h"
+#include "unicode.h"
+#include "rasterizer.h"
+#include "input.h"
+#include "sound_manager.h"
+#include "player_profile.h"
+#include "saved_game_files.h"
+#include "game_sound.h"
+#include "bink_playback.h"
 
 /* ---------- constants */
 
@@ -34,8 +36,8 @@ extern short seed_random_range(unsigned long *seed, short lower_bound, short upp
 
 /* ---------- globals */
 
-static unsigned long bss_00453ad8;
-static char bss_00453ae8[128];
+static unsigned long bss_00453ad8 = 0;
+static char bss_00453ae8[128] = {0};
 
 short data_002e4c84 = NONE;
 
@@ -163,7 +165,7 @@ const char *attract_mode_get_localized_movie_path(
 			_snprintf(bss_00453ae8, NUMBEROF(bss_00453ae8), "d:\\bink\\attract3%s.bik", language_suffixes[language]);
 			break;
 		default:
-			match_assert("c:\\halo\\SOURCE\\interface\\attract_mode.c", 198, !"unreachable");
+			match_unreachable("c:\\halo\\SOURCE\\interface\\attract_mode.c", 198);
 			break;
 		}
 

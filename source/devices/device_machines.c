@@ -26,6 +26,13 @@ symbols in this file:
 
 /* ---------- headers */
 
+#include "cseries.h"
+#include "devices.h"
+#include "device_definitions.h"
+#include "bipeds.h"
+#include "physics_constants.h"
+#include "object_lights.h"
+
 /* ---------- constants */
 
 /* ---------- macros */
