@@ -19,7 +19,9 @@ header included in hcex build.
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/VEHICLES.C */
+
+void vehicle_hover(long vehicle_index, boolean hover);
 
 /* ---------- globals */
 
