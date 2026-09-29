@@ -454,6 +454,15 @@ boolean sphere_test_vector3d(real_point3d const *center, real radius, real_point
 
 boolean valid_real_sine_cosine(real sine, real cosine);
 
+boolean accelerate_to_position(
+	real *position_reference,
+	real *velocity_reference,
+	real position_desired,
+	real acceleration_maximum,
+	real velocity_maximum,
+	real position_lower_bound,
+	real position_upper_bound,
+	boolean circular_position);
 void angular_accelerate_to_position(
 	real_vector3d *position,
 	real_vector3d const *position_desired,

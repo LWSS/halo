@@ -145,6 +145,10 @@ boolean game_load(struct game_options *options);
 void game_initialize_for_new_map(void);
 void game_set_game_variant_from_name(const char *name);
 
+/* ---------- prototypes/GAME_ALLEGIANCE.C */
+
+boolean game_team_is_enemy(short our_team, short other_team);
+
 /* ---------- prototypes/GAME_TIME.C */
 
 boolean game_time_initialized(void);

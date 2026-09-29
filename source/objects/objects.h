@@ -34,6 +34,13 @@ enum
 
 enum
 {
+	_object_class_collideable = 0,
+	_object_class_noncollideable,
+	NUMBER_OF_OBJECT_CLASSES,
+};
+
+enum
+{
 	_object_header_active_bit = 0,
 	_object_header_visible_bit,
 	_object_header_being_created_bit,
