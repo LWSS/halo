@@ -19,6 +19,7 @@ enum
 	MAXIMUM_WINDOWS = 4,
 	MAXIMUM_LENS_FLARES_PER_FRAME = 1024,
 	MAXIMUM_LIGHTS_PER_WINDOW = 128,
+	NUMBER_OF_DYNAMIC_SCREEN_GEOMETRY_MAPS = 3, // [fake name]
 };
 
 enum
@@ -86,6 +87,33 @@ struct rasterizer_frame_begin_parameters
 {
 	real game_time_sec;
 	real dt;
+};
+
+struct dynamic_screen_vertex
+{
+	real_point2d position;
+	real_point2d texcoord;
+	pixel32 color;
+};
+
+struct rasterizer_dynamic_screen_geometry_parameters
+{
+	struct rasterizer_meter_parameters *meter_parameters;
+	real_vector2d *offset;
+	boolean map_anchor_screen[NUMBER_OF_DYNAMIC_SCREEN_GEOMETRY_MAPS];
+	struct bitmap_data *map[NUMBER_OF_DYNAMIC_SCREEN_GEOMETRY_MAPS];
+	boolean map_wrapped[NUMBER_OF_DYNAMIC_SCREEN_GEOMETRY_MAPS];
+	real_point2d *map_offset[NUMBER_OF_DYNAMIC_SCREEN_GEOMETRY_MAPS];
+	real_vector2d map_scale[NUMBER_OF_DYNAMIC_SCREEN_GEOMETRY_MAPS];
+	real_vector2d map_texture_scale[NUMBER_OF_DYNAMIC_SCREEN_GEOMETRY_MAPS];
+	real_rgb_color *map_tint[NUMBER_OF_DYNAMIC_SCREEN_GEOMETRY_MAPS];
+	real_argb_color plasma_fade;
+	boolean doing_plasma_effect;
+	real *map_fade[NUMBER_OF_DYNAMIC_SCREEN_GEOMETRY_MAPS];
+	short map0_to_1_blend_function;
+	short map1_to_2_blend_function;
+	short framebuffer_blend_function;
+	boolean point_sampled;
 };
 
 struct rasterizer_window_begin_parameters

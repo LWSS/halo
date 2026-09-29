@@ -14,11 +14,42 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	STRING_LISTS_GROUP_TAG = 'str#',
+	STRING_LISTS_GROUP_VERSION = 1,
+	UNICODE_STRING_LISTS_GROUP_TAG = 'ustr',
+	UNICODE_STRING_LISTS_GROUP_VERSION = 1
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+struct string_list_string_reference
+{
+	struct tag_data string;
+};
+
+struct string_list_group_header
+{
+	struct tag_block string_references;		// string_list_string_reference
+};
+
+struct unicode_string_list_string_reference
+{
+	struct tag_data string;
+};
+
+struct unicode_string_list_group_header
+{
+	struct tag_block string_references;		// unicode_string_list_string_reference
+};
+
+/* ---------- prototypes/TEXT_GROUP.C */
+
+char *string_list_get_string(long tag_index, short string_index);
+wchar_t *unicode_string_list_get_string(long tag_index, short string_index);
 
 /* ---------- globals */
 
