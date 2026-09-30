@@ -10,11 +10,31 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	NUMBER_OF_QWORD_WORDS = 4, // [fake name]
+	QWORD_BITS = NUMBER_OF_QWORD_WORDS*SHORT_BITS, // [fake name]
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+struct qword_value // [fake name]
+{
+	union
+	{
+		unsigned __int64 qword;
+		word words[NUMBER_OF_QWORD_WORDS];
+	};
+};
+
+/* ---------- prototypes/64BIT_MATH.C */
+
+void add64(struct qword_value const *a, struct qword_value const *b, struct qword_value *result);
+void subtract64(struct qword_value const *a, struct qword_value const *b, struct qword_value *result);
+void multiply64(struct qword_value const *a, struct qword_value const *b, struct qword_value *result);
+void divide64(struct qword_value const *numerator, struct qword_value const *denominator, struct qword_value *quotient, struct qword_value *remainder);
 
 /* ---------- globals */
 
