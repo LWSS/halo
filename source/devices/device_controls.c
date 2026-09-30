@@ -55,7 +55,7 @@ void control_place(
 	struct scenario_control_datum *scenario_control)
 {
 	struct control_datum *control = control_get(control_index);
-	struct control_definition *definition = control_definition_get(control->definition_index);
+	struct control_definition const *definition = control_definition_get(control->definition_index);
 
 	device_add_scenario_information(control_index, &scenario_control->device);
 
@@ -77,8 +77,8 @@ void control_place(
 boolean control_new(
 	long control_index)
 {
-	struct control_datum *control = control_get(control_index);
-	struct control_definition *definition = control_definition_get(control->definition_index);
+	struct control_datum const *control = control_get(control_index);
+	struct control_definition const *definition = control_definition_get(control->definition_index);
 
 	return TRUE;
 }
@@ -92,8 +92,8 @@ void control_delete(
 boolean control_update(
 	long control_index)
 {
-	struct control_datum *control = control_get(control_index);
-	struct control_definition *definition = control_definition_get(control->definition_index);
+	struct control_datum const *control = control_get(control_index);
+	struct control_definition const *definition = control_definition_get(control->definition_index);
 
 	return TRUE;
 }
@@ -102,8 +102,8 @@ void control_touched(
 	long control_index,
 	long unit_index)
 {
-	struct control_datum *control = control_get(control_index);
-	struct control_definition *definition = control_definition_get(control->definition_index);
+	struct control_datum const *control = control_get(control_index);
+	struct control_definition const *definition = control_definition_get(control->definition_index);
 
 	if (definition->control.trigger == _control_trigger_player)
 	{
@@ -116,8 +116,8 @@ void control_touched(
 void control_destroyed(
 	long control_index)
 {
-	struct control_datum *control = control_get(control_index);
-	struct control_definition *definition = control_definition_get(control->definition_index);
+	struct control_datum const *control = control_get(control_index);
+	struct control_definition const *definition = control_definition_get(control->definition_index);
 
 	if (definition->control.trigger == _control_trigger_destruction)
 	{
@@ -132,12 +132,12 @@ void control_destroyed(
 static void control_toggle(
 	long control_index)
 {
-	struct control_datum *control = control_get(control_index);
-	struct control_definition *definition = control_definition_get(control->definition_index);
+	struct control_datum const *control = control_get(control_index);
+	struct control_definition const *definition = control_definition_get(control->definition_index);
 
 	if (control->device.position_group_index != NONE)
 	{
-		struct device_group_datum *device_group = device_group_get(control->device.position_group_index);
+		struct device_group_datum const *device_group = device_group_get(control->device.position_group_index);
 		real desired_value;
 
 		switch (definition->control.type)

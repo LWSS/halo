@@ -81,7 +81,7 @@ boolean device_new(
 	long device_index)
 {
 	struct device_datum *device = device_get(device_index);
-	struct device_definition *definition = device_definition_get(device->definition_index);
+	struct device_definition const *definition = device_definition_get(device->definition_index);
 
 	device->device.position_group_index = NONE;
 	device->device.power_group_index = NONE;
@@ -93,7 +93,7 @@ boolean device_new(
 void device_delete(
 	long device_index)
 {
-	struct device_datum *device = device_get(device_index);
+	struct device_datum const *device = device_get(device_index);
 
 	device_group_delete(device->device.power_group_index);
 	device_group_delete(device->device.position_group_index);
@@ -105,12 +105,12 @@ boolean device_update(
 	long device_index)
 {
 	struct device_datum *device = device_get(device_index);
-	struct device_definition *definition = device_definition_get(device->definition_index);
+	struct device_definition const *definition = device_definition_get(device->definition_index);
 	boolean result = FALSE;
 
 	if (device->device.power_group_index != NONE)
 	{
-		struct device_group_datum *power_group = device_group_get(device->device.power_group_index);
+		struct device_group_datum const *power_group = device_group_get(device->device.power_group_index);
 
 		if (power_group->desired_value != device->device.power || device->device.power_velocity != 0.f)
 		{
@@ -138,7 +138,7 @@ boolean device_update(
 
 	if (device->device.position_group_index != NONE)
 	{
-		struct device_group_datum *position_group = device_group_get(device->device.position_group_index);
+		struct device_group_datum const *position_group = device_group_get(device->device.position_group_index);
 
 		if (position_group->desired_value == device->device.position && device->device.position_velocity == 0.f)
 		{
@@ -207,7 +207,7 @@ void device_export_function_values(
 	long device_index)
 {
 	struct device_datum *device = device_get(device_index);
-	struct device_definition *definition = device_definition_get(device->definition_index);
+	struct device_definition const *definition = device_definition_get(device->definition_index);
 	short function_index;
 
 	for (function_index = 0; function_index < NUMBER_OF_INCOMING_OBJECT_FUNCTIONS; function_index++)
@@ -246,8 +246,8 @@ void device_export_function_values(
 
 				if (device->object.type == _object_type_machine && device->device.position_group_index != NONE)
 				{
-					struct machine_datum *machine = machine_get(device_index);
-					struct device_group_datum *device_group = device_group_get(machine->device.position_group_index);
+					struct machine_datum const *machine = machine_get(device_index);
+					struct device_group_datum const *device_group = device_group_get(machine->device.position_group_index);
 
 					if (TEST_FLAG(machine->machine.flags, _machine_does_not_operate_automatically_bit) ||
 						TEST_FLAG(machine->machine.flags, _machine_one_sided_bit))
@@ -285,8 +285,8 @@ void device_preprocess_node_orientations(
 	long device_index,
 	struct real_orientation *node_orientations)
 {
-	struct device_datum *device = device_get(device_index);
-	struct device_definition *definition = device_definition_get(device->definition_index);
+	struct device_datum const *device = device_get(device_index);
+	struct device_definition const *definition = device_definition_get(device->definition_index);
 	struct animation_graph *animation_graph = animation_graph_definition_get(definition->object.animation_graph.index);
 	struct animation_graph_device_animations *device_animations = animation_graph->device_animations.count ?
 		TAG_BLOCK_GET_ELEMENT(&animation_graph->device_animations, 0, struct animation_graph_device_animations) : NULL;
@@ -340,7 +340,7 @@ void device_preprocess_node_orientations(
 void device_render_debug(
 	long device_index)
 {
-	struct device_datum *device = device_get(device_index);
+	struct device_datum const *device = device_get(device_index);
 
 	if (debug_objects_devices)
 	{
@@ -378,7 +378,7 @@ boolean device_set_desired_position(
 
 	if (device_index != NONE)
 	{
-		struct device_datum *device = device_get(device_index);
+		struct device_datum const *device = device_get(device_index);
 
 		if (device->device.position_group_index != NONE)
 		{
@@ -475,12 +475,12 @@ boolean device_group_set_desired_value(
 	if (success)
 	{
 		struct object_iterator iterator;
-		struct device_datum *device;
+		struct device_datum const *device;
 
 		object_iterator_new(&iterator, _object_mask_device, 0);
-		while (device = (struct device_datum *)object_iterator_next(&iterator))
+		while (device = (struct device_datum const *)object_iterator_next(&iterator))
 		{
-			struct device_definition *definition = device_definition_get(device->definition_index);
+			struct device_definition const *definition = device_definition_get(device->definition_index);
 
 			if (device->device.power_group_index == group_index)
 			{
@@ -498,7 +498,7 @@ void device_set_actual_position(
 {
 	if (device_index != NONE)
 	{
-		struct device_datum *device = device_get(device_index);
+		struct device_datum const *device = device_get(device_index);
 
 		if (device->device.position_group_index != NONE)
 		{
@@ -533,7 +533,7 @@ void device_group_set_actual_value(
 	struct object_iterator iterator;
 	struct device_datum *device;
 
-	value = PIN(value, 0.f, 1.f);
+		value = PIN(value, 0.f, 1.f);
 	device_group_get(group_index)->desired_value = value;
 
 	object_iterator_new(&iterator, _object_mask_device, 0);
@@ -613,9 +613,9 @@ void device_add_scenario_information(
 	struct scenario_device_datum *scenario_device)
 {
 	struct device_datum *device = device_get(device_index);
-	struct device_definition *definition = device_definition_get(device->definition_index);
-	struct device_group_datum *power_group;
-	struct device_group_datum *position_group;
+	struct device_definition const *definition = device_definition_get(device->definition_index);
+	struct device_group_datum const *power_group;
+	struct device_group_datum const *position_group;
 
 	device->device.power_group_index = scenario_device->power_group_index == NONE ?
 		device_group_new(TEST_FLAG(scenario_device->flags, _scenario_device_initially_off_bit) ? 0.f : 1.f, FLAG(_device_group_runtime_bit)) :
@@ -648,7 +648,7 @@ void device_touched(
 	long device_index,
 	long unit_index)
 {
-	struct device_datum *device = device_get(device_index);
+	struct device_datum const *device = device_get(device_index);
 
 	switch (device->object.type)
 	{
@@ -666,13 +666,13 @@ void device_touched(
 boolean device_can_change_position(
 	long device_index)
 {
-	struct device_datum *device = device_get(device_index);
+	struct device_datum const *device = device_get(device_index);
 	boolean can_change_position = FALSE;
 
 	if (device->device.position_group_index != NONE)
 	{
-		struct device_group_datum *position_group = device_group_get(device->device.position_group_index);
-		struct device_group_datum *power_group = device_group_get(device->device.power_group_index);
+		struct device_group_datum const *position_group = device_group_get(device->device.position_group_index);
+		struct device_group_datum const *power_group = device_group_get(device->device.power_group_index);
 
 		can_change_position = TRUE;
 
@@ -701,7 +701,7 @@ boolean device_frontfacing(
 	real_point3d const *point,
 	real_vector3d const *vector)
 {
-	struct control_datum *control = control_try_and_get(device_index);
+	struct control_datum const *control = control_try_and_get(device_index);
 	boolean frontfacing = TRUE;
 
 	if (control)
@@ -725,7 +725,7 @@ void device_effect_new(
 {
 	if (effect_index != NONE)
 	{
-		struct device_datum *device = device_get(device_index);
+		struct device_datum const *device = device_get(device_index);
 		long group_tag = tag_get_group_tag(effect_index);
 
 		if (group_tag != EFFECT_DEFINITION_TAG)
@@ -774,7 +774,7 @@ static void device_group_delete(
 {
 	if (device_group_index != NONE)
 	{
-		struct device_group_datum *device_group = device_group_get(device_group_index);
+		struct device_group_datum const *device_group = device_group_get(device_group_index);
 
 		if (TEST_FLAG(device_group->flags, _device_group_runtime_bit))
 		{
@@ -793,7 +793,7 @@ static void create_initial_device_groups(
 
 	for (group_index = 0; group_index < scenario->device_groups.count; group_index++)
 	{
-		struct scenario_device_group *device_group = TAG_BLOCK_GET_ELEMENT(&scenario->device_groups, group_index, struct scenario_device_group);
+		struct scenario_device_group const *device_group = TAG_BLOCK_GET_ELEMENT(&scenario->device_groups, group_index, struct scenario_device_group);
 		unsigned long flags = 0;
 		short new_group_index;
 

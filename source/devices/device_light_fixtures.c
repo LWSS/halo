@@ -53,7 +53,7 @@ void light_fixture_place(
 	struct scenario_light_fixture_datum *scenario_light_fixture)
 {
 	struct light_fixture_datum *light_fixture = light_fixture_get(light_fixture_index);
-	struct light_fixture_definition *definition = light_fixture_definition_get(light_fixture->definition_index);
+	struct light_fixture_definition const *definition = light_fixture_definition_get(light_fixture->definition_index);
 
 	device_add_scenario_information(light_fixture_index, &scenario_light_fixture->device);
 
@@ -68,8 +68,8 @@ void light_fixture_place(
 boolean light_fixture_new(
 	long light_fixture_index)
 {
-	struct light_fixture_datum *light_fixture = light_fixture_get(light_fixture_index);
-	struct light_fixture_definition *definition = light_fixture_definition_get(light_fixture->definition_index);
+	struct light_fixture_datum const *light_fixture = light_fixture_get(light_fixture_index);
+	struct light_fixture_definition const *definition = light_fixture_definition_get(light_fixture->definition_index);
 
 	return TRUE;
 }
@@ -83,8 +83,8 @@ void light_fixture_delete(
 boolean light_fixture_update(
 	long light_fixture_index)
 {
-	struct light_fixture_datum *light_fixture = light_fixture_get(light_fixture_index);
-	struct light_fixture_definition *definition = light_fixture_definition_get(light_fixture->definition_index);
+	struct light_fixture_datum const *light_fixture = light_fixture_get(light_fixture_index);
+	struct light_fixture_definition const *definition = light_fixture_definition_get(light_fixture->definition_index);
 
 	return TRUE;
 }

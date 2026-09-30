@@ -89,7 +89,7 @@ boolean machine_new(
 	long machine_index)
 {
 	struct machine_datum *machine = machine_get(machine_index);
-	struct machine_definition *definition = machine_definition_get(machine->definition_index);
+	struct machine_definition const *definition = machine_definition_get(machine->definition_index);
 
 	SET_FLAG(machine->object.flags, _object_dynamic_lighting_recompute_bit, TRUE);
 	SET_FLAG(machine->object.flags, _object_static_lighting_recompute_bit, TEST_FLAG(definition->machine.flags, _machine_is_elevator_bit));
@@ -108,7 +108,7 @@ boolean machine_update(
 	long machine_index)
 {
 	struct machine_datum *machine = machine_get(machine_index);
-	struct machine_definition *definition = machine_definition_get(machine->definition_index);
+	struct machine_definition const *definition = machine_definition_get(machine->definition_index);
 
 	if (definition->machine.type == _machine_gear)
 	{
@@ -242,8 +242,8 @@ void machine_bumped(
 	long machine_index,
 	long unit_index)
 {
-	struct machine_datum *machine = machine_get(machine_index);
-	struct machine_definition *definition = machine_definition_get(machine->definition_index);
+	struct machine_datum const *machine = machine_get(machine_index);
+	struct machine_definition const *definition = machine_definition_get(machine->definition_index);
 
 	return;
 }
@@ -251,8 +251,8 @@ void machine_bumped(
 void machine_try_to_open_with_damage(
 	long machine_index)
 {
-	struct machine_datum *machine = machine_get(machine_index);
-	struct machine_definition *definition = machine_definition_get(machine->definition_index);
+	struct machine_datum const *machine = machine_get(machine_index);
+	struct machine_definition const *definition = machine_definition_get(machine->definition_index);
 
 	if (TEST_FLAG(machine->machine.flags, _machine_opened_by_melee_attack_bit))
 	{
