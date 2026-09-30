@@ -533,8 +533,13 @@ void device_group_set_actual_value(
 	struct object_iterator iterator;
 	struct device_datum *device;
 
+	{
+		struct device_group_datum *device_group;
+
 		value = PIN(value, 0.f, 1.f);
-	device_group_get(group_index)->desired_value = value;
+		device_group = device_group_get(group_index);
+		device_group->desired_value = value;
+	}
 
 	object_iterator_new(&iterator, _object_mask_device, 0);
 	while (device = (struct device_datum *)object_iterator_next(&iterator))
