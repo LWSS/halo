@@ -1713,8 +1713,6 @@
 { "file_offset": 534160, "flags": 32, "name": "_recorded_animation_initialize_event_stream" },
 { "file_offset": 534224, "flags": 32, "name": "_recorded_animation_initialize_event_stream_with_size" },
 { "file_offset": 534288, "flags": 32, "name": "_recorded_animation_apply_event_stream" },
-{ "file_offset": 534756, "flags": 0, "name": "$L24305", "static": true },
-{ "file_offset": 534772, "flags": 0, "name": "_recorded_animation_apply_event_stream_padding", "static": true },
 { "file_offset": 534784, "flags": 32, "name": "_byte_swap_recording_stream" },
 { "file_offset": 534800, "flags": 32, "name": "_apply_animation_state" },
 { "file_offset": 534976, "flags": 32, "name": "_apply_aiming_speed" },
