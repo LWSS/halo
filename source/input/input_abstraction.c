@@ -212,8 +212,6 @@ void input_abstraction_initialize(
 void input_abstraction_update(
 	void)
 {
-	static real const one_over_short_max = 1.f/SHORT_MAX;
-	static real const reference_values[4] = { _pi/4.f, 3.f*_pi/4.f, -_pi/4.f, -3.f*_pi/4.f };
 	real const stick_diagonal_angle = DEGREES_TO_RADIANS(45);
 	real const stick_second_quadrant_diagonal_angle = DEGREES_TO_RADIANS(135);
 	real const right_stick_diagonal_snap_angle = DEGREES_TO_RADIANS(10);
@@ -229,6 +227,8 @@ void input_abstraction_update(
 
 		if (gamepad)
 		{
+			static real const one_over_short_max = 1.f/SHORT_MAX;
+			static real const reference_values[4] = { _pi/4.f, 3.f*_pi/4.f, -_pi/4.f, -3.f*_pi/4.f };
 			struct game_input_state *state = &input_abstraction_globals.input_state[controller_index];
 			real left_angle;
 			real right_angle;
