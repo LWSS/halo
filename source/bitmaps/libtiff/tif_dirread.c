@@ -228,7 +228,11 @@ TIFFReadDirectory(tif)
 			fip++;
 		if (!fip->field_tag || fip->field_tag != dp->tdir_tag) {
 // halo decomp add
-			/* halo ignores unknown tags silently */
+/*
+			TIFFWarning(tif->tif_name,
+			    "unknown field with tag %d (0x%x) ignored",
+			    dp->tdir_tag,  dp->tdir_tag);
+*/
 #line 230
 // halo decomp end
 			dp->tdir_tag = IGNORE;
@@ -600,14 +604,19 @@ CheckDirCount(tif, dir, count)
 	TIFFDirEntry *dir;
 	u_long count;
 {
-// halo decomp add
-	/* halo ignores mismatched tags silently */
 	if (count != dir->tdir_count) {
+// halo decomp add
+/*
+		TIFFWarning(tif->tif_name,
+	"incorrect count for field \"%s\" (%lu, expecting %lu); tag ignored",
+		    TIFFFieldWithTag(dir->tdir_tag)->field_name,
+		    dir->tdir_count, count);
+*/
+#line 605
+// halo decomp end
 		return (0);
 	}
 	return (1);
-#line 608
-// halo decomp end
 }
 
 /*
@@ -1196,7 +1205,14 @@ TIFFFetchExtraSamples(tif, dp)
 		return (0);
 	}
 // halo decomp add
-	/* halo accepts any single extra sample as matteing (e.g. unassociated alpha) */
+/*
+	type = TIFFExtractData(tif, dp->tdir_type, dp->tdir_offset);
+	if (type != EXTRASAMPLE_ASSOCALPHA) {
+		TIFFError(tif->tif_name,
+		    "Can only handle associated-alpha extra samples");
+		return (0);
+	}
+*/
 // halo decomp end
 	return (TIFFSetField(tif, TIFFTAG_MATTEING, 1));
 }
