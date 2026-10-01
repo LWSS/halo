@@ -30,6 +30,9 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_read.c,v 1.
  * TIFF Library.
  * Scanline-oriented Read Support
  */
+// halo decomp add
+#line 32 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_read.c"
+// halo decomp end
 #include "tiffioP.h"
 
 #if USE_PROTOTYPES

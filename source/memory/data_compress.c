@@ -65,7 +65,8 @@ boolean data_decompress(
 	void const *compressed_buffer,
 	unsigned long compressed_size,
 	void *decompressed_buffer,
-	unsigned long *decompressed_size)
+	unsigned long *decompressed_size,
+	unsigned long maximum_decompressed_size)
 {
 	boolean success = FALSE;
 	long uncompress_status;

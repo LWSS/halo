@@ -29,6 +29,9 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_close.c,v 1
 /*
  * TIFF Library.
  */
+// halo decomp add
+#line 33 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_close.c"
+// halo decomp end
 #include "tiffioP.h"
 
 #if USE_PROTOTYPES

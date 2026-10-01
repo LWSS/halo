@@ -31,6 +31,9 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_getimage.c,
  *
  * Read and return a packed RGBA image.
  */
+// halo decomp add
+#line 40 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_getimage.c"
+// halo decomp end
 #include "tiffio.h"
 #include "tiffcompat.h"
 #include "prototypes.h"
@@ -56,6 +59,10 @@ static	u_long **BWmap;
 static	u_long **PALmap;
 
 static	int gt();
+// halo decomp add
+static	int makebwmap(RGBvalue *);
+static	int makecmap(u_short *, u_short *, u_short *);
+// halo decomp end
 
 TIFFReadRGBAImage(tif, rwidth, rheight, raster, stop)
 	TIFF *tif;
@@ -344,6 +351,9 @@ static tileSeparateRoutine pickTileSeparateCase(RGBvalue*);
 typedef void (*tileSeparateRoutine)();
 static tileSeparateRoutine pickTileSeparateCase();
 #endif
+// halo decomp add
+#line 348
+// halo decomp end
 
 /*
  * Get an tile-organized image that has
@@ -525,6 +535,10 @@ gtStripSeparate(tif, raster, Map, h, w)
  * pixel values simply by indexing into the table with one
  * number.
  */
+// halo decomp add
+static
+#line 529
+// halo decomp end
 makebwmap(Map)
 	RGBvalue *Map;
 {
@@ -580,6 +594,10 @@ makebwmap(Map)
  * pixel values simply by indexing into the table with one
  * number.
  */
+// halo decomp add
+static
+#line 584
+// halo decomp end
 makecmap(rmap, gmap, bmap)
 	u_short *rmap, *gmap, *bmap;
 {

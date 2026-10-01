@@ -193,6 +193,18 @@ match_vassert(													\
 	)															\
 )
 
+#define match_assert_valid_real_rgb_color(file, line, color)	\
+match_vassert(													\
+	file,														\
+	line,														\
+	valid_real_rgb_color(color),								\
+	csprintf(													\
+		temporary,												\
+		"%s: assert_valid_real_rgb_color(%f, %f, %f)",			\
+		#color, (*color).red, (*color).green, (*color).blue		\
+	)															\
+)
+
 #define match_assert_valid_real_vector3d_axes2(file, line, forward, up)		\
 match_vassert(																\
 	file,																\
@@ -403,6 +415,13 @@ union real_argb_color
 	};
 };
 typedef union real_argb_color real_argb_color;
+
+union real_hsv_color
+{
+	real n[3];
+	struct { real hue, saturation, value; };
+};
+typedef union real_hsv_color real_hsv_color;
 
 /* ---------- prototypes/REAL_MATH.C */
 
@@ -1549,6 +1568,15 @@ __inline boolean valid_real_matrix4x3(
 		valid_real(matrix->scale) &&
 		valid_real_vector3d_axes3(&matrix->forward, &matrix->left, &matrix->up) &&
 		valid_real_point3d(&matrix->position);
+}
+
+__inline boolean valid_real_rgb_color(
+	real_rgb_color const *color)
+{
+	return valid_real(color->red) && valid_real(color->green) && valid_real(color->blue) &&
+		color->red>=0.f && color->red<=1.f &&
+		color->green>=0.f && color->green<=1.f &&
+		color->blue>=0.f && color->blue<=1.f;
 }
 
 // TODO: depends on byte_rectangle3d, need to include integer_math?

@@ -40,8 +40,36 @@ union byte_rectangle3d
 };
 typedef union byte_rectangle3d byte_rectangle3d;
 
+union rgb_color
+{
+	word n[3];
+	struct { word red, green, blue; };
+};
+typedef union rgb_color rgb_color;
 
-typedef unsigned long pixel32;
+union argb_color
+{
+	word n[4];
+	struct
+	{
+		word alpha;
+		union
+		{
+			rgb_color rgb;
+			struct { word red, green, blue; };
+		};
+	};
+};
+typedef union argb_color argb_color;
+
+union hsv_color
+{
+	word n[3];
+	struct { word hue, saturation, value; };
+};
+typedef union hsv_color hsv_color;
+
+typedef unsigned long pixel32; // (ARGB format)
 
 /* ---------- prototypes/INTEGER_MATH.C */
 
