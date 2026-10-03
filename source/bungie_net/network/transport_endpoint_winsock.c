@@ -859,7 +859,7 @@ char const *winsock_error_to_string(
 	case ERROR_NOT_ENOUGH_MEMORY:
 		result = "WSA_NOT_ENOUGH_MEMORY";
 		break;
-	case (long)WSA_INVALID_EVENT:
+	case WSA_INVALID_EVENT:
 		result = "WSA_INVALID_EVENT";
 		break;
 	case WSA_MAXIMUM_WAIT_EVENTS:
