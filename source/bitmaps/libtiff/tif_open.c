@@ -29,9 +29,6 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_open.c,v 1.
 /*
  * TIFF Library.
  */
-// halo decomp add
-#line 31 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_open.c"
-// halo decomp end
 #include "tiffioP.h"
 #include "prototypes.h"
 
@@ -171,7 +168,7 @@ TIFFFdOpen(fd, name, mode)
 	m = getMode(mode, module);
 	if (m == -1)
 		goto bad2;
-	tif = (TIFF *)malloc(sizeof (TIFF) + strlen(name) + 1);
+	tif = (TIFF *)match_malloc("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_open.c", 171, sizeof (TIFF) + strlen(name) + 1);
 	if (tif == NULL) {
 		TIFFError(module, "%s: Out of memory (TIFF structure)", name);
 		goto bad2;

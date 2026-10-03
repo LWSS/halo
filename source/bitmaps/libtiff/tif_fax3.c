@@ -31,9 +31,6 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_fax3.c,v 1.
  *
  * CCITT Group 3 and Group 4 Compression Support.
  */
-// halo decomp add
-#line 33 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_fax3.c"
-// halo decomp end
 #include "tiffioP.h"
 #include <stdio.h>
 #include <assert.h>
@@ -252,7 +249,7 @@ Fax3SetupState(tif, space)
 	}
 	if (is2DEncoding(tif) || td->td_compression == COMPRESSION_CCITTFAX4)
 		cc += rowbytes+1;
-	tif->tif_data = malloc(cc);
+	tif->tif_data = match_malloc("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_fax3.c", 252, cc);
 	if (tif->tif_data == NULL) {
 		TIFFError("Fax3SetupState",
 		    "%s: No space for Fax3 state block", tif->tif_name);
@@ -1077,7 +1074,7 @@ Fax3Cleanup(tif)
 	TIFF *tif;
 {
 	if (tif->tif_data) {
-		free(tif->tif_data);
+		match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_fax3.c", 1077, tif->tif_data);
 		tif->tif_data = NULL;
 	}
 }

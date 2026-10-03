@@ -36,9 +36,6 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_dirread.c,v
  *     carefully chosen to make things work with compilers that
  *     are busted in one way or another (e.g. SGI/MIPS).
  */
-// halo decomp add
-#line 38 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirread.c"
-// halo decomp end
 #include "tiffioP.h"
 
 #define	IGNORE	0		/* tag placeholder used below */
@@ -96,7 +93,7 @@ CheckMalloc(tif, n, what)
 	int n;
 	char *what;
 {
-	char *cp = malloc(n);
+	char *cp = match_malloc("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirread.c", 96, n);
 	if (cp == NULL)
 		TIFFError(tif->tif_name, "No space %s", what);
 	return (cp);
@@ -233,7 +230,6 @@ TIFFReadDirectory(tif)
 			    "unknown field with tag %d (0x%x) ignored",
 			    dp->tdir_tag,  dp->tdir_tag);
 */
-#line 230
 // halo decomp end
 			dp->tdir_tag = IGNORE;
 			fip = tiffFieldInfo;	/* restart search */
@@ -408,7 +404,7 @@ TIFFReadDirectory(tif)
 					TIFFSetField(tif, dp->tdir_tag,
 					    cp, cp+v, cp+2*v, cp+3*v);
 				}
-				free(cp);
+				match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirread.c", 404, cp);
 			}
 			break;
 		case TIFFTAG_PAGENUMBER:
@@ -514,7 +510,7 @@ TIFFReadDirectory(tif)
 		EstimateStripByteCounts(tif, dir, dircount);
 	}
 	if (dir)
-		free((char *)dir);
+		match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirread.c", 510, (char *)dir);
 	if (!TIFFFieldSet(tif, FIELD_MAXSAMPLEVALUE))
 		td->td_maxsamplevalue = (1L<<td->td_bitspersample)-1;
 	/*
@@ -534,7 +530,7 @@ TIFFReadDirectory(tif)
 	return (1);
 bad:
 	if (dir)
-		free((char *)dir);
+		match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirread.c", 530, (char *)dir);
 	return (0);
 }
 
@@ -612,7 +608,6 @@ CheckDirCount(tif, dir, count)
 		    TIFFFieldWithTag(dir->tdir_tag)->field_name,
 		    dir->tdir_count, count);
 */
-#line 605
 // halo decomp end
 		return (0);
 	}
@@ -845,7 +840,7 @@ TIFFFetchRationalArray(tif, dir, v)
 					break;
 			}
 		}
-		free((char *)l);
+		match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirread.c", 837, (char *)l);
 	}
 	return (ok);
 }
@@ -926,7 +921,7 @@ TIFFFetchNormalTag(tif, dp)
 		if (ok)
 			ok = TIFFSetField(tif, dp->tdir_tag, cp);
 		if (cp != NULL)
-			free(cp);
+			match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirread.c", 918, cp);
 	} else if (CheckDirCount(tif, dp, 1)) {	/* singleton value */
 		char c[2];
 		switch (dp->tdir_type) {
@@ -1030,7 +1025,7 @@ TIFFFetchStripThing(tif, dir, nstrips, lpp)
 			while (nstrips-- > 0)
 				*lp++ = *wp++;
 		}
-		free((char *)dp);
+		match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirread.c", 1022, (char *)dp);
 	} else
 		status = TIFFFetchLongArray(tif, dir, lp);
 	return (status);
@@ -1062,11 +1057,11 @@ TIFFFetchRefBlackWhite(tif, dir)
 			for (i = 0; i < dir->tdir_count; i++)
 				fp[i] = (float)((u_long *)cp)[i];
 			ok = TIFFSetField(tif, dir->tdir_tag, fp);
-			free((char *)fp);
+			match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirread.c", 1054, (char *)fp);
 		}
 	}
 	if (cp)
-		free(cp);
+		match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirread.c", 1058, cp);
 	return (ok);
 }
 #endif

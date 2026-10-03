@@ -30,9 +30,6 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_read.c,v 1.
  * TIFF Library.
  * Scanline-oriented Read Support
  */
-// halo decomp add
-#line 32 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_read.c"
-// halo decomp end
 #include "tiffioP.h"
 
 #if USE_PROTOTYPES
@@ -259,7 +256,7 @@ TIFFFillStrip(tif, strip)
 		 * mapped read-only).
 		 */
 		if ((tif->tif_flags & TIFF_MYBUFFER) && tif->tif_rawdata)
-			free(tif->tif_rawdata);
+			match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_read.c", 259, tif->tif_rawdata);
 		tif->tif_flags &= ~TIFF_MYBUFFER;
 		if (td->td_stripoffset[strip] + bytecount > tif->tif_size) {
 			/*
@@ -456,7 +453,7 @@ TIFFFillTile(tif, tile)
 		 * mapped read-only).
 		 */
 		if ((tif->tif_flags & TIFF_MYBUFFER) && tif->tif_rawdata)
-			free(tif->tif_rawdata);
+			match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_read.c", 456, tif->tif_rawdata);
 		tif->tif_flags &= ~TIFF_MYBUFFER;
 		if (td->td_stripoffset[tile] + bytecount > tif->tif_size) {
 			tif->tif_curtile = -1;		/* unknown state */
@@ -515,7 +512,7 @@ TIFFReadBufferSetup(tif, bp, size)
 
 	if (tif->tif_rawdata) {
 		if (tif->tif_flags & TIFF_MYBUFFER)
-			free(tif->tif_rawdata);
+			match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_read.c", 515, tif->tif_rawdata);
 		tif->tif_rawdata = NULL;
 	}
 	if (bp) {
@@ -524,7 +521,7 @@ TIFFReadBufferSetup(tif, bp, size)
 		tif->tif_flags &= ~TIFF_MYBUFFER;
 	} else {
 		tif->tif_rawdatasize = roundup(size, 1024);
-		tif->tif_rawdata = malloc(tif->tif_rawdatasize);
+		tif->tif_rawdata = match_malloc("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_read.c", 524, tif->tif_rawdatasize);
 		tif->tif_flags |= TIFF_MYBUFFER;
 	}
 	if (tif->tif_rawdata == NULL) {

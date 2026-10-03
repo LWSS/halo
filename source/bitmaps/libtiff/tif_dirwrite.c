@@ -36,9 +36,6 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_dirwrite.c,
  *     carefully chosen to make things work with compilers that
  *     are busted in one way or another (e.g. SGI/MIPS).
  */
-// halo decomp add
-#line 45 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirwrite.c"
-// halo decomp end
 #include "tiffioP.h"
 #include "prototypes.h"
 
@@ -147,7 +144,7 @@ TIFFWriteDirectory(tif)
 		return (0);
 	}
 	if ((tif->tif_flags & TIFF_MYBUFFER) && tif->tif_rawdata) {
-		free(tif->tif_rawdata);
+		match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirwrite.c", 154, tif->tif_rawdata);
 		tif->tif_rawdata = NULL;
 		tif->tif_rawcc = 0;
 	}
@@ -164,7 +161,7 @@ TIFFWriteDirectory(tif)
 		if (TIFFFieldSet(tif, b))
 			nfields += (b < FIELD_SUBFILETYPE ? 2 : 1);
 	dirsize = nfields * sizeof (TIFFDirEntry);
-	data = malloc(dirsize);
+	data = match_malloc("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirwrite.c", 171, dirsize);
 	if (data == NULL) {
 		TIFFError(tif->tif_name,
 		    "Cannot write directory, out of space");
@@ -332,7 +329,7 @@ TIFFWriteDirectory(tif)
 		goto bad;
 	}
 	TIFFFreeDirectory(tif);
-	free(data);
+	match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirwrite.c", 339, data);
 	tif->tif_flags &= ~TIFF_DIRTYDIRECT;
 
 	/*
@@ -346,7 +343,7 @@ TIFFWriteDirectory(tif)
 	tif->tif_curstrip = -1;
 	return (1);
 bad:
-	free(data);
+	match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirwrite.c", 353, data);
 	return (0);
 }
 #undef WriteRationalPair
@@ -627,14 +624,14 @@ DECLARE6(TIFFWriteRationalArray, TIFF*, tif,
 	dir->tdir_tag = tag;
 	dir->tdir_type = (short)type;
 	dir->tdir_count = n;
-	t = (u_long *)malloc(2*n * sizeof (long));
+	t = (u_long *)match_malloc("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirwrite.c", 634, 2*n * sizeof (long));
 	for (i = 0; i < n; i++) {
 		/* need algorithm to convert ... XXX */
 		t[2*i+0] = v[i]*10000.0 + 0.5;
 		t[2*i+1] = 10000;
 	}
 	status = TIFFWriteData(tif, dir, (char *)t);
-	free((char *)t);
+	match_free("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirwrite.c", 641, (char *)t);
 	return (status);
 }
 

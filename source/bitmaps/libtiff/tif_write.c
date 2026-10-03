@@ -31,9 +31,6 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_write.c,v 1
  *
  * Scanline-oriented Write Support
  */
-// halo decomp add
-#line 33 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_write.c"
-// halo decomp end
 #include "tiffioP.h"
 #include <stdio.h>
 #include <assert.h>
@@ -390,9 +387,9 @@ TIFFSetupStrips(tif)
 	if (td->td_planarconfig == PLANARCONFIG_SEPARATE)
 		td->td_nstrips *= td->td_samplesperpixel;
 	td->td_stripoffset = (u_long *)
-	    malloc(td->td_nstrips * sizeof (u_long));
+	    match_malloc("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_write.c", 390, td->td_nstrips * sizeof (u_long));
 	td->td_stripbytecount = (u_long *)
-	    malloc(td->td_nstrips * sizeof (u_long));
+	    match_malloc("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_write.c", 392, td->td_nstrips * sizeof (u_long));
 	if (td->td_stripoffset == NULL || td->td_stripbytecount == NULL)
 		return (0);
 	/*
@@ -484,7 +481,7 @@ TIFFBufferSetup(tif, module)
 	 */
 	if (size < 8*1024)
 		size = 8*1024;
-	tif->tif_rawdata = malloc(size);
+	tif->tif_rawdata = match_malloc("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_write.c", 484, size);
 	if (tif->tif_rawdata == NULL) {
 		TIFFError(module, "%s: No space for output buffer",
 		    tif->tif_name);
@@ -508,9 +505,9 @@ TIFFGrowStrips(tif, delta, module)
 	TIFFDirectory *td = &tif->tif_dir;
 
 	assert(td->td_planarconfig == PLANARCONFIG_CONTIG);
-	td->td_stripoffset = (u_long *)realloc(td->td_stripoffset,
+	td->td_stripoffset = (u_long *)match_realloc("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_write.c", 509, td->td_stripoffset,
 	    (td->td_nstrips + delta) * sizeof (u_long));
-	td->td_stripbytecount = (u_long *)realloc(td->td_stripbytecount,
+	td->td_stripbytecount = (u_long *)match_realloc("c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_write.c", 511, td->td_stripbytecount,
 	    (td->td_nstrips + delta) * sizeof (u_long));
 	if (td->td_stripoffset == NULL || td->td_stripbytecount == NULL) {
 		td->td_nstrips = 0;
