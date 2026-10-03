@@ -14,39 +14,39 @@ TRANSPORT_ENDPOINT_WINSOCK.C
 
 enum
 {
-	MAXIMUM_CONNECT_THREADS = 64, // [fake name]
-	MINIMUM_SOCKET_BUFFER_SIZE = 0x4000, // [fake name]
-	CONNECT_TIMEOUT = 10*MILLISECONDS_PER_SECOND, // [fake name]
-	CONNECT_SELECT_TIMEOUT_SECONDS = 1, // [fake name]
-	CONNECT_MUTEX_TIMEOUT = MILLISECONDS_PER_SECOND, // [fake name]
-	LISTEN_BACKLOG = 32, // [fake name]
+	MAXIMUM_CONNECT_THREADS = 64, /* fake name */
+	MINIMUM_SOCKET_BUFFER_SIZE = 0x4000, /* fake name */
+	CONNECT_TIMEOUT = 10*MILLISECONDS_PER_SECOND, /* fake name */
+	CONNECT_SELECT_TIMEOUT_SECONDS = 1, /* fake name */
+	CONNECT_MUTEX_TIMEOUT = MILLISECONDS_PER_SECOND, /* fake name */
+	LISTEN_BACKLOG = 32, /* fake name */
 };
 
 /* ---------- macros */
 
 /* ---------- structures */
 
-struct transport_connect_process // [fake name]
+struct transport_connect_process /* fake name */
 {
 	struct transport_endpoint *ep;
 	struct transport_address address;
 	struct thread *thread;
 	struct mutex *mutex;
-	boolean cancelled; // [fake name]
+	boolean cancelled; /* fake name */
 };
 
-struct connect_thread_entry // [fake name]
+struct connect_thread_entry /* fake name */
 {
 	struct thread *thread;
-	boolean dispose; // [fake name]
+	boolean dispose; /* fake name */
 };
 
-struct _transport_endpoint_globals // [fake name]
+struct _transport_endpoint_globals /* fake name */
 {
-	char const *error_string; // [fake name]
-	long unknown; // [fake name]
-	struct connect_thread_entry threads[MAXIMUM_CONNECT_THREADS]; // [fake name]
-	long last_error; // [fake name]
+	char const *error_string; /* fake name */
+	long unknown; /* fake name */
+	struct connect_thread_entry threads[MAXIMUM_CONNECT_THREADS]; /* fake name */
+	long last_error; /* fake name */
 };
 
 /* ---------- prototypes */
@@ -59,7 +59,7 @@ static DWORD WINAPI connect_async_thread_proc(void *input_data);
 
 /* ---------- globals */
 
-static struct _transport_endpoint_globals transport_endpoint_globals = {0}; // [fake name]
+static struct _transport_endpoint_globals transport_endpoint_globals; /* fake name */
 
 /* ---------- public code */
 
@@ -104,8 +104,8 @@ short get_endpoint_address(
 	struct transport_endpoint *ep,
 	struct transport_address *address)
 {
-	short result = _transport_error_none;
 	struct sockaddr_in socket_address;
+	short result = _transport_error_none;
 	long address_size = sizeof(struct sockaddr_in);
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 247, ep && address);
@@ -165,8 +165,8 @@ short set_endpoint_blocking(
 	struct transport_endpoint *ep,
 	long blocking)
 {
-	short result = _transport_error_none;
 	boolean current_blocking;
+	short result = _transport_error_none;
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 313, ep);
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 314, transport_initialized);
@@ -218,8 +218,8 @@ short bind_endpoint(
 	struct transport_endpoint *ep,
 	struct transport_address const *address)
 {
-	short result = _transport_error_none;
 	struct sockaddr_in socket_address;
+	short result = _transport_error_none;
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 364, ep && address);
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 365, transport_initialized);
@@ -278,10 +278,10 @@ short connect_endpoint(
 	struct transport_endpoint *ep,
 	struct transport_address const *address)
 {
-	short result = _transport_error_none;
 	long socket_type;
 	struct sockaddr_in socket_address;
 	boolean blocking;
+	short result = _transport_error_none;
 	long winsock_error = 0;
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 437, ep && address);
@@ -319,9 +319,9 @@ short connect_endpoint(
 
 			if (winsock_error == WSAEWOULDBLOCK)
 			{
-				unsigned long deadline = system_milliseconds() + CONNECT_TIMEOUT;
 				struct timeval timeout;
 				fd_set writeable;
+				unsigned long deadline = system_milliseconds() + CONNECT_TIMEOUT;
 
 				timeout.tv_sec = CONNECT_SELECT_TIMEOUT_SECONDS;
 				timeout.tv_usec = 0;
@@ -389,8 +389,8 @@ short connect_endpoint_async(
 	struct transport_address const *address,
 	struct transport_connect_process **process_ref_ptr)
 {
-	short result = _transport_error_none;
 	struct transport_connect_process *input;
+	short result = _transport_error_none;
 
 	connection_thread_list_maintenance();
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 616, ep && address && process_ref_ptr);
@@ -489,9 +489,9 @@ short listen_endpoint(
 struct transport_endpoint *accept_endpoint(
 	struct transport_endpoint *listening_endpoint)
 {
-	struct transport_endpoint *ep = NULL;
 	SOCKET accepted;
 	struct sockaddr_in address;
+	struct transport_endpoint *ep = NULL;
 	long address_size = sizeof(struct sockaddr_in);
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 721, listening_endpoint && (listening_endpoint->socket >= 0));
@@ -625,8 +625,8 @@ long read_from_endpoint(
 	long length,
 	struct transport_address *src_addr)
 {
-	long result = SOCKET_ERROR;
 	struct sockaddr_in address;
+	long result = SOCKET_ERROR;
 	long address_size = sizeof(struct sockaddr_in);
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 887, ep && buffer && src_addr && (length > 0));
@@ -639,8 +639,8 @@ long read_from_endpoint(
 
 		if (ep->socket != INVALID_SOCKET)
 		{
-			struct transport_address bind_address = {0};
 			short err;
+			struct transport_address bind_address = {0};
 
 			bind_address.address_length = IPV4_ADDRESS_LENGTH;
 			err = bind_endpoint(ep, &bind_address);
@@ -697,8 +697,8 @@ long write_to_endpoint(
 	long length,
 	struct transport_address const *dest_addr)
 {
-	long result = SOCKET_ERROR;
 	struct sockaddr_in address;
+	long result = SOCKET_ERROR;
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 957, ep && buffer && (length > 0) && dest_addr);
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 958, transport_initialized);
@@ -859,13 +859,13 @@ char const *winsock_error_to_string(
 	case ERROR_NOT_ENOUGH_MEMORY:
 		result = "WSA_NOT_ENOUGH_MEMORY";
 		break;
-	case 0: // WSA_INVALID_EVENT
+	case (long)WSA_INVALID_EVENT:
 		result = "WSA_INVALID_EVENT";
 		break;
-	case MAXIMUM_WAIT_OBJECTS:
+	case WSA_MAXIMUM_WAIT_EVENTS:
 		result = "WSA_MAXIMUM_WAIT_EVENTS";
 		break;
-	case WAIT_FAILED:
+	case WSA_WAIT_FAILED:
 		result = "WSA_WAIT_FAILED";
 		break;
 	case ERROR_INVALID_PARAMETER:
@@ -874,7 +874,7 @@ char const *winsock_error_to_string(
 	case WAIT_IO_COMPLETION:
 		result = "WSA_WAIT_IO_COMPLETION";
 		break;
-	case WAIT_TIMEOUT:
+	case WSA_WAIT_TIMEOUT:
 		result = "WSA_WAIT_TIMEOUT";
 		break;
 	case ERROR_OPERATION_ABORTED:
@@ -1189,9 +1189,9 @@ static SOCKET create_socket(
 	long type,
 	long protocol)
 {
-	SOCKET result = socket(family, type, protocol);
 	long option;
 	long option_size;
+	SOCKET result = socket(family, type, protocol);
 
 	if (result != INVALID_SOCKET)
 	{
@@ -1239,10 +1239,10 @@ static SOCKET create_socket(
 static DWORD WINAPI connect_async_thread_proc(
 	void *input_data)
 {
-	struct transport_connect_process *input = (struct transport_connect_process *)input_data;
 	struct thread *thread;
-	struct mutex *mutex = NULL;
 	short result;
+	struct transport_connect_process *input = (struct transport_connect_process *)input_data;
+	struct mutex *mutex = NULL;
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 569, input);
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 570, input->ep);

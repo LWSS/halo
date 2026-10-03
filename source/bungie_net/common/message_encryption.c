@@ -12,17 +12,17 @@ MESSAGE_ENCRYPTION.C
 
 enum
 {
-	MESSAGE_KEY_LONGS = 2, // [fake name]
-	MESSAGE_KEY_SIZE = MESSAGE_KEY_LONGS*sizeof(unsigned long), // [fake name]
-	TEA_KEY_LONGS = 4, // [fake name]
-	TEA_BLOCK_LONGS = 2, // [fake name]
-	TEA_BLOCK_SIZE = TEA_BLOCK_LONGS*sizeof(unsigned long), // [fake name]
-	TEA_ROUNDS = 32, // [fake name]
+	MESSAGE_KEY_LONGS = 2, /* fake name */
+	MESSAGE_KEY_SIZE = MESSAGE_KEY_LONGS*sizeof(unsigned long), /* fake name */
+	TEA_KEY_LONGS = 4, /* fake name */
+	TEA_BLOCK_LONGS = 2, /* fake name */
+	TEA_BLOCK_SIZE = TEA_BLOCK_LONGS*sizeof(unsigned long), /* fake name */
+	TEA_ROUNDS = 32, /* fake name */
 };
 
 /* ---------- macros */
 
-#define TEA_DELTA 0x9E3779B9 // [fake name]
+#define TEA_DELTA 0x9E3779B9 /* fake name */
 
 /* ---------- structures */
 
@@ -46,14 +46,16 @@ void message_encrypt(
 
 	if (!TEST_FLAG(flags, _message_encrypted_bit))
 	{
+		long tea_key[TEA_KEY_LONGS];
+		word i;
 		word block_count = (length - sizeof(message_header)) / TEA_BLOCK_SIZE;
 		short tail_size = (length - sizeof(message_header)) % TEA_BLOCK_SIZE;
 		unsigned long *block = (unsigned long *)(msgptr + 1);
-		long tea_key[TEA_KEY_LONGS];
-		word i;
 
-		tea_key[0] = tea_key[2] = key[0];
-		tea_key[1] = tea_key[3] = key[1];
+		tea_key[2] = key[0];
+		tea_key[0] = key[0];
+		tea_key[3] = key[1];
+		tea_key[1] = key[1];
 
 		for (i = 0; i != block_count; i++)
 		{
@@ -88,14 +90,16 @@ void message_decrypt(
 
 	if (TEST_FLAG(flags, _message_encrypted_bit))
 	{
+		long tea_key[TEA_KEY_LONGS];
+		word i;
 		word block_count = (length - sizeof(message_header)) / TEA_BLOCK_SIZE;
 		short tail_size = (length - sizeof(message_header)) % TEA_BLOCK_SIZE;
 		unsigned long *block = (unsigned long *)(msgptr + 1);
-		long tea_key[TEA_KEY_LONGS];
-		word i;
 
-		tea_key[0] = tea_key[2] = key[0];
-		tea_key[1] = tea_key[3] = key[1];
+		tea_key[2] = key[0];
+		tea_key[0] = key[0];
+		tea_key[3] = key[1];
+		tea_key[1] = key[1];
 
 		for (i = 0; i != block_count; i++)
 		{
@@ -147,6 +151,7 @@ void tea_encipher(
 	unsigned long *output,
 	long const *key)
 {
+	long i;
 	unsigned long y = input[0];
 	unsigned long z = input[1];
 	unsigned long sum = 0;
@@ -155,7 +160,6 @@ void tea_encipher(
 	long b = key[1];
 	long c = key[2];
 	long d = key[3];
-	long i;
 
 	for (i = 0; i < TEA_ROUNDS; i++)
 	{
@@ -175,6 +179,7 @@ void tea_decipher(
 	unsigned long *output,
 	long const *key)
 {
+	long i;
 	unsigned long y = input[0];
 	unsigned long z = input[1];
 	unsigned long sum = TEA_DELTA*TEA_ROUNDS;
@@ -183,7 +188,6 @@ void tea_decipher(
 	long b = key[1];
 	long c = key[2];
 	long d = key[3];
-	long i;
 
 	for (i = 0; i < TEA_ROUNDS; i++)
 	{

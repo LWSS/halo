@@ -10,22 +10,16 @@ header included in hcex build.
 
 /* ---------- constants */
 
-enum
-{
-	NUMBER_OF_QWORD_WORDS = 4, // [fake name]
-	QWORD_BITS = NUMBER_OF_QWORD_WORDS*SHORT_BITS, // [fake name]
-};
-
 /* ---------- macros */
 
 /* ---------- structures */
 
-struct qword_value // [fake name]
+struct qword_value /* fake name */
 {
 	union
 	{
 		unsigned __int64 qword;
-		word words[NUMBER_OF_QWORD_WORDS];
+		word words[4];
 	};
 };
 
