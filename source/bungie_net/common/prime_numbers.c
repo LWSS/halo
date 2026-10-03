@@ -12,7 +12,7 @@ PRIME_NUMBERS.C
 
 enum
 {
-	NUMBER_OF_PROBABLE_PRIME_FACTORS = 4, // [fake name]
+	NUMBER_OF_PROBABLE_PRIME_FACTORS = 4, /* fake name */
 };
 
 /* ---------- macros */
@@ -31,8 +31,8 @@ static unsigned long *primegen(unsigned long maximum, unsigned long *num_primes)
 unsigned long randomprime(
 	unsigned long maximum)
 {
-	unsigned long result = 0;
 	unsigned long num_primes;
+	unsigned long result = 0;
 	unsigned long *primes = primegen(maximum, &num_primes);
 
 	if (primes)
@@ -83,11 +83,11 @@ static unsigned long *primegen(
 	unsigned long maximum,
 	unsigned long *num_primes)
 {
-	unsigned long odd_count = maximum >> 1;
 	unsigned long *primes;
 	unsigned long i;
 	unsigned long limit;
 	unsigned long count;
+	unsigned long odd_count = maximum >> 1;
 
 	if (!(maximum & 1))
 	{
@@ -111,8 +111,8 @@ static unsigned long *primegen(
 
 	if (primes)
 	{
-		unsigned long odd = 3;
 		unsigned long square_root;
+		unsigned long odd = 3;
 
 		i = 0;
 		square_root = (unsigned long)sqrt(maximum);

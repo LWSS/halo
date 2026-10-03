@@ -14,7 +14,7 @@ PUBLIC_KEY_CRYPT.C
 
 enum
 {
-	MINIMUM_KEY_PRIME = 0xFFFFFF, // [fake name]
+	MINIMUM_KEY_PRIME = 0xFFFFFF, /* fake name */
 };
 
 /* ---------- macros */

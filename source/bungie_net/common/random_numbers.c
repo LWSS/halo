@@ -18,7 +18,7 @@ RANDOM_NUMBERS.C
 
 /* ---------- globals */
 
-static boolean random_numbers_initialized = FALSE; // [fake name]
+static boolean random_numbers_initialized; /* fake name */
 
 /* ---------- public code */
 

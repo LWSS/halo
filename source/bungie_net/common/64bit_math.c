@@ -26,13 +26,13 @@ void add64(
 	struct qword_value const *b,
 	struct qword_value *result)
 {
-	long carry = 0;
 	long i;
 	long sum;
+	long carry = 0;
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\64bit_math.c", 33, a && b && result);
 
-	for (i = 0; i < NUMBER_OF_QWORD_WORDS; i++)
+	for (i = 0; i < 4; i++)
 	{
 		sum = a->words[i] + b->words[i] + carry;
 
@@ -71,15 +71,15 @@ void multiply64(
 	struct qword_value const *b,
 	struct qword_value *result)
 {
-	unsigned long products[2*NUMBER_OF_QWORD_WORDS-1] = {0, 1, 2, 3, 4, 5, 6};
 	unsigned long i;
 	unsigned long j;
+	unsigned long products[7] = {0, 1, 2, 3, 4, 5, 6};
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\64bit_math.c", 95, a && b && result);
 
-	for (i = 0; i < NUMBER_OF_QWORD_WORDS; i++)
+	for (i = 0; i < 4; i++)
 	{
-		for (j = 0; j < NUMBER_OF_QWORD_WORDS; j++)
+		for (j = 0; j < 4; j++)
 		{
 			unsigned long product = a->words[i] * b->words[j];
 
@@ -88,7 +88,7 @@ void multiply64(
 		}
 	}
 
-	for (i = 0; i < NUMBER_OF_QWORD_WORDS; i++)
+	for (i = 0; i < 4; i++)
 	{
 		result->words[i] = (word)products[i];
 	}
@@ -102,7 +102,7 @@ void divide64(
 	struct qword_value *quotient,
 	struct qword_value *remainder)
 {
-	word division[2*NUMBER_OF_QWORD_WORDS];
+	word division[8];
 	struct qword_value difference;
 	struct qword_value high;
 	unsigned long i;
@@ -110,29 +110,29 @@ void divide64(
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\64bit_math.c", 124, numerator && denominator);
 
-	for (i = 0; i < NUMBER_OF_QWORD_WORDS; i++)
+	for (i = 0; i < 4; i++)
 	{
 		division[i] = denominator->words[i];
-		division[i + NUMBER_OF_QWORD_WORDS] = 0;
+		division[i + 4] = 0;
 	}
 
-	for (bit = 0; bit < QWORD_BITS; bit++)
+	for (bit = 0; bit < 64; bit++)
 	{
 		unsigned long carry = 0;
 
-		for (i = 0; i < 2*NUMBER_OF_QWORD_WORDS; i++)
+		for (i = 0; i < 8; i++)
 		{
 			carry += division[i] * 2;
 			division[i] = (word)carry;
 			carry >>= SHORT_BITS;
 		}
 
-		high = *(struct qword_value *)&division[NUMBER_OF_QWORD_WORDS];
+		high = *(struct qword_value *)&division[4];
 		subtract64(&high, numerator, &difference);
 
-		if (!(difference.words[NUMBER_OF_QWORD_WORDS - 1] & FLAG(SHORT_BITS - 1)))
+		if (!(difference.words[3] & FLAG(SHORT_BITS - 1)))
 		{
-			*(struct qword_value *)&division[NUMBER_OF_QWORD_WORDS] = difference;
+			*(struct qword_value *)&division[4] = difference;
 			division[0]++;
 		}
 	}
@@ -144,7 +144,7 @@ void divide64(
 
 	if (remainder)
 	{
-		*remainder = *(struct qword_value *)&division[NUMBER_OF_QWORD_WORDS];
+		*remainder = *(struct qword_value *)&division[4];
 	}
 
 	return;
@@ -156,12 +156,12 @@ static void negate64(
 	struct qword_value const *a,
 	struct qword_value *result)
 {
-	word carry = 0;
 	long i;
+	word carry = 0;
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\64bit_math.c", 58, a && result);
 
-	for (i = 0; i < NUMBER_OF_QWORD_WORDS; i++)
+	for (i = 0; i < 4; i++)
 	{
 		result->words[i] = (word)-(a->words[i] + carry);
 

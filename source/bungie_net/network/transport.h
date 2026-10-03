@@ -13,13 +13,13 @@ header included in hcex build.
 enum
 {
 	IPV4_ADDRESS_LENGTH = 4,
-	IPV6_ADDRESS_LENGTH = 16, // [fake name]
+	IPV6_ADDRESS_LENGTH = 16, /* fake name */
 };
 
 enum
 {
 	_transport_type_udp = 17,
-	_transport_type_tcp = 18, // [fake name]
+	_transport_type_tcp = 18, /* fake name */
 };
 
 enum
@@ -54,27 +54,23 @@ enum
 
 /* ---------- structures */
 
-struct transport_address_data // [fake name]
+struct transport_address_data /* fake name */
 {
 	union
 	{
-		unsigned long ipv4_address; // [fake name]
-		word words[IPV6_ADDRESS_LENGTH/sizeof(word)]; // [fake name]
-		byte bytes[IPV6_ADDRESS_LENGTH]; // [fake name]
+		unsigned long ipv4_address; /* fake name */
+		word words[IPV6_ADDRESS_LENGTH/sizeof(word)]; /* fake name */
+		byte bytes[IPV6_ADDRESS_LENGTH]; /* fake name */
 	};
 };
 
 struct transport_address
 {
-	struct transport_address_data address; // [fake name]
+	struct transport_address_data address; /* fake name */
 	word address_length;
 	word port;
-	long address_type; // [fake name]
+	long address_type; /* fake name */
 };
-
-struct transport_endpoint;
-struct transport_endpoint_set;
-struct transport_connect_process; // [fake name]
 
 /* ---------- prototypes/TRANSPORT_ADDRESS.C */
 

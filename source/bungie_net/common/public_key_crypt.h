@@ -12,15 +12,15 @@ header included in hcex build.
 
 enum
 {
-	NUMBER_OF_PUBLIC_KEY_DWORDS = 2, // [fake name]
-	MINIMUM_KEY_SECRET = UNSIGNED_CHAR_MAX, // [fake name]
+	NUMBER_OF_PUBLIC_KEY_DWORDS = 2, /* fake name */
+	MINIMUM_KEY_SECRET = UNSIGNED_CHAR_MAX, /* fake name */
 };
 
 /* ---------- macros */
 
 /* ---------- structures */
 
-struct public_key // [fake name]
+struct public_key /* fake name */
 {
 	unsigned long dwords[NUMBER_OF_PUBLIC_KEY_DWORDS];
 };

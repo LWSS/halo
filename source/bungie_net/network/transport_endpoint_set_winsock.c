@@ -21,9 +21,9 @@ TRANSPORT_ENDPOINT_SET_WINSOCK.C
 
 enum
 {
-	WINSOCK_VERSION_MAJOR = 2, // [fake name]
-	WINSOCK_VERSION_MINOR = 0, // [fake name]
-	TITLE_ADDRESS_TIMEOUT = 10*MILLISECONDS_PER_SECOND, // [fake name]
+	WINSOCK_VERSION_MAJOR = 2, /* fake name */
+	WINSOCK_VERSION_MINOR = 0, /* fake name */
+	TITLE_ADDRESS_TIMEOUT = 10*MILLISECONDS_PER_SECOND, /* fake name */
 };
 
 /* ---------- macros */
@@ -211,10 +211,10 @@ long transport_initialize(
 
 	if (!transport_initialized)
 	{
-		WSADATA winsock_data = {0};
-		XNetStartupParams startup = {0};
 		unsigned long link_status;
 		FILE *file;
+		WSADATA winsock_data = {0};
+		XNetStartupParams startup = {0};
 
 		startup.cfgSizeOfStruct = sizeof(XNetStartupParams);
 		startup.cfgFlags = 0;
@@ -229,7 +229,9 @@ long transport_initialize(
 		startup.cfgSecRegMax = 32;
 
 		link_status = XNetGetEthernetLinkStatus();
-		error(_error_log, "xbox ethernet link is %s%s%s%s%s",
+		error(
+			_error_log,
+			"xbox ethernet link is %s%s%s%s%s",
 			link_status & XNET_ETHERNET_LINK_ACTIVE ? "connected" : "not connected",
 			link_status & XNET_ETHERNET_LINK_100MBPS ? " at 100 Mbps" : "",
 			link_status & XNET_ETHERNET_LINK_10MBPS ? " at 10 Mbps" : "",
@@ -264,8 +266,8 @@ long transport_initialize(
 			}
 			else
 			{
-				unsigned long deadline = system_milliseconds() + TITLE_ADDRESS_TIMEOUT;
 				unsigned long address_status;
+				unsigned long deadline = system_milliseconds() + TITLE_ADDRESS_TIMEOUT;
 
 				do
 				{
@@ -383,12 +385,12 @@ long poll_endpoint_set(
 	struct transport_endpoint_set *set,
 	word timeout)
 {
-	long result = _transport_error_none;
-	long i = 0;
 	fd_set readable;
 	struct timeval wait;
 	long count;
 	boolean poll_failed;
+	long result = _transport_error_none;
+	long i = 0;
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_set_winsock.c", 477, set);
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_set_winsock.c", 478, transport_initialized);

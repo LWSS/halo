@@ -16,32 +16,32 @@ KEY_AGREEMENT.C
 
 enum
 {
-	_key_agreement_initiate = 0, // [fake name]
-	_key_agreement_finalize, // [fake name]
-	NUMBER_OF_KEY_AGREEMENT_PACKETS, // [fake name]
+	_key_agreement_initiate = 0, /* fake name */
+	_key_agreement_finalize, /* fake name */
+	NUMBER_OF_KEY_AGREEMENT_PACKETS, /* fake name */
 };
 
 enum
 {
-	KEY_AGREEMENT_PACKET_VERSION = 1, // [fake name]
-	NUMBER_OF_KEY_AGREEMENT_PACKET_CLASSES = 1, // [fake name]
-	MAXIMUM_KEY_AGREEMENT_DECODED_PACKET_SIZE = 96, // [fake name]
-	MAXIMUM_KEY_AGREEMENT_PACKET_SIZE = 128, // [fake name]
-	KEY_AGREEMENT_BUFFER_SIZE = 512, // [fake name]
+	KEY_AGREEMENT_PACKET_VERSION = 1, /* fake name */
+	NUMBER_OF_KEY_AGREEMENT_PACKET_CLASSES = 1, /* fake name */
+	MAXIMUM_KEY_AGREEMENT_DECODED_PACKET_SIZE = 96, /* fake name */
+	MAXIMUM_KEY_AGREEMENT_PACKET_SIZE = 128, /* fake name */
+	KEY_AGREEMENT_BUFFER_SIZE = 512, /* fake name */
 };
 
 /* ---------- macros */
 
 /* ---------- structures */
 
-struct message_initiate_key_agreement // [fake name]
+struct message_initiate_key_agreement /* fake name */
 {
 	struct public_key prime;
 	struct public_key g;
 	struct public_key key;
 };
 
-struct message_finalize_key_agreement // [fake name]
+struct message_finalize_key_agreement /* fake name */
 {
 	struct public_key key;
 };
@@ -57,7 +57,7 @@ static message_header *create_message_finalize_key_agreement(struct public_key c
 
 /* ---------- globals */
 
-static struct data_packet_field initiate_fields[] = // [fake name]
+static struct data_packet_field initiate_fields[] = /* fake name */
 {
 	{__pack_long, NUMBER_OF_PUBLIC_KEY_DWORDS, 0, 0, 0},
 	{__pack_long, NUMBER_OF_PUBLIC_KEY_DWORDS, 0, 0, 0},
@@ -65,7 +65,7 @@ static struct data_packet_field initiate_fields[] = // [fake name]
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition initiate_definition = // [fake name]
+static struct data_packet_definition initiate_definition = /* fake name */
 {
 	"message_initiate_key_agreement_packet",
 	0,
@@ -75,13 +75,13 @@ static struct data_packet_definition initiate_definition = // [fake name]
 	FALSE,
 };
 
-static struct data_packet_field finalize_fields[] = // [fake name]
+static struct data_packet_field finalize_fields[] = /* fake name */
 {
 	{__pack_long, NUMBER_OF_PUBLIC_KEY_DWORDS, 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition finalize_definition = // [fake name]
+static struct data_packet_definition finalize_definition = /* fake name */
 {
 	"message_finalize_key_agreement_packet",
 	0,
@@ -91,7 +91,7 @@ static struct data_packet_definition finalize_definition = // [fake name]
 	FALSE,
 };
 
-static struct data_packet_group_packet key_agreement_packets[NUMBER_OF_KEY_AGREEMENT_PACKETS] = // [fake name]
+static struct data_packet_group_packet key_agreement_packets[NUMBER_OF_KEY_AGREEMENT_PACKETS] = /* fake name */
 {
 	{0, &initiate_definition},
 	{0, &finalize_definition},
@@ -107,7 +107,7 @@ static struct data_packet_group_definition key_agreement_packets_group =
 	key_agreement_packets,
 };
 
-static byte key_agreement_buffer[KEY_AGREEMENT_BUFFER_SIZE] = {0}; // [fake name]
+static byte key_agreement_buffer[KEY_AGREEMENT_BUFFER_SIZE]; /* fake name */
 
 /* ---------- public code */
 
@@ -154,9 +154,9 @@ boolean initiate_key_exchange(
 	struct public_key *prime,
 	struct public_key *secret)
 {
-	boolean success = TRUE;
 	struct public_key g;
 	message_header *message;
+	boolean success = TRUE;
 
 	generate_key_parameters(prime, secret, &g);
 	generate_public_key(prime, secret, &g, key);
@@ -188,7 +188,6 @@ boolean complete_key_exchange(
 	struct public_key *secret,
 	struct public_key *private_key)
 {
-	short packet_version = KEY_AGREEMENT_PACKET_VERSION;
 	word length;
 	short packet_size;
 	short packet_type;
@@ -196,6 +195,7 @@ boolean complete_key_exchange(
 	struct message_initiate_key_agreement initiate_packet;
 	struct message_finalize_key_agreement finalize_packet;
 	struct public_key public_key;
+	short packet_version = KEY_AGREEMENT_PACKET_VERSION;
 
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\key_agreement.c", 261, msgptr && prime && secret && private_key);
 
@@ -276,7 +276,14 @@ static boolean decode_key_agreement_packet(
 	short *packet_version,
 	short expected_packet_class)
 {
-	return data_packet_group_decode_packet(&key_agreement_packets_group, decoded_packet, encoded_packet, encoded_packet_size, packet_type, packet_version, expected_packet_class);
+	return data_packet_group_decode_packet(
+		&key_agreement_packets_group,
+		decoded_packet,
+		encoded_packet,
+		encoded_packet_size,
+		packet_type,
+		packet_version,
+		expected_packet_class);
 }
 
 static boolean encode_key_agreement_packet(
@@ -286,7 +293,13 @@ static boolean encode_key_agreement_packet(
 	short packet_type,
 	short packet_version)
 {
-	return data_packet_group_encode_packet(&key_agreement_packets_group, decoded_packet, encoded_packet, encoded_packet_size, packet_type, packet_version);
+	return data_packet_group_encode_packet(
+		&key_agreement_packets_group,
+		decoded_packet,
+		encoded_packet,
+		encoded_packet_size,
+		packet_type,
+		packet_version);
 }
 
 static message_header *create_key_agreement_message(

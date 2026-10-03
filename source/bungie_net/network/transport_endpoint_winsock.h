@@ -16,17 +16,17 @@ header included in hcex build.
 
 enum
 {
-	MICROSECONDS_PER_MILLISECOND = 1000, // [fake name]
+	MICROSECONDS_PER_MILLISECOND = 1000, /* fake name */
 };
 
 enum
 {
-	_endpoint_connected_bit = 0, // [fake name]
-	_endpoint_listening_bit, // [fake name]
-	_endpoint_readable_bit, // [fake name]
-	_endpoint_in_set_bit, // [fake name]
-	_endpoint_nonblocking_bit, // [fake name]
-	_endpoint_client_bit, // [fake name]
+	_endpoint_connected_bit = 0, /* fake name */
+	_endpoint_listening_bit, /* fake name */
+	_endpoint_readable_bit, /* fake name */
+	_endpoint_in_set_bit, /* fake name */
+	_endpoint_nonblocking_bit, /* fake name */
+	_endpoint_client_bit, /* fake name */
 	NUMBER_OF_ENDPOINT_FLAGS,
 };
 
@@ -44,12 +44,12 @@ struct transport_endpoint
 
 struct transport_endpoint_set
 {
-	fd_set sockets; // [fake name]
+	fd_set sockets; /* fake name */
 	struct transport_endpoint **ep_array;
 	long max_endpoints;
-	long last_index; // [fake name]
-	long current_index; // [fake name]
-	long needs_compaction; // [fake name]
+	long last_index; /* fake name */
+	long current_index; /* fake name */
+	long needs_compaction; /* fake name */
 };
 
 /* ---------- prototypes/EXAMPLE.C */

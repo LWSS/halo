@@ -11,7 +11,7 @@ TRANSPORT_ADDRESS.C
 
 enum
 {
-	MAXIMUM_TRANSPORT_ADDRESS_STRING_LENGTH = 256, // [fake name]
+	MAXIMUM_TRANSPORT_ADDRESS_STRING_LENGTH = 256, /* fake name */
 };
 
 /* ---------- macros */
@@ -22,7 +22,7 @@ enum
 
 /* ---------- globals */
 
-static char transport_address_string[MAXIMUM_TRANSPORT_ADDRESS_STRING_LENGTH] = {0}; // [fake name]
+static char transport_address_string[MAXIMUM_TRANSPORT_ADDRESS_STRING_LENGTH]; /* fake name */
 
 /* ---------- public code */
 
@@ -83,11 +83,31 @@ char *transport_address_to_string(
 
 	if (addr->address_length == IPV4_ADDRESS_LENGTH)
 	{
-		_snprintf(transport_address_string, sizeof(transport_address_string), "%hd.%hd.%hd.%hd:%hd", addr->address.bytes[3], addr->address.bytes[2], addr->address.bytes[1], addr->address.bytes[0], addr->port);
+		_snprintf(
+			transport_address_string,
+			sizeof(transport_address_string),
+			"%hd.%hd.%hd.%hd:%hd",
+			addr->address.bytes[3],
+			addr->address.bytes[2],
+			addr->address.bytes[1],
+			addr->address.bytes[0],
+			addr->port);
 	}
 	else if (addr->address_length == IPV6_ADDRESS_LENGTH)
 	{
-		_snprintf(transport_address_string, sizeof(transport_address_string), "%4X.%4X.%4X.%4X.%4X.%4X.%4X.%4X:%hd", addr->address.words[0], addr->address.words[1], addr->address.words[2], addr->address.words[3], addr->address.words[4], addr->address.words[5], addr->address.words[6], addr->address.words[7], addr->port);
+		_snprintf(
+			transport_address_string,
+			sizeof(transport_address_string),
+			"%4X.%4X.%4X.%4X.%4X.%4X.%4X.%4X:%hd",
+			addr->address.words[0],
+			addr->address.words[1],
+			addr->address.words[2],
+			addr->address.words[3],
+			addr->address.words[4],
+			addr->address.words[5],
+			addr->address.words[6],
+			addr->address.words[7],
+			addr->port);
 	}
 
 	return transport_address_string;
