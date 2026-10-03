@@ -10,7 +10,15 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	SOUND_ENVIRONMENT_DEFINITION_TAG = 'snde' /* fake name */
+};
+
 /* ---------- macros */
+
+#define sound_environment_get(index) ((index) == NONE ? &default_sound_environment : (struct sound_environment *)tag_get(SOUND_ENVIRONMENT_DEFINITION_TAG, (index))) /* fake name */
+#define sound_environment_try_and_get(index) ((index) == NONE ? (struct sound_environment *)NULL : sound_environment_get(index)) /* fake name */
 
 /* ---------- structures */
 

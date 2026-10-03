@@ -157,7 +157,7 @@ struct sound_definition
 	struct sound_scale_modifiers scale_upper_bound;
 	short encoding;
 	short compression;
-	struct tag_reference promotion_sound;
+	struct tag_reference promotion_sound;	// sound_definition
 	short promotion_count;
 	word pad2;
 	long runtime_maximum_play_time;
@@ -182,7 +182,7 @@ struct looping_sound_definition
 	long runtime_scripting_sound_index;
 	real runtime_maximum_distance;
 	long unused[2];
-	struct tag_reference continuous_damage_effect;
+	struct tag_reference continuous_damage_effect;	// continuous_damage_effect_definition
 	struct tag_block tracks;
 	struct tag_block details;
 };
