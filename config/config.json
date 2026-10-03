@@ -56,7 +56,6 @@
 					"source/bungie_net",
 					"source/bitmaps",
 					"source/bitmaps/libtiff",
-					"source/bitmaps/s3tc",
 					"source/ai"
 				],
 				"headers": [
