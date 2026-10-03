@@ -36,6 +36,9 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_dirread.c,v
  *     carefully chosen to make things work with compilers that
  *     are busted in one way or another (e.g. SGI/MIPS).
  */
+// halo decomp add
+#line 38 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirread.c"
+// halo decomp end
 #include "tiffioP.h"
 
 #define	IGNORE	0		/* tag placeholder used below */
@@ -224,9 +227,14 @@ TIFFReadDirectory(tif)
 		while (fip->field_tag && fip->field_tag < dp->tdir_tag)
 			fip++;
 		if (!fip->field_tag || fip->field_tag != dp->tdir_tag) {
+// halo decomp add
+/*
 			TIFFWarning(tif->tif_name,
 			    "unknown field with tag %d (0x%x) ignored",
 			    dp->tdir_tag,  dp->tdir_tag);
+*/
+#line 230
+// halo decomp end
 			dp->tdir_tag = IGNORE;
 			fip = tiffFieldInfo;	/* restart search */
 			continue;
@@ -597,10 +605,15 @@ CheckDirCount(tif, dir, count)
 	u_long count;
 {
 	if (count != dir->tdir_count) {
+// halo decomp add
+/*
 		TIFFWarning(tif->tif_name,
 	"incorrect count for field \"%s\" (%lu, expecting %lu); tag ignored",
 		    TIFFFieldWithTag(dir->tdir_tag)->field_name,
 		    dir->tdir_count, count);
+*/
+#line 605
+// halo decomp end
 		return (0);
 	}
 	return (1);
@@ -1191,11 +1204,15 @@ TIFFFetchExtraSamples(tif, dp)
 		    "Can not handle more than 1 extra sample/pixel");
 		return (0);
 	}
+// halo decomp add
+/*
 	type = TIFFExtractData(tif, dp->tdir_type, dp->tdir_offset);
 	if (type != EXTRASAMPLE_ASSOCALPHA) {
 		TIFFError(tif->tif_name,
 		    "Can only handle associated-alpha extra samples");
 		return (0);
 	}
+*/
+// halo decomp end
 	return (TIFFSetField(tif, TIFFTAG_MATTEING, 1));
 }

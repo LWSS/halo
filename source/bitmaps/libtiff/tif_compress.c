@@ -32,6 +32,12 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_compress.c,
  * Compression Scheme Configuration Support.
  */
 #include "tiffioP.h"
+// halo decomp add
+/* halo only registers the LZW, PackBits and JPEG schemes */
+#define	LZW_SUPPORT
+#define	PACKBITS_SUPPORT
+#define	JPEG_SUPPORT
+// halo decomp end
 
 #if USE_PROTOTYPES
 extern	int TIFFInitDumpMode(TIFF*);

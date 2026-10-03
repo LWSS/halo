@@ -36,6 +36,9 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_lzw.c,v 1.3
  *
  * The original Berkeley copyright notice appears below in its entirety.
  */
+// halo decomp add
+#line 38 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_lzw.c"
+// halo decomp end
 #include "tiffioP.h"
 #include <stdio.h>
 #include <assert.h>

@@ -31,6 +31,9 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_fax3.c,v 1.
  *
  * CCITT Group 3 and Group 4 Compression Support.
  */
+// halo decomp add
+#line 33 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_fax3.c"
+// halo decomp end
 #include "tiffioP.h"
 #include <stdio.h>
 #include <assert.h>

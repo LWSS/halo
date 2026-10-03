@@ -36,6 +36,9 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_dirwrite.c,
  *     carefully chosen to make things work with compilers that
  *     are busted in one way or another (e.g. SGI/MIPS).
  */
+// halo decomp add
+#line 45 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_dirwrite.c"
+// halo decomp end
 #include "tiffioP.h"
 #include "prototypes.h"
 

@@ -37,6 +37,18 @@
  *
  * NB: This file is a mess.
  */
+// halo decomp add
+#ifdef xbox
+/* halo builds libtiff as MSDOS (binary open, fstat file size) with prototypes but no const,
+   with the SVID bit string routines (cseries memset/memcpy) and without libtiff's asserts */
+#define	MSDOS
+#define	USE_PROTOTYPES	1
+#define	NDEBUG
+#define	bzero(dst,len)		memset((char *)dst, 0, len)
+#define	bcopy(src,dst,len)	memcpy((char *)dst, (char *)src, len)
+#define	bcmp(src, dst, len)	memcmp((char *)dst, (char *)src, len)
+#endif
+// halo decomp end
 #if (defined(_MSC_VER) || defined(__STDC__) || defined(__EXTENDED__)) && !defined(USE_PROTOTYPES)
 #define	USE_PROTOTYPES	1
 #define	USE_CONST	1

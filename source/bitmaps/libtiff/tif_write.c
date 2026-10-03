@@ -31,6 +31,9 @@ static char rcsid[] = "$Header: /usr/people/sam/tiff/libtiff/RCS/tif_write.c,v 1
  *
  * Scanline-oriented Write Support
  */
+// halo decomp add
+#line 33 "c:\\halo\\SOURCE\\bitmaps\\libtiff\\tif_write.c"
+// halo decomp end
 #include "tiffioP.h"
 #include <stdio.h>
 #include <assert.h>
