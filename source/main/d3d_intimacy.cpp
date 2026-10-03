@@ -23,6 +23,8 @@ extern "C"
 	#include "cseries.h"
 	#include "d3d_intimacy.h"
 	#include "errors.h"
+	#include "integer_math.h"
+	#include "real_math.h"
 	#include "main.h"
 }
 

@@ -14,7 +14,7 @@ RECORDED_ANIMATION_PLAYBACK_V1.C
 /* ---------- macros */
 
 // each simple event copies one field of the same name into the unit control data
-#define APPLY_EVENT(line, field) /* [fake name] */ \
+#define APPLY_EVENT(line, field) /* fake name */ \
 static void apply_##field(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream) \
 { \
 	match_assert("c:\\halo\\SOURCE\\cutscene\\recorded_animation_playback_v1.c", line, control); \

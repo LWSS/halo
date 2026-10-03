@@ -29,8 +29,35 @@ enum
 
 enum
 {
+	_device_function_none = 0,
+	_device_function_power,
+	_device_function_change_in_power,
+	_device_function_position,
+	_device_function_change_in_position,
+	_device_function_locked,
+	_device_function_delay,
+	NUMBER_OF_DEVICE_FUNCTION_MODES,
+};
+
+enum
+{
+	_device_animation_position = 0,
+	_device_animation_power,
+	NUMBER_OF_DEVICE_ANIMATIONS,
+};
+
+enum
+{
 	MACHINE_DEFINITION_TAG = 'mach',
 	MACHINE_DEFINITION_VERSION = 1,
+};
+
+enum
+{
+	_machine_door = 0,
+	_machine_platform,
+	_machine_gear,
+	NUMBER_OF_MACHINE_TYPES,
 };
 
 enum
@@ -41,18 +68,46 @@ enum
 	NUMBER_OF_MACHINE_FLAGS,
 };
 
+enum
+{
+	CONTROL_DEFINITION_TAG = 'ctrl',
+	CONTROL_DEFINITION_VERSION = 1,
+};
+
+enum
+{
+	_control_toggle_switch = 0,
+	_control_on_button,
+	_control_off_button,
+	_control_call_button,
+	NUMBER_OF_CONTROL_TYPES,
+};
+
+enum
+{
+	_control_trigger_player = 0,
+	_control_trigger_destruction,
+	NUMBER_OF_CONTROL_TRIGGERS,
+};
+
+enum
+{
+	LIGHT_FIXTURE_DEFINITION_TAG = 'lifi',
+	LIGHT_FIXTURE_DEFINITION_VERSION = 1,
+};
 
 /* ---------- macros */
 
 #define device_definition_get(index) ((struct device_definition *)tag_get(DEVICE_DEFINITION_TAG, index))
-
 #define machine_definition_get(index) ((struct machine_definition *)tag_get(MACHINE_DEFINITION_TAG, index))
+#define control_definition_get(index) ((struct control_definition *)tag_get(CONTROL_DEFINITION_TAG, index)) // [fake name?]
+#define light_fixture_definition_get(index) ((struct light_fixture_definition *)tag_get(LIGHT_FIXTURE_DEFINITION_TAG, index)) // [fake name?]
 
 /* ---------- structures */
 
 struct _device_definition
 {
-	unsigned int flags;
+	unsigned long flags;
 	real power_transition_time;
 	real power_acceleration_time;
 	real powered_position_transition_time;
@@ -94,7 +149,7 @@ struct _machine_definition
 	unsigned long unused1[20];
 	short collision_response;
 	short elevator_node_index;
-	unsigned int unused2[13];
+	unsigned long unused2[13];
 	long runtime_door_open_ticks;
 };
 
@@ -105,7 +160,35 @@ struct machine_definition
 	struct _machine_definition machine;
 };
 
-/* ---------- prototypes/EXAMPLE.C */
+struct _control_definition
+{
+	short type;
+	short trigger;
+	real call_value;
+	unsigned long unused[20];
+	struct tag_reference on_effect;
+	struct tag_reference off_effect;
+	struct tag_reference deny_effect;
+};
+
+struct control_definition
+{
+	struct _object_definition object;
+	struct _device_definition device;
+	struct _control_definition control;
+};
+
+struct _light_fixture_definition
+{
+	unsigned long unused[16];
+};
+
+struct light_fixture_definition
+{
+	struct _object_definition object;
+	struct _device_definition device;
+	struct _light_fixture_definition light_fixture;
+};
 
 /* ---------- globals */
 

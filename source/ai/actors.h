@@ -195,6 +195,20 @@ enum
 	NUMBER_OF_ACTOR_PERCEPTION_TYPES,
 };
 
+enum
+{
+	MAXIMUM_FIRING_POSITION_AVOID_POINTS = 32,
+	MAXIMUM_FIRING_POSITION_ATTACK_VECTORS = 32,
+};
+
+enum
+{
+	_actor_aiming_clear = 0,
+	_actor_aiming_occluded,
+	_actor_aiming_blocked,
+	NUMBER_OF_ACTOR_AIMING_OBSTRUCTION_TYPES,
+};
+
 #define MAXIMUM_NUMBER_OF_ACTORS 256
 #define MAXIMUM_NUMBER_OF_ACTOR_PATHS 32
 
@@ -782,31 +796,31 @@ struct actor_debug_info
 	real_vector3d burst_lead_vector;
 	char __unknown1C[40];
 	long last_projectile_aiming_time;
-	boolean field_60;
-	real_point3d field_64;
-	real_vector3d field_70;
-	real_point3d field_7C;
-	boolean field_88;
-	real_vector3d field_8C;
-	real_vector3d field_98;
-	boolean field_A4;
-	short field_A6;
-	real field_A8;
-	real field_AC;
-	real field_B0;
-	real field_B4;
+	boolean aim_last_by_vector;
+	real_point3d aim_last_origin;
+	real_vector3d aim_last_vector;
+	real_point3d aim_last_target;
+	boolean aim_last_rotated;
+	real_vector3d aim_last_rotated_vector;
+	real_vector3d aim_last_rotated_original_vector;
+	boolean audibility_valid;
+	short audibility_result;
+	real audibility_perception_distance;
+	real audibility_straight_distance;
+	real audibility_propagation_distance;
+	real audibility_final_distance;
 	boolean field_B8;
 	short field_BA;
 	short field_BC;
 	real field_C0;
 	long last_vehicle_avoidance_time;
-	real_point3d field_C8;
-	real_point3d field_D4;
-	real field_E0;
-	real_point3d field_E4;
-	real field_F0;
-	boolean field_F4;
-	real_point3d field_F8;
+	real_point3d vehicle_avoidance_point;
+	real_point3d vehicle_center;
+	real vehicle_radius;
+	real_point3d vehicle_intended_entry_point;
+	real vehicle_intersect_t;
+	boolean vehicle_modified;
+	real_point3d vehicle_modified_point;
 	long last_melee_time;
 	real_point3d field_108;
 	real_vector3d field_114;
@@ -846,11 +860,11 @@ struct actor_debug_info
 	real collision_t[ACTOR_MAXIMUM_AVOIDANCE_RAYS];
 	real_point3d ray_origin[ACTOR_MAXIMUM_AVOIDANCE_RAYS];
 	real_vector3d ray_direction[ACTOR_MAXIMUM_AVOIDANCE_RAYS];
-	short field_62F8[8][2];
+	short avoid_result[8][2]; /* fake name */
 	real avoid_t[8][2];
 	real_point3d field_6358[8][2];
 	real_vector3d field_6418[8][2];
-	real field_64D8[8];
+	real avoidance_weights[8]; /* fake name */
 	long field_64F8;
 	real field_64FC;
 	short field_6500;
@@ -880,6 +894,97 @@ struct actor_debug_info
 	short evaluation_mode;
 };
 
+struct firing_position
+{
+	struct firing_position_definition *definition;
+	short original_index;
+	short line_of_sight;
+	real path_distance_from_actor;
+	real_vector3d path_direction_from_actor;
+	real path_distance_to_target;
+	real path_closest_approach_to_target;
+	real_vector3d path_direction_from_target;
+	real linear_distance_squared_to_target;
+	boolean valid;
+	boolean rejected;
+	real pre_evaluation;
+	real evaluation;
+};
+
+struct firing_position_avoid_point
+{
+	real radius;
+	real_point3d point;
+};
+
+struct firing_position_attack_vector
+{
+	short type;
+	real_point3d point;
+	real_vector3d vector;
+};
+
+struct firing_position_evaluation_context
+{
+	unsigned long allowed_position_mask;
+	short evaluation_mode;
+	long evaluation_data[3];
+	boolean allow_rejected_positions;
+	boolean allow_outside_range;
+	real maximum_allowable_range;
+	real maximum_search_range;
+	boolean specific_target_enable;
+	real_point3d specific_target_point;
+	long specific_target_surface_index;
+	short specific_target_cluster_index;
+	boolean attractor_enable;
+	real attractor_weight;
+	real attractor_radius;
+	boolean find_path_direction_from_actor;
+	boolean use_last_visible_target_position;
+	boolean find_path_distance_to_target;
+	boolean find_path_direction_from_target;
+	boolean flying;
+	boolean directional_driving;
+	boolean directional_driving_cannot_stop;
+	unsigned long preferred_groups;
+	real preferred_weight;
+	long avoid_point_count;
+	struct firing_position_avoid_point avoid_point[MAXIMUM_FIRING_POSITION_AVOID_POINTS];
+	short attack_vector_count;
+	short friend_attack_vector_count;
+	short dangerous_enemy_attack_vector_count;
+	struct firing_position_attack_vector attack_vectors[MAXIMUM_FIRING_POSITION_ATTACK_VECTORS];
+	boolean has_gun_offset_stand;
+	real_vector3d gun_offset_stand;
+	boolean has_gun_offset_crouch;
+	real_vector3d gun_offset_crouch;
+	boolean has_target;
+	real target_current_distance;
+	real_point3d target_point;
+	real_point3d target_head_position;
+	real_point3d target_line_of_sight_position;
+	boolean target_line_of_sight_optional;
+	long target_vehicle_index;
+	long target_pathfinding_surface_index;
+	real_point3d target_pathfinding_point;
+	short target_cluster_index;
+	long target_prop_index;
+	boolean target_has_hint_vector;
+	real_vector3d target_hint_vector;
+	real target_danger_radius;
+	boolean post_evaluation_bounded;
+	real post_evaluation_bound;
+
+	/* fake names */
+	short encounter_count; /* fake name */
+	short consider_count; /* fake name */
+	short valid_count; /* fake name */
+	short nonrejected_count; /* fake name */
+	short post_evaluation_count; /* fake name */
+	short skipped_count; /* fake name */
+};
+
 /* ---------- prototypes/ACTORS.C */
 
 real_argb_color const *actor_activation_debug_color(long actor_index);
@@ -890,6 +995,10 @@ boolean actor_has_unlimited_grenades(long actor_index);
 /* ---------- prototypes/ACTOR_COMBAT.C */
 
 long actor_aim_grenade(long actor_index, real_point3d const *origin, real_vector3d *vector);
+
+/* ---------- prototypes/ACTOR_LOOKING.C */
+
+void actor_looking_test_validity(long actor_index, real_vector3d *test_vector, boolean *valid_aiming, boolean *valid_looking);
 
 /* ---------- prototypes/ACTOR_MOVING.C */
 

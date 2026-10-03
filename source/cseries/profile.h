@@ -39,6 +39,16 @@ struct profile_section
 
 /* ---------- prototypes/PROFILE.C */
 
+void profile_frame_start(void);
+void profile_frame_end(void);
+void profile_render_start(void);
+void profile_render_end(void);
+void profile_idle_start(void);
+void profile_idle_end(void);
+void profile_lapsed_frames(short lapsed_frames, boolean at_minimum, char *string);
+void profile_lapsed_msec(long msec);
+void profile_seconds_elapsed(real seconds_elapsed);
+
 void profile_initialize(void);
 
 void profile_enter_private(struct profile_section *objects_update_section);

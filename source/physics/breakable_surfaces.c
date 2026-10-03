@@ -331,6 +331,11 @@ static void breakable_surface_effect(
 					plane3d_from_point_and_normal(&s_plane, &origin, &s_normal);
 					plane3d_from_point_and_normal(&t_plane, &origin, &t_normal);
 
+					// NOTE: the reason the file does not bytematch is the plane3d_distance_to_point() calls below.
+					// sapien confirms this function, but the bytematch doesn't line up.
+					// Terms should be `x + (y + z)` instead of `x + y + z`
+					// Can be forced to match, but doesn't really affect anything
+
 					surface_bounds.x1 = plane3d_distance_to_point(&s_plane, vertex_point);
 					surface_bounds.x0 = surface_bounds.x1;
 					surface_bounds.y1 = plane3d_distance_to_point(&t_plane, vertex_point);

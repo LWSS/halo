@@ -15,6 +15,17 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	_biped_airborne_bit = 0,
+	_biped_slipping_bit,
+	_biped_absolute_movement_bit,
+	_biped_no_collision_bit,
+	_biped_movement_passes_through_bipeds_bit,
+	_biped_limp_body_physics_active_bit,
+	NUMBER_OF_BIPED_FLAGS,
+};
+
 /* ---------- macros */
 
 #define biped_get(index)			((struct biped_datum *)object_get_and_verify_type((index), _object_mask_biped))
@@ -71,8 +82,10 @@ void biped_get_sight_position(
 	real_vector3d const *desired_gun_offset,
 	real_point3d *sight_position);
 void biped_get_physics_pill(long biped_index, real_point3d *base, real *height, real *width);
+void biped_accelerate(long biped_index, real_vector3d *acceleration);
 
 void biped_stop_limp_body_physics(long biped_index);
+long biped_find_pathfinding_surface_index(long biped_index, real_point3d *pathfinding_point);
 
 void biped_build_flying_axes(real_vector3d const *forward_vector, real_vector3d *left_vector, real_vector3d *up_vector);
 

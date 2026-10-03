@@ -16,11 +16,23 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	_joystick_preset_standard = 0,
+	_joystick_preset_south_paw,
+	_joystick_preset_legacy,
+	_joystick_preset_legacy_south_paw,
+	NUMBER_OF_JOYSTICK_PRESETS,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/PLAYER_PROFILE.C */
+
+void player_profile_save_last_level_played(short local_player_index);
+void player_profile_save_level_completed(short local_player_index);
 
 /* ---------- globals */
 

@@ -13,6 +13,14 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	_cached_map_file_in_progress = 0,
+	_cached_map_file_success,
+	_cached_map_file_failed,
+	NUMBER_OF_CACHED_MAP_FILE_PRECACHE_STATES,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */

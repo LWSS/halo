@@ -366,7 +366,6 @@ void vectors3d_from_euler_angles3d(
 	return;
 }
 
-// TODO: mismatch in calculating dot and 'a', funky compiler optimization
 boolean fast_vector_intersects_sphere(
 	real_point3d const *point,
 	real_vector3d const *vector,
@@ -382,7 +381,8 @@ boolean fast_vector_intersects_sphere(
 	}
 	else
 	{
-		real b = vector->i*p.x + vector->j*p.y + vector->k*p.z;
+		real_vector3d v = *vector;
+		real b = p.x*v.i + p.y*v.j + p.z*v.k;
 		
 		if (b >= 0.f)
 		{
@@ -390,7 +390,7 @@ boolean fast_vector_intersects_sphere(
 		}
 		else
 		{
-			real a = vector->i*vector->i + vector->j*vector->j + vector->k*vector->k;
+			real a = v.i*v.i + v.j*v.j + v.k*v.k;
 			real disc = b * b - a * c;
 			
 			if (disc <= 0.f)

@@ -50,7 +50,7 @@ boolean attract_mode_should_start(
 	real progress;
 
 	if (cache_files_precache_in_progress() &&
-		cache_files_precache_map_status(&progress)==1)
+		cache_files_precache_map_status(&progress)==_cached_map_file_success)
 	{
 		cache_files_precache_map_end();
 	}

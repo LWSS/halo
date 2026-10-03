@@ -20,6 +20,8 @@ header included in hcex build.
 
 /* ---------- prototypes/SOUND_MANAGER.C */
 
+void sound_render(void);
+
 void sound_dispose(void);
 
 void sound_initialize(void);

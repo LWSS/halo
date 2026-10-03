@@ -14,6 +14,7 @@ file has inline function assertions.
 
 #define _real_epsilon 0.0001f
 #define _pi ((real)M_PI)
+#define _half_pi ((real)M_PI_2) // [fake name?]
 
 #define REAL_MIN -3.4028235e38f
 #define REAL_MAX 3.4028235e38f
@@ -53,6 +54,16 @@ vassert(												\
 		"%s: assert_valid_real_vector2d(%f, %f, %f)",	\
 		#vector, (*vector).i, (*vector).j, (*vector).k	\
 	)													\
+)
+
+#define assert_valid_real_plane3d(plane)								\
+vassert(																\
+	valid_real_plane3d(plane),											\
+	csprintf(															\
+		temporary,														\
+		"%s: assert_valid_real_plane3d(%f, %f, %f / %f)",				\
+		#plane, (*plane).n.i, (*plane).n.j, (*plane).n.k, (*plane).d	\
+	)																	\
 )
 
 #define assert_valid_real_normal3d(vector)				\
@@ -155,6 +166,18 @@ match_vassert(													\
 		temporary,												\
 		"%s: assert_valid_real_vector2d(%f, %f, %f)",			\
 		#vector, (*vector).i, (*vector).j, (*vector).k			\
+	)															\
+)
+
+#define match_assert_valid_real_plane3d(file, line, plane)		\
+match_vassert(													\
+	file,														\
+	line,														\
+	valid_real_plane3d(plane),								\
+	csprintf(													\
+		temporary,												\
+		"%s: assert_valid_real_plane3d(%f, %f, %f / %f)",	\
+		#plane, (plane)->n.i, (plane)->n.j, (plane)->n.k, (plane)->d\
 	)															\
 )
 
@@ -450,10 +473,22 @@ real_vector3d *vector3d_from_euler_angles2d(real_vector3d *vector, real_euler_an
 boolean point_in_pill2d(real_point2d const *point, real_point2d const *base, real_vector2d const *height, real width);
 real point_to_line_distance_squared3d(real_point3d const *point, real_point3d const *base, real_vector3d const *height);
 
+boolean line_from_planes3d(real_plane3d const *plane0, real_plane3d const *plane1, real_point3d *point, real_vector3d *vector);
+boolean point_from_planes3d(real_plane3d const *plane0, real_plane3d const *plane1, real_plane3d const *plane2, real_point3d *point);
+
 boolean sphere_test_vector3d(real_point3d const *center, real radius, real_point3d const *point, real_vector3d const *vector, real *t, real_vector3d *normal);
 
 boolean valid_real_sine_cosine(real sine, real cosine);
 
+boolean accelerate_to_position(
+	real *position_reference,
+	real *velocity_reference,
+	real position_desired,
+	real acceleration_maximum,
+	real velocity_maximum,
+	real position_lower_bound,
+	real position_upper_bound,
+	boolean circular_position);
 void angular_accelerate_to_position(
 	real_vector3d *position,
 	real_vector3d const *position_desired,
@@ -464,6 +499,10 @@ void angular_accelerate_to_position(
 /* ---------- prototypes/MATRIX_MATH.C */
 
 void matrix4x3_identity(real_matrix4x3 *matrix);
+real_matrix3x3 *matrix3x3_transpose(real_matrix3x3 const *matrix, real_matrix3x3 *result);
+real_matrix3x3 *matrix3x3_multiply(real_matrix3x3 const *a, real_matrix3x3 const *b, real_matrix3x3 *result);
+real_vector3d *matrix3x3_transform_vector(real_matrix3x3 const *matrix, real_vector3d const *vector, real_vector3d *result);
+real_matrix3x3 *matrix3x3_from_forward_and_up(real_matrix3x3 *matrix, real_vector3d const *forward, real_vector3d const *up);
 void matrix4x3_transpose(real_matrix4x3 *matrix);
 void matrix4x3_inverse(real_matrix4x3 const *matrix, real_matrix4x3 *result);
 void matrix4x3_scale(real_matrix4x3 *matrix, real scale);
@@ -491,6 +530,9 @@ real_plane3d *matrix4x3_inverse_transform_plane(real_matrix4x3 const *matrix, re
 void matrix4x3_multiply(real_matrix4x3 const *a, real_matrix4x3 const *b, real_matrix4x3 *result);
 
 /* ---------- prototypes/RANDOM_MATH.C */
+
+void lock_global_random_seed(void);
+void unlock_global_random_seed(void);
 
 unsigned long *get_global_random_seed_address(void);
 unsigned long *get_global_local_random_seed_address(void);
@@ -855,6 +897,12 @@ __inline real_point3d *point_from_line3d(
 	return result;
 }
 
+#define vector_from_line3d(v0, v1, t, result) \
+	point_from_line3d((real_point3d const *)(v0), (v1), (double)(t), (real_point3d *)(result))
+
+#define scale_point3d(point, scale, result) \
+	scale_vector3d((real_vector3d const *)(point), (scale), (real_vector3d *)(result))
+
 __inline real_vector3d *vector_from_points3d(
 	real_point3d const *a,
 	real_point3d const *b,
@@ -1112,13 +1160,14 @@ __inline real_plane3d *plane3d_from_points(
 
 	cross_product3d(&v0, &v1, &plane->n);
 
-	if (normalize3d(&plane->n) == 0.0f)
+	if (normalize3d(&plane->n) != 0.0f)
 	{
-		plane->d = 0.0f;
+		plane->d = dot_product3d(&plane->n, (real_vector3d const *)point0);
 	}
 	else
 	{
-		plane->d = dot_product3d(&plane->n, (real_vector3d const *)point0);
+		plane->d = 0.0f;
+		return NULL;
 	}
 
 	return plane;
@@ -1475,20 +1524,17 @@ __inline boolean valid_real_normal3d(
 	return valid_realcmp(magnitude_squared3d(n), 1.f);
 }
 
+__inline boolean valid_real_plane3d(
+	real_plane3d const *plane)
+{
+	return valid_real_normal3d(&plane->n) && valid_real(plane->d);
+}
+
 __inline boolean valid_real_vector3d_axes2(
 	real_vector3d const *forward,
 	real_vector3d const *up)
 {
-	boolean result = FALSE;
-	if (valid_real_normal3d(forward) && valid_real_normal3d(up))
-	{
-		real product = dot_product3d(forward, up);
-		if (valid_realcmp(product, 0.f))
-		{
-			result = TRUE;
-		}
-	}
-	return result;
+	return valid_real_normal3d(forward) && valid_real_normal3d(up) && valid_realcmp(dot_product3d(forward, up), 0.f);
 }
 
 __inline boolean valid_real_vector3d_axes3(

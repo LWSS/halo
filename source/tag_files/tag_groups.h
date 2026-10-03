@@ -73,7 +73,7 @@ typedef void (*byte_swap_block_proc)(void *);
 typedef boolean (*postprocess_block_proc)(void *, boolean);
 typedef byte *(*format_block_proc)(long, struct tag_block *, long, byte *);
 typedef void (*delete_block_proc)(struct tag_block *, long);
-typedef void (*byte_swap_data_proc)(void *, void *, long); // [fake name]
+typedef void (*byte_swap_data_proc)(void *, void *, long); /* fake name */
 
 struct tag_field
 {

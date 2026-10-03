@@ -19,7 +19,7 @@ enum
 	MAXIMUM_WINDOWS = 4,
 	MAXIMUM_LENS_FLARES_PER_FRAME = 1024,
 	MAXIMUM_LIGHTS_PER_WINDOW = 128,
-	NUMBER_OF_DYNAMIC_SCREEN_GEOMETRY_MAPS = 3, // [fake name]
+	NUMBER_OF_DYNAMIC_SCREEN_GEOMETRY_MAPS = 3, /* fake name */
 };
 
 enum
@@ -78,8 +78,32 @@ enum
 	_rasterizer_lock_bsp_switch
 };
 
+enum
+{
+	_rasterizer_target_render_primary = 0,
+	_rasterizer_target_render_secondary,
+	_rasterizer_target_shadow_primary,
+	_rasterizer_target_shadow_secondary,
+	_rasterizer_target_sun_glow_primary,
+	_rasterizer_target_sun_glow_secondary,
+	_rasterizer_target_water,
+	_rasterizer_target_z,
+	NUMBER_OF_RASTERIZER_TARGETS,
+};
+
+enum
+{
+	_render_planar_fog_mode_off = 0,
+	_render_planar_fog_mode_normal,
+	_render_planar_fog_mode_fully_fogged,
+	NUMBER_OF_RENDER_PLANAR_FOG_MODES,
+};
+
 
 /* ---------- macros */
+
+#define RASTERIZER_TARGET_RENDER_PRIMARY_WIDTH 640
+#define RASTERIZER_TARGET_RENDER_PRIMARY_HEIGHT 480
 
 /* ---------- structures */
 
@@ -248,6 +272,11 @@ struct rasterizer_lens_flare_submit_parameters
 
 /* ---------- prototypes/RASTERIZER.C */
 
+void rasterizer_reset_state(void);
+void rasterizer_set_vblank_callback(void (*callback)(unsigned long));
+void rasterizer_debug_draw(void);
+void rasterizer_transparent_geometry_draw(boolean water);
+
 boolean rasterizer_initialize(void);
 
 void rasterizer_frame_begin(const struct rasterizer_frame_begin_parameters *parameters);
@@ -304,6 +333,17 @@ struct rasterizer_globals_struct
 	short current_lock_operation;
 	rectangle2d screen_bounds;
 	rectangle2d frame_bounds;
+	byte __unknown14[4];
+	__int64 frame_index;
+	unsigned long flip_index;
+	volatile __int64 vblank_index;
+	volatile __int64 flip_vblank_index;
+	byte __unknown38[5];
+	boolean use_rasterizer_frame_rate_throttle;
+	boolean use_rasterizer_frame_rate_stabilization;
+	short refresh_rate;
+	real z_near;
+	real z_far;
 };
 
 extern struct rasterizer_globals_struct rasterizer_globals;

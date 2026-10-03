@@ -152,6 +152,12 @@ struct animation_graph_unit_seat
 	struct tag_block weapon_classes;	// animation_graph_weapon_class
 };
 
+struct animation_graph_device_animations
+{
+	long unused[21];
+	struct tag_block animations;		// animation_graph_animation_index
+};
+
 struct animation_graph
 {
 	struct tag_block object_overlays;		// animation_graph_object_overlay

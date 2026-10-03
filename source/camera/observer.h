@@ -29,6 +29,8 @@ struct observer_result
 
 /* ---------- prototypes/OBSERVER.C */
 
+void observer_update(real dt);
+
 void observer_initialize_for_new_map(void);
 
 struct observer_result const *observer_get_camera(short local_player_index);

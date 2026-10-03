@@ -86,4 +86,11 @@ void render_debug_collision_model(struct collision_model_instance const *instanc
 
 /* ---------- public code */
 
+__inline short collision_model_get_material_type(
+	struct collision_model const *model,
+	short material_index)
+{
+	return material_index != NONE ? TAG_BLOCK_GET_ELEMENT(&model->resistance.materials, material_index, struct damage_material)->type : NONE;
+}
+
 #endif // __COLLISION_MODELS_H

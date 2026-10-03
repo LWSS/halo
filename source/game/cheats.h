@@ -30,6 +30,8 @@ struct cheat_globals
 
 /* ---------- prototypes/EXAMPLE.C */
 
+void cheats_update(void);
+
 /* ---------- globals */
 
 extern struct cheat_globals cheat;

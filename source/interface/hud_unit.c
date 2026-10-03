@@ -282,7 +282,7 @@ void hud_render_damage_indicators(
 					case 1:
 						position.x = render.camera.window_bounds.x0 + definition->left_offset;
 						position.y = (render.camera.viewport_bounds.y0 + render.camera.viewport_bounds.y1) / 2;
-						theta = _pi / 2.f;
+						theta = _half_pi;
 						break;
 					case 2:
 						position.y = render.camera.window_bounds.y1 - definition->bottom_offset;
@@ -292,7 +292,7 @@ void hud_render_damage_indicators(
 					case 3:
 						position.x = render.camera.window_bounds.x1 - definition->right_offset;
 						position.y = (render.camera.viewport_bounds.y0 + render.camera.viewport_bounds.y1) / 2;
-						theta = 3.f * _pi / 2.f;
+						theta = 3.f * _half_pi;
 						break;
 					default:
 						match_unreachable("c:\\halo\\SOURCE\\interface\\hud_unit.c", 1024);

@@ -59,6 +59,14 @@ enum
 	NUMBER_OF_SCENARIO_GET_CURRENT_BITS,
 };
 
+enum
+{
+	_scenario_type_solo = 0,
+	_scenario_type_multiplayer,
+	_scenario_type_main_menu,
+	NUMBER_OF_SCENARIO_TYPES,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */

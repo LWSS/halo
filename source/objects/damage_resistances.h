@@ -17,6 +17,19 @@ header included in hcex build.
 
 /* ---------- structures */
 
+struct damage_material
+{
+	char name[32];
+	unsigned long flags;
+	short type;
+	word pad;
+	real shield_leak_fraction;
+	real shield_damage_multiplier;
+	real shield_unused[3];
+	real body_damage_multiplier;
+	long body_unused[2];
+};
+
 struct damage_resistance
 {
 	unsigned long flags;

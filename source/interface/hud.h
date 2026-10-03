@@ -35,6 +35,9 @@ struct hud_scripted_globals_definition
 
 /* ---------- prototypes/HUD_UNIT.C */
 
+void hud_autosave(boolean begin);
+void hud_load(boolean begin);
+
 struct player_datum;
 
 void unit_hud_shield_meter_mapper_init(void);

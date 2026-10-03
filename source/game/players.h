@@ -89,10 +89,18 @@ struct player_datum
 
 /* ---------- prototypes/PLAYER_CONTROL.C */
 
+void player_control_update(real seconds_elapsed);
+
 void player_control_unzoom(long unit_index);
+long player_control_get_unit_index(short local_player_index);
 
 /* ---------- prototypes/PLAYERS.C */
 
+long player_new(long machine_index, long player_index, short local_player_index, struct network_player *network_player_data);
+void local_player_set_player_index(short local_player_index, long player_index);
+boolean players_respawn_coop(void);
+
+boolean local_player_exists(long local_player_index);
 short local_player_count(void);
 short local_player_get_next(short local_player_index);
 long local_player_get_player_index(short local_player_index);
@@ -110,11 +118,18 @@ void player_input_enable(boolean enable);
 
 /* ---------- prototypes/PLAYER_QUEUES_NEW.C */
 
+void update_server_delete(void);
+boolean update_server_new(void);
+void update_server_start(void);
+
 void update_queues_reset_and_fill_with_lies(void);
 
 /* ---------- globals */
 
 extern struct data_array *player_data;
+
+extern real player_look_yaw_rate[];
+extern real player_look_pitch_rate[];
 
 /* ---------- public code */
 

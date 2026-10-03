@@ -37,16 +37,16 @@ enum
 
 enum
 {
-	DEBUG_RECORDING_STRING_SIZE = 10*1024, // [fake name]
-	DEBUG_RECORDING_DISPLAY_LENGTH = 1024 // [fake name]
+	DEBUG_RECORDING_STRING_SIZE = 10*1024, /* fake name */
+	DEBUG_RECORDING_DISPLAY_LENGTH = 1024 /* fake name */
 };
 
 /* ---------- macros */
 
 /* ---------- structures */
 
-typedef void (*initialize_event_stream_proc)(struct animation_playback_controller *animation_state, struct unit_control_data *control, char const **playback_stream, byte unit_control_version); // [fake name]
-typedef boolean (*apply_event_stream_proc)(struct animation_playback_controller *animation_state, struct unit_control_data *control, long *ticks, char const **playback_stream); // [fake name]
+typedef void (*initialize_event_stream_proc)(struct animation_playback_controller *animation_state, struct unit_control_data *control, char const **playback_stream, byte unit_control_version); /* fake name */
+typedef boolean (*apply_event_stream_proc)(struct animation_playback_controller *animation_state, struct unit_control_data *control, long *ticks, char const **playback_stream); /* fake name */
 
 struct animation_playback
 {
@@ -67,12 +67,12 @@ struct animation_thread
 	short version;
 };
 
-struct animation_thread_debug // [fake name]
+struct animation_thread_debug /* fake name */
 {
-	boolean valid; // [fake name]
+	boolean valid; /* fake name */
 	char const *event_stream_start;
 	long stream_length;
-	short animation_index; // [fake name]
+	short animation_index; /* fake name */
 };
 
 /* ---------- prototypes */

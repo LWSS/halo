@@ -66,14 +66,16 @@ struct render_globals
 
 /* ---------- prototypes/RENDER.C */
 
+void render_frame(struct render_window const *windoze, short window_count, point2d const *screenshot_page_index, point2d const *screenshot_index, struct bitmap_data *screenshot_bitmap, real time_delta_since_tick_sec);
+
 void render_effects(boolean enable);
 void render_initialize(void);
 void render_initialize_for_new_map(void);
 void render_dispose_from_old_map(void);
 void render_dispose(void);
 
-void render_frame_pregame(const struct render_window *window);
-void render_frame_present(const point2d *screenshot_index, struct bitmap_data *bitmap);
+void render_frame_pregame(struct render_window const *window, struct bitmap_data *screenshot_bitmap);
+void render_frame_present(point2d const *screenshot_index, struct bitmap_data *bitmap);
 boolean render_location_visible(struct location *location);
 struct rendered_cluster *rendered_cluster_get(short rendered_cluster_index);
 
@@ -87,6 +89,7 @@ void render_objects_dispose(void);
 /* ---------- globals */
 
 extern struct render_globals render;
+extern boolean debug_render_freeze;
 
 /* ---------- public code */
 

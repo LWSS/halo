@@ -103,14 +103,24 @@ struct collision_result
 
 /* ---------- prototypes/COLLISIONS.C */
 
+boolean collision_test_vector_exit(struct collision_result const *previous_collision, real_point3d const *point, real_vector3d const *vector, struct collision_result *exit_collision);
+boolean collision_test_pill(unsigned long flags, real_point3d const *point, real_vector3d const *vector, real radius, long ignore_object_index, struct collision_result *collision);
+boolean collision_test_pill_new(unsigned long flags, real_point3d const *point, real_vector3d const *vector, real radius, long ignore_object_index, struct collision_result *collision);
+boolean collision_fix_pill(unsigned long flags, real_point3d const *old_position, real distance, real height, real width, long ignore_object_index, real_point3d *new_position);
+short collision_move_point(real_point3d const *old_position, real_vector3d const *old_velocity, struct collision_feature_list const *features, real_point3d *new_position, real_vector3d *new_velocity, short maximum_collision_count, struct collision_plane *collisions);
+
 boolean collision_test_vector(unsigned long flags, real_point3d const *point, real_vector3d const *vector, long ignore_object_index, struct collision_result *collision);
 boolean collision_test_sphere(real_point3d const *center, real radius, long ignore_object_index);
 boolean collision_test_point(unsigned long flags, real_point3d const *point, long ignore_object_index);
+boolean collision_fix_pill(unsigned long flags, real_point3d const *base, real radius, real height, real width, long ignore_object_index, real_point3d *new_base);
 short collision_move_sphere(unsigned long flags, real_point3d const *old_position, real_vector3d const *old_velocity, real radius, long ignore_object_index, real_point3d *new_position, real_vector3d *new_velocity, short maximum_count, struct collision_plane *collisions);
 short collision_move_pill(unsigned long flags, real_point3d const *old_position, real_vector3d const *old_velocity, real height, real width, long ignore_object_index, real_point3d *new_position, real_vector3d *new_velocity, short maximum_count, struct collision_plane *collisions);
 boolean collision_get_features_in_sphere(unsigned long flags, real_point3d const *center, real radius, real height, real width, long ignore_object_index, struct collision_feature_list *features);
 
 /* ---------- globals */
+
+extern boolean debug_collision_skip_objects;
+extern boolean debug_collision_skip_vectors;
 
 /* ---------- public code */
 

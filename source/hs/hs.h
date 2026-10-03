@@ -16,6 +16,9 @@ header included in hcex build.
 
 /* ---------- prototypes/HS.C */
 
+void hs_runtime_dispose_from_old_map(void);
+void hs_runtime_initialize_for_new_map(void);
+
 boolean hs_compile_and_evaluate(const char *expression);
 
 short hs_tokens_enumerate(char const *substring, long type_flags, char const **results, short maximum_count);

@@ -26,6 +26,9 @@ enum
 
 /* ---------- prototypes/ERRORS.C */
 
+boolean errors_handle(void);
+char *error_get(void);
+
 void errors_initialize(void);
 void errors_dispose(void);
 void error(long priority, const char *format, ...);

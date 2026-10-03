@@ -14,7 +14,9 @@ header included in hcex build.
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/CAMERA_SCRIPTING.C */
+
+void scripted_camera_set(short camera_point_index, short tick_count, long relative_to_object_index);
 
 /* ---------- globals */
 

@@ -54,6 +54,51 @@ enum
 
 /* ---------- structures */
 
+struct structure_cluster
+{
+	short sky_index;
+	short fog_designator;
+	short background_sound_palette_index;
+	short sound_environment_palette_index;
+	short weather_palette_index;
+	short transitions_to_structure_bsp_index;
+	short first_runtime_decal_index;
+	unsigned short runtime_decal_count;
+	long unused1[6];
+	struct tag_block predicted_resources;	// predicted_resource
+	struct tag_block subclusters;			// structure_subcluster
+	unsigned short first_lens_flare_marker_index;
+	unsigned short lens_flare_marker_count;
+	struct tag_block surface_indices;		// long
+	struct tag_block mirrors;				// structure_mirror
+	struct tag_block portal_indices;		// short
+};
+
+struct structure_fog_plane
+{
+	short region_index;
+	short runtime_material_type;
+	real_plane3d plane;
+	struct tag_block vertices;	// real_point3d
+};
+
+struct structure_fog_region
+{
+	long unused[9];
+	short fog_palette_index;
+	short weather_palette_index;
+};
+
+struct structure_fog_palette_entry
+{
+	char name[32];
+	struct tag_reference fog;
+	unsigned short pad;
+	short runtime_global_function_index;
+	char global_function_name[32];
+	long unused[13];
+};
+
 struct structure_leaf
 {
 	byte_rectangle3d bounds;

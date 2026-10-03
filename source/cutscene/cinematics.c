@@ -34,7 +34,7 @@ CINEMATICS.C
 
 enum
 {
-	MAXIMUM_ACTIVE_CINEMATIC_TITLES = 4 // [fake name]
+	MAXIMUM_ACTIVE_CINEMATIC_TITLES = 4 /* fake name */
 };
 
 /* ---------- macros */
@@ -330,7 +330,7 @@ void cinematic_render(
 				{
 					struct unicode_string_list_group_header *string_list = tag_get(UNICODE_STRING_LISTS_GROUP_TAG, string_list_index);
 
-					if (VALID_INDEX(definition->text_index, string_list->string_references.count))
+					if (definition->text_index >= 0 && definition->text_index < string_list->string_references.count)
 					{
 						rectangle2d *bounds = &definition->bounds;
 						real fade = 1.f;

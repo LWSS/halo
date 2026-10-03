@@ -231,7 +231,7 @@ void terminal_draw(
 			terminal_gets_bounds.y1 = render.camera.window_bounds.y1;
 
 			offset_rectangle2d(&terminal_gets_bounds, -render.camera.viewport_bounds.x0, -render.camera.viewport_bounds.y0);
-			draw_string_set_draw_mode(font_tag_index, NONE, 0, 0, &terminal_globals.input_state->color);
+			draw_string_set_draw_mode(font_tag_index, _text_style_plain, _text_justification_left, 0, &terminal_globals.input_state->color);
 
 			if (terminal_globals.insertion_point_visible)
 			{
@@ -283,7 +283,7 @@ void terminal_draw(
 					);
 				}
 
-				draw_string_set_draw_mode(font_tag_index, NONE, 0, 0, &color);
+				draw_string_set_draw_mode(font_tag_index, _text_style_plain, _text_justification_left, 0, &color);
 				rasterizer_draw_string(&terminal_gets_bounds, NULL, NULL, 0, line->buffer);
 				draw_string_set_tab_stops(terminal_tab_stops, 0);
 			}

@@ -94,6 +94,10 @@ struct bitmap_data
 
 /* ---------- prototypes/BITMAPS.C */
 
+struct bitmap_data *bitmap_2d_new(short width, short height, short mipmap_count, short format);
+void bitmap_delete(struct bitmap_data *bitmap);
+char *tiff_export(struct file_reference *file, struct bitmap_data *in_bitmap);
+
 short bitmap_format_get_bits_per_pixel(short format);
 char *bitmap_cube_map_address(struct bitmap_data const *bitmap, short x, short y, short face_index, short mipmap_index);
 void *bitmap_mipmap_address(struct bitmap_data const *bitmap, short mipmap_index);

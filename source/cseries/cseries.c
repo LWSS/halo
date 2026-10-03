@@ -479,6 +479,35 @@ void *csmemcpy(
 	return memcpy(destination, source, size);
 }
 
+char *stristr(
+	char const *haystack,
+	char const *needle)
+{
+	char c;
+	char sc;
+	unsigned long length;
+
+	if ((c = *needle++) != 0)
+	{
+		length = csstrlen(needle);
+		do
+		{
+			do
+			{
+				if ((sc = *haystack++) == 0)
+				{
+					return NULL;
+				}
+			}
+			while (sc != c);
+		}
+		while (_strnicmp(haystack, needle, length) != 0);
+		haystack--;
+	}
+
+	return (char *)haystack;
+}
+
 unsigned long string_hash(
 	const char *string)
 {

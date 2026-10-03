@@ -12,6 +12,10 @@ header included in hcex build.
 
 #ifdef DEBUG
 #include "path.h"
+#include "actors.h"
+#include "encounters.h"
+#include "ai_communication.h"
+#include "dialogue_definitions.h"
 #endif
 
 /* ---------- constants */
@@ -103,18 +107,19 @@ enum
 
 /* ---------- macros */
 
-/* ---------- structures */
+#define MAXIMUM_LINEOFSIGHT_POINTS 16384
+#define MAXIMUM_LINEOFSIGHT_RAYS 8192
+#define MAXIMUM_IDLE_LOOK_PROPS 32
+#define MAXIMUM_BALLISTIC_PILLS 16
+#define MAXIMUM_BALLISTIC_POINTS 64
 
-struct ai_debug_unknown_state
-{
-	char __unknown0[1648];
-};
+/* ---------- structures */
 
 struct ai_debug_firing_position
 {
 	boolean pursuit_position;
 	boolean evaluated;
-	char __unknown2[62];
+	struct firing_position last_evaluation;
 };
 
 #ifdef DEBUG
@@ -124,20 +129,20 @@ struct ai_debug_state
 	boolean select_this_actor;
 	boolean fix_defending_guard_firing_positions;
 	boolean fix_actor_variants;
-	boolean debug_fast_los;
-	boolean debug_evaluate_all_positions;
-	boolean debug_ignore_player;
-	boolean debug_invisible_player;
-	boolean debug_flee_always;
-	boolean debug_force_all_active;
-	boolean debug_disable_wounded_sounds;
-	boolean debug_blind;
-	boolean debug_deaf;
+	boolean fast_los;
+	boolean evaluate_all_positions;
+	boolean ignore_player;
+	boolean invisible_player;
+	boolean flee_always;
+	boolean force_all_active;
+	boolean disable_wounded_sounds;
+	boolean blind;
+	boolean deaf;
 	boolean force_vocalizations;
 	boolean force_crouch;
 	boolean path_disable_obstacle_avoidance;
 	boolean path_disable_smoothing;
-	boolean field_11;
+	boolean oversteer_disable;
 	char selected_squad_name[32];
 	long selected_encounter_index;
 	long selected_actor_index;
@@ -150,7 +155,43 @@ struct ai_debug_state
 	real path_attractor_radius;
 	real path_attractor_weight;
 	real path_accept_radius;
-	char __unknown3C[81];
+	unsigned long communication_suppress_flags[BIT_VECTOR_SIZE_IN_LONGS(NUMBER_OF_AI_COMMUNICATION_TYPES)]; /* fake name */
+	unsigned long communication_ignore_flags[BIT_VECTOR_SIZE_IN_LONGS(NUMBER_OF_AI_COMMUNICATION_TYPES)]; /* fake name */
+	unsigned long vocalization_focus_flags[BIT_VECTOR_SIZE_IN_LONGS(NUMBER_OF_VOCALIZATION_TYPES)]; /* fake name */
+	char __unknown80[4];
+	boolean communication_focus_enable;
+	boolean communication_random_disabled;
+	boolean communication_timeout_disabled;
+	boolean communication_unit_repeat_disabled;
+	boolean ballistic_lineoffire_freeze;
+	boolean print_major_upgrade;
+	boolean print_pursuit_checks;
+	boolean print_rules;
+	boolean print_rule_values;
+	boolean print_respawn;
+	boolean print_evaluation_statistics;
+	boolean print_communication;
+	boolean print_communication_player;
+	boolean print_vocalizations;
+	boolean print_placement;
+	boolean print_speech;
+	boolean print_speech_timers;
+	boolean print_allegiance;
+	boolean print_lost_speech;
+	boolean print_migration;
+	boolean print_automatic_migration;
+	boolean print_scripting;
+	boolean print_surprise;
+	boolean print_command_lists;
+	boolean print_damage_modifiers;
+	boolean print_secondary_looking;
+	boolean print_oversteer;
+	boolean print_conversations;
+	boolean print_killing_sprees;
+	boolean print_acknowledgement;
+	boolean print_unfinished_paths;
+	boolean print_bsp_transition;
+	boolean print_uncovering;
 	boolean render;
 	boolean render_all_actors;
 	boolean render_inactive_actors;
@@ -165,9 +206,9 @@ struct ai_debug_state
 	boolean render_props;
 	boolean render_props_web;
 	boolean render_props_no_friends;
+	boolean render_props_target_weight;
 	boolean render_props_unreachable;
 	boolean render_props_unopposable;
-	boolean render_props_target_weight;
 	boolean render_idle_look;
 	boolean render_targets;
 	boolean render_targets_last_visible;
@@ -241,27 +282,50 @@ struct ai_debug_state
 	real lineoffire_pillwidth[16];
 	boolean lineofsight_overflow;
 	long lineofsight_numpoints;
-	char __unknown2F0[262144];
-	long field_42F0;
-	char __unknown42F4[50472];
+	real_point3d lineofsight_points[MAXIMUM_LINEOFSIGHT_POINTS];
+	short lineofsight_pointcounts[MAXIMUM_LINEOFSIGHT_POINTS];
+	short lineofsight_pointclusters[MAXIMUM_LINEOFSIGHT_POINTS];
+	long lineofsight_numrays;
+	short lineofsight_rays[MAXIMUM_LINEOFSIGHT_RAYS][3];
+	boolean ballistic_valid;
+	boolean ballistic_success;
+	real_point3d ballistic_origin;
+	real_vector3d ballistic_initial_velocity;
+	long ballistic_numpills;
+	real_point3d ballistic_pillbase[MAXIMUM_BALLISTIC_PILLS];
+	real_vector3d ballistic_pilldirectedheight[MAXIMUM_BALLISTIC_PILLS];
+	real ballistic_pillwidth[MAXIMUM_BALLISTIC_PILLS];
+	long ballistic_numpoints;
+	real_point3d ballistic_points[MAXIMUM_BALLISTIC_POINTS];
+	char __unknown4C7D8[16];
+	boolean path_start_valid;
+	real_point3d path_start_point;
+	long path_start_surface_index;
+	long path_start_unit_index;
+	boolean path_destination_valid;
+	struct path_destination path_destination;
+	boolean path_state_valid;
 	struct path_state path_state;
 	struct path_result path;
 	struct path_debug_storage path_debug;
 	boolean firing_position_context_valid;
-	byte pad[3];
-	struct ai_debug_unknown_state field_7D384;
-	struct ai_debug_firing_position firing_positions[512];
-	char __unknown859F4[32];
+	struct firing_position_evaluation_context firing_position_context;
+	struct ai_debug_firing_position firing_positions[MAXIMUM_FIRING_POSITIONS_PER_ENCOUNTER];
+	long aiming_validity_actor_index;
+	boolean aiming_validity_looking_stored;
+	boolean aiming_validity_aiming_stored;
+	real_vector3d aiming_validity_looking_stored_vector;
+	real_vector3d aiming_validity_aiming_stored_vector;
 	boolean idle_look_valid;
 	long prop_idle_actor_index;
 	short prop_idle_look_count;
-	long prop_idle_look_indicies[32];
-	real prop_idle_look_distances[32];
-	boolean field_85B20;
-	boolean field_85B21;
-	boolean field_85B22;
+	long prop_idle_look_indicies[MAXIMUM_IDLE_LOOK_PROPS];
+	real prop_idle_look_distances[MAXIMUM_IDLE_LOOK_PROPS];
+	boolean speak_active; /* fake name */
+	boolean speak_list; /* fake name */
+	boolean speak_list_skip_unused; /* fake name */
 	long speaking_unit_index;
-	short field_85B28;
+	short speak_delay_timer; /* fake name */
 	short vocalization_type;
 };
 #endif // DEBUG
@@ -283,14 +347,24 @@ void ai_debug_lineoffire_addpill(real_point3d const *base, real_vector3d const *
 void ai_debug_lineoffire_success(boolean success);
 boolean ai_debug_highlight_cluster(short index, real_argb_color const **highlight_color);
 void ai_debug_lineofsight_reset(void);
+void ai_debug_lineofsight(real_point3d const *p0, short p0_cluster_index, real_point3d const *p1, short p1_cluster_index);
 char *ai_debug_describe_actor(long actor_index, long unit_index, boolean include_squad, char *buffer, long bufsize);
 void ai_debug_vocalize(char const *speech_priority_name, char const *vocalization_type_name);
 void ai_debug_speak(char const *vocalization_type_name);
+void ai_debug_speak_list(char const *name);
+void ai_debug_communication_suppress(long name_count, char const **names);
+void ai_debug_communication_ignore(long name_count, char const **names);
+void ai_debug_communication_focus(long name_count, char const **names);
+void ai_debug_idle_look_clear(long actor_index);
+void ai_debug_idle_look_addprop(long prop_index, real distance);
 
 void ai_debug_change_selected_encounter(boolean search_forwards);
 void ai_debug_change_selected_actor(boolean search_forwards);
+void ai_debug_teleport_to(long encounter_index);
 
 void ai_debug_initialize_for_new_map(void);
+void ai_debug_update(void);
+void ai_debug_render(void);
 
 
 /* ---------- globals */

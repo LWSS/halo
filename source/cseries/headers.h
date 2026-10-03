@@ -15,12 +15,13 @@ HEADERS.H
 #include <time.h>
 
 #include "progress.h"
-#include "profile.h"
 
 #include "integer_math.h"
 #include "real_math.h"
 #include "periodic_functions.h"
 #include "geometry.h"
+
+#include "profile.h"
 
 #include "byte_swapping.h"
 #include "crc.h"

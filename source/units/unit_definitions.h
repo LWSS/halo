@@ -109,6 +109,14 @@ struct powered_seat_definition
 	long unused[14];
 };
 
+struct dialogue_variant_definition
+{
+	short variant_number;
+	word pad;
+	long unused;
+	struct tag_reference dialogue_variant;
+};
+
 struct _unit_definition
 {
 	unsigned long flags;

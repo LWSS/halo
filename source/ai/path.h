@@ -44,6 +44,12 @@ enum
 
 /* ---------- macros */
 
+#define MAXIMUM_SMOOTHED_PATH_STEPS 4
+#define MAXIMUM_DISC_COUNT 128
+#define MAXIMUM_OBSTACLE_AVOIDANCE_STEPS 128
+
+#define MAXIMUM_RAW_PATH_STEPS 64
+
 /* ---------- structures */
 
 struct path_destination
@@ -66,7 +72,7 @@ struct path_result
 	boolean steps_finish_path;
 	char step_count;
 	char step_index;
-	struct path_step steps[4];
+	struct path_step steps[MAXIMUM_SMOOTHED_PATH_STEPS];
 };
 
 struct path_input
@@ -102,6 +108,9 @@ struct path_node
 	short quantized_cost_estimate;
 	short depth;
 	short heap_location;
+	short debug_render_traverse_index;
+	real closest_distance;
+	real_point3d closest_point;
 };
 
 struct path_heap_element
@@ -121,12 +130,63 @@ struct path_state
 	real closest_distance;
 	real closest_cost_estimate;
 	real_point3d closest_point;
-	char __unknown80[16384];
 	short node_count;
 	struct path_node node_list[PATH_NODE_LIST_SIZE];
 	short heap_count;
 	struct path_heap_element heap[1025];
 	short hash_table[PATH_HASH_TABLE_SIZE];
+};
+
+struct disc
+{
+	short flags;
+	short obstacle_index;
+	long object_index;
+	real_point2d center;
+	real radius;
+	real z;
+};
+
+struct obstacles
+{
+	short obstacle_count;
+	short disc_count;
+	short disc_optional_count;
+	struct disc discs[MAXIMUM_DISC_COUNT];
+};
+
+struct step
+{
+	real_point2d point;
+	long surface_index;
+	real_vector2d direction;
+	real distance;
+	short obstacle_index;
+	byte obstacle_direction_index;
+	short obstructed_goal_step_indices[2];
+	real total_distance;
+	short previous_step_index;
+};
+
+struct obstacle_path
+{
+	real radius;
+	boolean ignore_broken_surfaces;
+	struct obstacles const *obstacles;
+	struct structure_bsp const *structure;
+	real_point2d goal;
+	long goal_surface_index;
+	short goal_obstacle_index;
+	short goal_step_index;
+	short best_goal_blocked_step_index;
+	real best_goal_blocked_distance;
+	boolean goal_found_exactly;
+	boolean finishing;
+	boolean ignore_optional;
+	short step_count;
+	struct step steps[MAXIMUM_OBSTACLE_AVOIDANCE_STEPS];
+	short heap_count;
+	short heap[MAXIMUM_OBSTACLE_AVOIDANCE_STEPS];
 };
 
 struct path_debug_storage
@@ -140,10 +200,40 @@ struct path_debug_storage
 	short path_traverse_result;
 	short path_build_result;
 	struct path_state path_state;
-	char __unknown[35292];
+	struct path_result result;
+	short raw_step_count;
+	struct path_step raw_steps[MAXIMUM_RAW_PATH_STEPS];
+	short smoothed_step_count;
+	struct path_step smoothed_steps[MAXIMUM_SMOOTHED_PATH_STEPS];
+	short avoided_step_count;
+	struct path_step avoided_steps[MAXIMUM_SMOOTHED_PATH_STEPS];
+	boolean debug_use_stored_obstacles;
+	short stored_obstacle_step_count;
+	struct obstacles path_obstacles[4];
+	struct obstacle_path path_obstacle_paths[4];
 };
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/PATH.C */
+
+void path_input_new(struct path_input *input, real pathfinding_radius, boolean ignore_broken_surfaces, long source_object_index);
+void path_input_set_start(struct path_input *input, real_point3d const *start_point, long start_surface_index);
+void path_input_set_attractor(struct path_input *input, real_point3d const *attractor_point, real radius, long object_index, real weight);
+void path_input_set_search_bounds(struct path_input *input, real maximum_distance);
+void path_state_new(struct path_input const *input, struct path_state *state, struct path_debug_storage *debug);
+void path_state_destination(struct path_state *state, real_point3d const *destination_point, long destination_surface_index, real destination_accept_radius);
+boolean path_state_find(struct path_state *state);
+boolean path_state_build_path(struct path_state *state, struct path_result *path);
+short path_node_from_hash_table(struct path_state *state, long surface_index);
+struct path_node *path_get_node(struct path_state *state, short node_index);
+real path_attractor_weight(struct path_state const *state, real_point3d const *p0, real_point3d const *p1, real *distance_reference);
+
+/* ---------- prototypes/PATH_OBSTACLES.C */
+
+void render_debug_obstacles(struct obstacles const *obstacles, real radius);
+
+/* ---------- prototypes/PATH_OBSTACLE_AVOIDANCE.C */
+
+void render_debug_path(struct obstacle_path const *path);
 
 /* ---------- globals */
 

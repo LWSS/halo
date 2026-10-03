@@ -80,6 +80,10 @@ struct game_engine
 
 /* ---------- prototypes/GAME_ENGINE.C */
 
+void game_engine_dispose(void);
+boolean game_engine_force_single_screen(void);
+void game_engine_update_non_deterministic(real seconds_elapsed);
+
 boolean game_engine_running(void);
 boolean game_engine_has_shield(long player_index);
 boolean game_engine_has_teams(void);

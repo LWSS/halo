@@ -11,12 +11,12 @@ RECORDED_ANIMATION_PLAYBACK.C
 
 /* ---------- constants */
 
-#define CONTROLLER_ANGLE_STEPS 1000 // [fake name]
+#define CONTROLLER_ANGLE_STEPS 1000 /* fake name */
 
 /* ---------- macros */
 
 // each simple event copies one field of the same name into the unit control data
-#define APPLY_EVENT(line, field) /* [fake name] */ \
+#define APPLY_EVENT(line, field) /* fake name */ \
 static void apply_##field(struct animation_playback_controller *animation_state, struct unit_control_data *control, struct animation_event_header const *header, char const **playback_stream) \
 { \
 	struct field##_event_data const *event_data = (struct field##_event_data const *)*playback_stream; \

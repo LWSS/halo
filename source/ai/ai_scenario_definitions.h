@@ -26,6 +26,18 @@ enum
 
 enum
 {
+	_encounter_not_initially_placed_bit = 0,
+	_encounter_respawn_enable_bit,
+	_encounter_blind_bit,
+	_encounter_deaf_bit,
+	_encounter_braindead_bit,
+	_encounter_3d_firing_positions_bit,
+	_encounter_manual_structure_bsp_bit,
+	NUMBER_OF_ENCOUNTER_FLAGS,
+};
+
+enum
+{
 	_firing_position_group_attacking = 0,
 	_firing_position_group_attacking_search,
 	_firing_position_group_attacking_guard,
@@ -75,6 +87,19 @@ enum
 /* ---------- macros */
 
 /* ---------- structures */
+
+struct actor_starting_location_definition
+{
+	real_point3d position;
+	real facing;
+	short cluster_index;
+	char sequence_id;
+	byte flags;
+	short default_state;
+	short initial_state;
+	short actor_palette_index;
+	short command_list_index;
+};
 
 struct squad_definition
 {
@@ -126,6 +151,15 @@ struct platoon_definition
 	unsigned long unused3;
 	unsigned long unused4[16];
 	struct tag_block unused_blocks[3];
+};
+
+struct firing_position_definition
+{
+	real_point3d position;
+	short group_index;
+	short cluster_index;
+	long pad;
+	long surface_index;
 };
 
 struct encounter_definition

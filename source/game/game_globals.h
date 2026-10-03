@@ -147,6 +147,25 @@ struct game_globals_grenade
 	struct tag_reference projectile;
 };
 
+struct game_globals_player_control
+{
+	real magnetism_friction;
+	real magnetism_adhesion;
+	real magnetism_inconsequential_target_scale;
+	real magnetism_unused[13];
+	real look_acceleration_time;
+	real look_acceleration_scale;
+	real look_pegging_threshold;
+	real look_default_pitch_rate;
+	real look_default_yaw_rate;
+	real look_autolevel_scale;
+	real look_unused[5];
+	short minimum_weapon_swap_ticks;
+	short minimum_autolevel_enabled_ticks;
+	real minimum_vehicle_flipping_angle;
+	struct tag_block look_function;
+};
+
 struct game_globals_rasterizer_data
 {
 	struct tag_reference distance_attenuation;
@@ -231,13 +250,32 @@ struct game_globals_multiplayer_information
 	long unused[14];
 };
 
+struct game_globals_falling_damage
+{
+	long falling_unused[2];
+	real falling_distance_lower_bound;
+	real falling_distance_upper_bound;
+	struct tag_reference falling_damage;
+	long terminal_velocity_unused[2];
+	real maximum_distance;
+	struct tag_reference maximum_distance_damage;
+	struct tag_reference vehicle_hit_environment_damage_effect;
+	struct tag_reference vehicle_killed_unit_damage_effect;
+	struct tag_reference vehicle_collision_damage;
+	struct tag_reference flaming_death_damage;
+	long unused2[4];
+	real runtime_maximum_falling_velocity;
+	real runtime_minimum_damage_velocity;
+	real runtime_maximum_damage_velocity;
+};
+
 struct game_globals
 {
 	unsigned long flags;
 	long unused0[61];
 	struct tag_block sounds;
 	struct tag_block camera;
-	struct tag_block player_control;
+	struct tag_block player_control;			// game_globals_player_control
 	struct tag_block difficulty_information;
 	struct tag_block grenades;					// game_globals_grenade
 	struct tag_block rasterizer_data;			// game_globals_rasterizer_data

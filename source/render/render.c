@@ -145,7 +145,8 @@ static void code_00174410(
 }
 
 void render_frame_pregame(
-	const struct render_window *window)
+	struct render_window const *window,
+	struct bitmap_data *screenshot_bitmap)
 {
 	struct rasterizer_frame_begin_parameters parameters;
 	struct rasterizer_window_begin_parameters rasterizer_parameters;
@@ -164,7 +165,7 @@ void render_frame_pregame(
 	rasterizer_parameters.camera = window->rasterizer_camera;
 	render_camera_build_frustum(&rasterizer_parameters.camera, NULL, &rasterizer_parameters.frustum, TRUE);
 
-	rasterizer_parameters.rasterizer_target = 0;
+	rasterizer_parameters.rasterizer_target = _rasterizer_target_render_primary;
 	rasterizer_window_begin(&rasterizer_parameters);
 
 	render_ui_widgets(0, &window->rasterizer_camera.viewport_bounds);
