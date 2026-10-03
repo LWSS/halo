@@ -405,9 +405,9 @@ struct _shader_transparent_generic
 	short framebuffer_fade_unused;
 	real lens_flare_spacing;
 	struct tag_reference lens_flare;
-	struct tag_block extra_layers;
-	struct tag_block maps; // struct shader_transparent_generic_map
-	struct tag_block stages;
+	struct tag_block extra_layers;		// shader_transparent_layer
+	struct tag_block maps;				// shader_transparent_generic_map
+	struct tag_block stages;			// shader_transparent_generic_stage
 };
 
 struct shader_transparent_generic
@@ -427,8 +427,8 @@ struct _shader_transparent_chicago
 	short framebuffer_fade_unused;
 	real lens_flare_spacing;
 	struct tag_reference lens_flare;
-	struct tag_block extra_layers;
-	struct tag_block maps; // struct shader_transparent_chicago_map
+	struct tag_block extra_layers;		// shader_transparent_layer
+	struct tag_block maps;				// shader_transparent_chicago_map
 	long extra_flags;
 	long unused[2];
 };

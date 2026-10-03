@@ -14,7 +14,9 @@ SHADERS.C
 
 enum
 {
-	TRANSPARENT_LIT_VERTEX_SHADER_PERMUTATION = 5 // [fake name]
+	_vertex_shader_permutation_none = 0, /* fake name */
+	_vertex_shader_permutation_first_type, /* fake name */
+	_vertex_shader_permutation_transparent_lit = 5 /* fake name */
 };
 
 /* ---------- macros */
@@ -39,56 +41,60 @@ short shader_get_vertex_shader_permutation(
 
 	if (shader == (struct shader const *)NONE)
 	{
-		result = 0;
+		result = _vertex_shader_permutation_none;
 	}
 	else
 	{
 		switch (shader->base.type)
 		{
 		case _shader_type_model:
-			if (((struct shader_model const *)shader_get_and_verify_type(shader, _shader_type_model))->model.translucency > 0.0f)
+		{
+			struct shader_model const *shader_model = shader_get_and_verify_type(shader, _shader_type_model);
+
+			if (shader_model->model.translucency > 0.0f)
 			{
-				result = 1;
+				result = _vertex_shader_permutation_first_type;
 			}
 			else
 			{
-				result = 0;
+				result = _vertex_shader_permutation_none;
 			}
 			break;
+		}
 		case _shader_type_effect:
 			if (((struct shader_effect const *)shader_get_and_verify_type(shader, _shader_type_effect))->effect.secondary_map.index != NONE)
 			{
-				result = ((struct shader_effect const *)shader_get_and_verify_type(shader, _shader_type_effect))->effect.secondary_map_anchor + 1;
+				result = ((struct shader_effect const *)shader_get_and_verify_type(shader, _shader_type_effect))->effect.secondary_map_anchor + _vertex_shader_permutation_first_type;
 			}
 			else
 			{
-				result = 0;
+				result = _vertex_shader_permutation_none;
 			}
 			break;
 		case _shader_type_transparent_generic:
-			result = ((struct shader_transparent_generic const *)shader_get_and_verify_type(shader, _shader_type_transparent_generic))->generic.type + 1;
-			if (result == 1 && !TEST_FLAG(((struct shader_transparent_generic const *)shader_get_and_verify_type(shader, _shader_type_transparent_generic))->generic.flags, _shader_transparent_generic_first_map_is_in_screenspace_bit))
+			result = ((struct shader_transparent_generic const *)shader_get_and_verify_type(shader, _shader_type_transparent_generic))->generic.type + _vertex_shader_permutation_first_type;
+			if (result == _vertex_shader_permutation_first_type && !TEST_FLAG(((struct shader_transparent_generic const *)shader_get_and_verify_type(shader, _shader_type_transparent_generic))->generic.flags, _shader_transparent_generic_first_map_is_in_screenspace_bit))
 			{
-				result = 0;
+				result = _vertex_shader_permutation_none;
 			}
 			if (TEST_FLAG(shader->base.radiosity.flags, _shader_radiosity_FILTHY_transparent_lit_bit))
 			{
-				result = TRANSPARENT_LIT_VERTEX_SHADER_PERMUTATION;
+				result = _vertex_shader_permutation_transparent_lit;
 			}
 			break;
 		case _shader_type_transparent_chicago:
-			result = ((struct shader_transparent_chicago const *)shader_get_and_verify_type(shader, _shader_type_transparent_chicago))->chicago.type + 1;
-			if (result == 1 && !TEST_FLAG(((struct shader_transparent_chicago const *)shader_get_and_verify_type(shader, _shader_type_transparent_chicago))->chicago.flags, _shader_transparent_chicago_first_map_is_in_screenspace_bit))
+			result = ((struct shader_transparent_chicago const *)shader_get_and_verify_type(shader, _shader_type_transparent_chicago))->chicago.type + _vertex_shader_permutation_first_type;
+			if (result == _vertex_shader_permutation_first_type && !TEST_FLAG(((struct shader_transparent_chicago const *)shader_get_and_verify_type(shader, _shader_type_transparent_chicago))->chicago.flags, _shader_transparent_chicago_first_map_is_in_screenspace_bit))
 			{
-				result = 0;
+				result = _vertex_shader_permutation_none;
 			}
 			if (TEST_FLAG(shader->base.radiosity.flags, _shader_radiosity_FILTHY_transparent_lit_bit))
 			{
-				result = TRANSPARENT_LIT_VERTEX_SHADER_PERMUTATION;
+				result = _vertex_shader_permutation_transparent_lit;
 			}
 			break;
 		default:
-			result = 0;
+			result = _vertex_shader_permutation_none;
 			break;
 		}
 	}
@@ -106,11 +112,19 @@ boolean shader_is_mirror(
 		switch (shader->base.type)
 		{
 		case _shader_type_environment:
-			result = TEST_FLAG(((struct shader_environment const *)shader_get_and_verify_type(shader, _shader_type_environment))->environment.reflection.flags, _shader_environment_reflection_mirror_bit);
+		{
+			struct shader_environment const *shader_environment = shader_get_and_verify_type(shader, _shader_type_environment);
+
+			result = TEST_FLAG(shader_environment->environment.reflection.flags, _shader_environment_reflection_mirror_bit);
 			break;
+		}
 		case _shader_type_transparent_glass:
-			result = ((struct shader_transparent_glass const *)shader_get_and_verify_type(shader, _shader_type_transparent_glass))->glass.reflection_type == _shader_transparent_glass_reflection_type_mirror;
+		{
+			struct shader_transparent_glass const *shader_transparent_glass = shader_get_and_verify_type(shader, _shader_type_transparent_glass);
+
+			result = shader_transparent_glass->glass.reflection_type == _shader_transparent_glass_reflection_type_mirror;
 			break;
+		}
 		}
 	}
 
@@ -143,17 +157,33 @@ boolean shader_is_decal(
 		switch (shader->base.type)
 		{
 		case _shader_type_transparent_generic:
-			result = TEST_FLAG(((struct shader_transparent_generic const *)shader_get_and_verify_type(shader, _shader_type_transparent_generic))->generic.flags, _shader_transparent_generic_decal_bit);
+		{
+			struct shader_transparent_generic const *shader_transparent_generic = shader_get_and_verify_type(shader, _shader_type_transparent_generic);
+
+			result = TEST_FLAG(shader_transparent_generic->generic.flags, _shader_transparent_generic_decal_bit);
 			break;
+		}
 		case _shader_type_transparent_chicago:
-			result = TEST_FLAG(((struct shader_transparent_chicago const *)shader_get_and_verify_type(shader, _shader_type_transparent_chicago))->chicago.flags, _shader_transparent_chicago_decal_bit);
+		{
+			struct shader_transparent_chicago const *shader_transparent_chicago = shader_get_and_verify_type(shader, _shader_type_transparent_chicago);
+
+			result = TEST_FLAG(shader_transparent_chicago->chicago.flags, _shader_transparent_chicago_decal_bit);
 			break;
+		}
 		case _shader_type_transparent_glass:
-			result = TEST_FLAG(((struct shader_transparent_glass const *)shader_get_and_verify_type(shader, _shader_type_transparent_glass))->glass.flags, _shader_transparent_glass_decal_bit);
+		{
+			struct shader_transparent_glass const *shader_transparent_glass = shader_get_and_verify_type(shader, _shader_type_transparent_glass);
+
+			result = TEST_FLAG(shader_transparent_glass->glass.flags, _shader_transparent_glass_decal_bit);
 			break;
+		}
 		case _shader_type_transparent_meter:
-			result = TEST_FLAG(((struct shader_transparent_meter const *)shader_get_and_verify_type(shader, _shader_type_transparent_meter))->meter.flags, _shader_transparent_meter_decal_bit);
+		{
+			struct shader_transparent_meter const *shader_transparent_meter = shader_get_and_verify_type(shader, _shader_type_transparent_meter);
+
+			result = TEST_FLAG(shader_transparent_meter->meter.flags, _shader_transparent_meter_decal_bit);
 			break;
+		}
 		}
 	}
 
@@ -170,11 +200,19 @@ boolean shader_is_water_decal(
 		switch (shader->base.type)
 		{
 		case _shader_type_transparent_generic:
-			result = TEST_FLAG(((struct shader_transparent_generic const *)shader_get_and_verify_type(shader, _shader_type_transparent_generic))->generic.flags, _shader_transparent_generic_draw_before_water_bit);
+		{
+			struct shader_transparent_generic const *shader_transparent_generic = shader_get_and_verify_type(shader, _shader_type_transparent_generic);
+
+			result = TEST_FLAG(shader_transparent_generic->generic.flags, _shader_transparent_generic_draw_before_water_bit);
 			break;
+		}
 		case _shader_type_transparent_chicago:
-			result = TEST_FLAG(((struct shader_transparent_chicago const *)shader_get_and_verify_type(shader, _shader_type_transparent_chicago))->chicago.flags, _shader_transparent_chicago_draw_before_water_bit);
+		{
+			struct shader_transparent_chicago const *shader_transparent_chicago = shader_get_and_verify_type(shader, _shader_type_transparent_chicago);
+
+			result = TEST_FLAG(shader_transparent_chicago->chicago.flags, _shader_transparent_chicago_draw_before_water_bit);
 			break;
+		}
 		}
 	}
 
@@ -191,11 +229,19 @@ boolean shader_ignores_effect(
 		switch (shader->base.type)
 		{
 		case _shader_type_transparent_generic:
-			result = TEST_FLAG(((struct shader_transparent_generic const *)shader_get_and_verify_type(shader, _shader_type_transparent_generic))->generic.flags, _shader_transparent_generic_ignore_effect_bit);
+		{
+			struct shader_transparent_generic const *shader_transparent_generic = shader_get_and_verify_type(shader, _shader_type_transparent_generic);
+
+			result = TEST_FLAG(shader_transparent_generic->generic.flags, _shader_transparent_generic_ignore_effect_bit);
 			break;
+		}
 		case _shader_type_transparent_chicago:
-			result = TEST_FLAG(((struct shader_transparent_chicago const *)shader_get_and_verify_type(shader, _shader_type_transparent_chicago))->chicago.flags, _shader_transparent_chicago_ignore_effect_bit);
+		{
+			struct shader_transparent_chicago const *shader_transparent_chicago = shader_get_and_verify_type(shader, _shader_type_transparent_chicago);
+
+			result = TEST_FLAG(shader_transparent_chicago->chicago.flags, _shader_transparent_chicago_ignore_effect_bit);
 			break;
+		}
 		}
 	}
 
@@ -333,7 +379,7 @@ void shader_texture_animation_evaluate(
 {
 	real u_period, v_period, r_period;
 	real u_value, v_value, r_value;
-	real cosine, sine;
+	real cosine_angle, sine_angle;
 
 	match_assert("c:\\halo\\SOURCE\\shaders\\shaders.c", 275, texture_animation);
 	match_assert("c:\\halo\\SOURCE\\shaders\\shaders.c", 276, texture_animation->u_source>=0 && texture_animation->u_source<NUMBER_OF_OBJECT_FUNCTION_REFERENCES);
@@ -371,23 +417,23 @@ void shader_texture_animation_evaluate(
 	{
 		real angle = DEGREES_TO_RADIANS(r_value);
 
-		cosine = cos(angle);
-		sine = sin(angle);
+		cosine_angle = cosine(angle);
+		sine_angle = sine(angle);
 	}
 	else
 	{
-		cosine = 1.0f;
-		sine = 0.0f;
+		cosine_angle = 1.0f;
+		sine_angle = 0.0f;
 	}
 
 	u_transform_reference->k = 0.0f;
-	u_transform_reference->i = cosine * u_scale;
-	u_transform_reference->j = -(v_scale * sine);
-	u_transform_reference->l = cosine * u_value - sine * v_value + texture_animation->r_center.x;
+	u_transform_reference->i = cosine_angle * u_scale;
+	u_transform_reference->j = -(v_scale * sine_angle);
+	u_transform_reference->l = cosine_angle * u_value - sine_angle * v_value + texture_animation->r_center.x;
 	v_transform_reference->k = 0.0f;
-	v_transform_reference->i = u_scale * sine;
-	v_transform_reference->j = cosine * v_scale;
-	v_transform_reference->l = cosine * v_value + sine * u_value + texture_animation->r_center.y;
+	v_transform_reference->i = u_scale * sine_angle;
+	v_transform_reference->j = cosine_angle * v_scale;
+	v_transform_reference->l = cosine_angle * v_value + sine_angle * u_value + texture_animation->r_center.y;
 
 	return;
 }
@@ -398,13 +444,15 @@ void shader_environment_texture_animation_evaluate(
 	real *u_offset,
 	real *v_offset)
 {
+	struct shader_environment const *shader_environment;
 	struct shader_environment_diffuse_properties const *diffuse;
 
 	match_assert("c:\\halo\\SOURCE\\shaders\\shaders.c", 345, shader);
 	match_assert("c:\\halo\\SOURCE\\shaders\\shaders.c", 346, u_offset);
 	match_assert("c:\\halo\\SOURCE\\shaders\\shaders.c", 347, v_offset);
 
-	diffuse = &((struct shader_environment const *)shader_get_and_verify_type(shader, _shader_type_environment))->environment.diffuse;
+	shader_environment = shader_get_and_verify_type(shader, _shader_type_environment);
+	diffuse = &shader_environment->environment.diffuse;
 
 	match_assert("c:\\halo\\SOURCE\\shaders\\shaders.c", 352, diffuse->u_animation_period!=0.0f);
 	match_assert("c:\\halo\\SOURCE\\shaders\\shaders.c", 353, diffuse->v_animation_period!=0.0f);
