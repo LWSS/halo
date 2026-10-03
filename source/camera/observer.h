@@ -35,6 +35,8 @@ void observer_initialize_for_new_map(void);
 
 struct observer_result const *observer_get_camera(short local_player_index);
 
+void observer_reconnect_to_structure_bsp(void);
+
 /* ---------- globals */
 
 /* ---------- public code */
