@@ -57,6 +57,8 @@ short object_type_get_datum_size(short object_type);
 char const *object_type_get_name(short object_type);
 
 void object_types_place_all(struct scenario *scenario);
+void object_types_disconnect_from_structure_bsp(void);
+void object_types_reconnect_to_structure_bsp(void);
 
 void object_types_initialize(void);
 void object_types_dispose(void);

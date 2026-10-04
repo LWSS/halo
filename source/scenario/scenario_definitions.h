@@ -15,6 +15,11 @@ header included in hcex build.
 
 enum
 {
+	SCENARIO_GROUP_TAG = 'scnr'
+};
+
+enum
+{
 	_scenario_object_placement_not_automatic_bit = 0,
 	_scenario_object_placement_not_on_easy_bit,
 	_scenario_object_placement_not_on_normal_bit,
@@ -30,13 +35,22 @@ enum
 	NUMBER_OF_SCENARIO_EQUIPMENT_FLAGS,
 };
 
+enum
+{
+	_trigger_volume_type_world_aligned_bounding_box = 0,
+	_trigger_volume_type_bounding_box,
+	NUMBER_OF_TRIGGER_VOLUME_TYPES
+};
+
 /* ---------- macros */
+
+#define scenario_definition_get(index) ((struct scenario *)tag_get(SCENARIO_GROUP_TAG, index)) /* fake name */
 
 /* ---------- structures */
 
 struct scenario_object_palette_entry
 {
-	struct tag_reference reference;
+	struct tag_reference reference;	// object_definition
 	unsigned long unused[8];
 };
 
@@ -137,6 +151,38 @@ struct scenario_player
 	long unused[6];
 };
 
+struct scenario_structure_bsp_reference
+{
+	long offset;
+	long size;
+	void *address;
+	unsigned long unused[1];
+	struct tag_reference structure_bsp;	// structure_bsp
+};
+
+struct scenario_trigger_volume
+{
+	short type;
+	word pad;
+	char name[TAG_STRING_LENGTH+1];
+	union
+	{
+		struct
+		{
+			long unused[3];
+			real_vector3d forward;
+			real_vector3d up;
+			real_point3d position;
+			real_vector3d extents;
+		} bounding_box;
+		struct
+		{
+			long unused[9];
+			real_rectangle3d rectangle;
+		} world_aligned_bounding_box;
+	};
+};
+
 struct scenario_cutscene_flag
 {
 	long flags;
@@ -159,10 +205,10 @@ struct scenario_cutscene_camera_point
 
 struct scenario
 {
-	struct tag_reference ugly_structure_bsp;
-	struct tag_reference unloved_globals;
-	struct tag_reference bad_sky;
-	struct tag_block sky_references;
+	struct tag_reference ugly_structure_bsp;	// structure_bsp
+	struct tag_reference unloved_globals;	// game_globals
+	struct tag_reference bad_sky;			// sky
+	struct tag_block sky_references;				// tag_reference
 	short type;
 	word flags;
 	struct tag_block scenario_references;
@@ -196,8 +242,8 @@ struct scenario
 	struct tag_block sound_scenery_palette;
 	struct tag_block unused_blocks[7];
 	struct tag_block starting_profiles;
-	struct tag_block players;
-	struct tag_block trigger_volumes;
+	struct tag_block players;						// scenario_player
+	struct tag_block trigger_volumes;				// scenario_trigger_volume
 	struct tag_block recorded_animations;
 	struct tag_block netgame_flags;
 	struct tag_block netgame_equipment;
@@ -225,10 +271,10 @@ struct scenario
 	struct tag_block cutscene_camera_points;			// scenario_cutscene_camera_point
 	struct tag_block cutscene_chapter_titles;
 	long rapidly_dwindling_unused_space[27];
-	struct tag_reference custom_object_names;
-	struct tag_reference ingame_help_text;
-	struct tag_reference hud_messages;
-	struct tag_block structure_bsp_references;
+	struct tag_reference custom_object_names;	// unicode_string_list_group_header
+	struct tag_reference ingame_help_text;	// unicode_string_list_group_header
+	struct tag_reference hud_messages;		// hud_state_messages
+	struct tag_block structure_bsp_references;		// scenario_structure_bsp_reference
 };
 
 /* ---------- prototypes/EXAMPLE.C */

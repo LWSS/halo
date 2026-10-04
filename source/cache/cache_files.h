@@ -28,6 +28,10 @@ enum
 /* ---------- prototypes/CACHE_FILES.C */
 
 unsigned long cache_files_get_checksum(void);
+void scenario_tags_unload(void);
+long scenario_tags_load(char const *name);
+boolean scenario_structure_bsp_load(struct scenario_structure_bsp_reference *reference);
+void scenario_structure_bsp_unload(struct scenario_structure_bsp_reference *reference);
 
 /* ---------- prototypes/CACHE_FILES_WINDOWS.C */
 
