@@ -345,7 +345,7 @@ struct transport_endpoint_set *create_endpoint_set(
 		{
 			set->needs_compaction = FALSE;
 			FD_ZERO(&set->sockets);
-			set->ep_array = (struct transport_endpoint **)match_malloc_clear("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_set_winsock.c", 418, max_endpoints * sizeof(struct transport_endpoint *));
+			set->ep_array = (struct transport_endpoint **)match_calloc("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_set_winsock.c", 418, max_endpoints, sizeof(struct transport_endpoint *));
 
 			if (set->ep_array)
 			{

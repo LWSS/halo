@@ -396,7 +396,7 @@ short connect_endpoint_async(
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 616, ep && address && process_ref_ptr);
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 617, transport_initialized);
 
-	input = (struct transport_connect_process *)match_malloc_clear("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 619, sizeof(struct transport_connect_process));
+	input = (struct transport_connect_process *)match_calloc("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 619, 1, sizeof(struct transport_connect_process));
 
 	if (input)
 	{
