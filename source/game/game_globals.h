@@ -15,7 +15,8 @@ header included in hcex build.
 
 enum
 {
-	GAME_GLOBALS_DEFINITION_TAG = 'matg'
+	GAME_GLOBALS_DEFINITION_TAG = 'matg',
+	GAME_GLOBALS_DEFINITION_VERSION = 3
 };
 
 /* referenced in game_globals.c? */

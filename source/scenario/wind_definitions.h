@@ -17,6 +17,8 @@ enum
 
 /* ---------- macros */
 
+#define wind_definition_get(index) ((struct wind_definition *)tag_get(WIND_DEFINITION_TAG, index)) /* fake name */
+
 /* ---------- structures */
 
 struct wind_definition

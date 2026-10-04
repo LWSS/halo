@@ -12,10 +12,13 @@ header included in hcex build.
 
 enum
 {
-	SKY_DEFINITION_TAG = 'sky ' /* fake name */
+	SKY_TAG = 'sky ',
+	SKY_VERSION = 1
 };
 
 /* ---------- macros */
+
+#define sky_definition_get(index) ((struct sky *)tag_get(SKY_TAG, index)) /* fake name */
 
 /* ---------- structures */
 
@@ -41,9 +44,9 @@ struct sky
 	struct sky_atmospheric_fog indoor_fog;
 	struct tag_reference indoor_fog_plane;	// fog_definition
 	long unused2[1];
-	struct tag_block shader_functions;
-	struct tag_block animations;
-	struct tag_block lights;
+	struct tag_block shader_functions;		// sky_shader_function
+	struct tag_block animations;			// sky_animation
+	struct tag_block lights;				// sky_light
 };
 
 /* ---------- prototypes/EXAMPLE.C */

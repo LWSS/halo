@@ -18,7 +18,7 @@ header included in hcex build.
 
 enum
 {
-	STRUCTURE_BSP_DEFINITION_TAG = 'sbsp' /* fake name */
+	STRUCTURE_BSP_TAG = 'sbsp'
 };
 
 enum
@@ -96,44 +96,44 @@ struct structure_fog_region
 
 struct structure_fog_palette_entry
 {
-	char name[32];
+	char name[TAG_STRING_LENGTH+1];
 	struct tag_reference fog;	// fog_definition
-	unsigned short pad;
+	word pad;
 	short runtime_global_function_index;
-	char global_function_name[32];
+	char global_function_name[TAG_STRING_LENGTH+1];
 	long unused[13];
 };
 
 struct structure_weather_palette_entry
 {
-	char name[32];
+	char name[TAG_STRING_LENGTH+1];
 	struct tag_reference particle_system;	// weather_particle_system_definition
-	unsigned short pad1;
+	word pad1;
 	short runtime_particle_system_global_function_index;
-	char particle_system_global_function_name[32];
+	char particle_system_global_function_name[TAG_STRING_LENGTH+1];
 	long particle_system_unused[11];
 	struct tag_reference wind;				// wind_definition
 	real_vector3d wind_direction;
 	real wind_magnitude;
-	unsigned short pad2;
+	word pad2;
 	short wind_global_function_index;
-	char wind_global_function_name[32];
+	char wind_global_function_name[TAG_STRING_LENGTH+1];
 	long wind_unused[11];
 };
 
 struct structure_background_sound_palette_entry
 {
-	char name[32];
+	char name[TAG_STRING_LENGTH+1];
 	struct tag_reference background_sound;	// looping_sound_definition
-	unsigned short pad;
+	word pad;
 	short runtime_global_function_index;
-	char global_function_name[32];
+	char global_function_name[TAG_STRING_LENGTH+1];
 	long unused[8];
 };
 
 struct structure_sound_environment_palette_entry
 {
-	char name[32];
+	char name[TAG_STRING_LENGTH+1];
 	struct tag_reference sound_environment;	// sound_environment
 	long unused[8];
 };

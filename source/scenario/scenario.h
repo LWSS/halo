@@ -71,8 +71,6 @@ enum
 
 /* ---------- structures */
 
-struct sound_environment;
-
 /* ---------- prototypes/SCENARIO.C */
 
 void scenario_initialize(void);

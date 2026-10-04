@@ -25,8 +25,6 @@ enum
 
 /* ---------- structures */
 
-struct scenario_structure_bsp_reference;
-
 /* ---------- prototypes/CACHE_FILES.C */
 
 void scenario_tags_unload(void);

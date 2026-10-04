@@ -15,7 +15,7 @@ header included in hcex build.
 
 enum
 {
-	SCENARIO_DEFINITION_TAG = 'scnr' /* fake name */
+	SCENARIO_GROUP_TAG = 'scnr'
 };
 
 enum
@@ -206,7 +206,7 @@ struct scenario
 	struct tag_reference ugly_structure_bsp;	// structure_bsp
 	struct tag_reference unloved_globals;	// game_globals
 	struct tag_reference bad_sky;			// sky
-	struct tag_block sky_references;
+	struct tag_block sky_references;				// tag_reference
 	short type;
 	word flags;
 	struct tag_block scenario_references;
@@ -240,8 +240,8 @@ struct scenario
 	struct tag_block sound_scenery_palette;
 	struct tag_block unused_blocks[7];
 	struct tag_block starting_profiles;
-	struct tag_block players;
-	struct tag_block trigger_volumes;
+	struct tag_block players;						// scenario_player
+	struct tag_block trigger_volumes;				// scenario_trigger_volume
 	struct tag_block recorded_animations;
 	struct tag_block netgame_flags;
 	struct tag_block netgame_equipment;
@@ -272,7 +272,7 @@ struct scenario
 	struct tag_reference custom_object_names;	// unicode_string_list_group_header
 	struct tag_reference ingame_help_text;	// unicode_string_list_group_header
 	struct tag_reference hud_messages;		// hud_state_messages
-	struct tag_block structure_bsp_references;
+	struct tag_block structure_bsp_references;		// scenario_structure_bsp_reference
 };
 
 /* ---------- prototypes/EXAMPLE.C */

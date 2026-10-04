@@ -183,8 +183,8 @@ struct looping_sound_definition
 	real runtime_maximum_distance;
 	long unused[2];
 	struct tag_reference continuous_damage_effect;	// continuous_damage_effect_definition
-	struct tag_block tracks;
-	struct tag_block details;
+	struct tag_block tracks;		// looping_sound_track
+	struct tag_block details;		// looping_sound_detail
 };
 
 struct looping_sound_track
