@@ -377,9 +377,14 @@ void shader_texture_animation_evaluate(
 	real_vector4d *u_transform_reference,
 	real_vector4d *v_transform_reference)
 {
-	real u_period, v_period, r_period;
-	real u_value, v_value, r_value;
-	real cosine_angle, sine_angle;
+	real u_period;
+	real v_period;
+	real r_period;
+	real u_value;
+	real v_value;
+	real r_value;
+	real cosine_angle;
+	real sine_angle;
 
 	match_assert("c:\\halo\\SOURCE\\shaders\\shaders.c", 275, texture_animation);
 	match_assert("c:\\halo\\SOURCE\\shaders\\shaders.c", 276, texture_animation->u_source>=0 && texture_animation->u_source<NUMBER_OF_OBJECT_FUNCTION_REFERENCES);
@@ -402,7 +407,9 @@ void shader_texture_animation_evaluate(
 	}
 	else
 	{
-		u_value = v_value = r_value = 1.0f;
+		r_value = 1.0f;
+		v_value = 1.0f;
+		u_value = 1.0f;
 	}
 
 	u_value *= periodic_function_evaluate(texture_animation->u_function, (time_value + texture_animation->u_phase) / u_period) * texture_animation->u_scale;
