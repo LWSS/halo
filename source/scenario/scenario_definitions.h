@@ -44,6 +44,8 @@ enum
 
 /* ---------- macros */
 
+#define scenario_definition_get(index) ((struct scenario *)tag_get(SCENARIO_GROUP_TAG, index)) /* fake name */
+
 /* ---------- structures */
 
 struct scenario_object_palette_entry

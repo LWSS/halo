@@ -109,6 +109,8 @@ enum
 
 /* ---------- macros */
 
+#define game_globals_definition_get(index) ((struct game_globals *)tag_get(GAME_GLOBALS_DEFINITION_TAG, index)) /* fake name */
+
 /* ---------- structures */
 
 struct breakable_surface

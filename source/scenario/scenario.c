@@ -164,11 +164,11 @@ boolean scenario_load(
 
 	if (global_scenario_index != NONE)
 	{
-		global_scenario = tag_get(SCENARIO_GROUP_TAG, global_scenario_index);
+		global_scenario = scenario_definition_get(global_scenario_index);
 
 		if (global_scenario->structure_bsp_references.count > 0)
 		{
-			global_game_globals = tag_get(GAME_GLOBALS_DEFINITION_TAG, tag_loaded(GAME_GLOBALS_DEFINITION_TAG, "globals\\globals"));
+			global_game_globals = game_globals_definition_get(tag_loaded(GAME_GLOBALS_DEFINITION_TAG, "globals\\globals"));
 
 			if (scenario_switch_structure_bsp(0))
 			{
@@ -826,7 +826,7 @@ boolean scenario_switch_structure_bsp(
 
 		if (scenario_structure_bsp_load(reference))
 		{
-			global_structure_bsp = tag_get(STRUCTURE_BSP_TAG, reference->structure_bsp.index);
+			global_structure_bsp = structure_bsp_definition_get(reference->structure_bsp.index);
 			global_collision_bsp = TAG_BLOCK_GET_ELEMENT(&global_structure_bsp->collision_bsp, 0, struct collision_bsp);
 			global_bsp3d = (struct bsp3d *)TAG_BLOCK_GET_ELEMENT(&global_structure_bsp->collision_bsp, 0, struct collision_bsp);
 			scenario_globals->structure_bsp_index = structure_bsp_index;
@@ -952,7 +952,7 @@ void scenario_get_sound_environment(
 	boolean *crossed_water_boundary)
 {
 	short local_player_index;
-	struct sound_environment *desired;
+	struct sound_environment const *desired;
 	struct sound_environment *current;
 	long environment_index = NONE;
 	long sound_index = NONE;

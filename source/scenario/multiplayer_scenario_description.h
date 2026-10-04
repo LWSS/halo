@@ -15,6 +15,8 @@ enum
 
 /* ---------- macros */
 
+#define multiplayer_scenario_description_definition_get(index) ((struct tag_block *)tag_get(MULTIPLAYER_SCENARIO_DESCRIPTION_TAG, index)) /* fake name */
+
 /* ---------- structures */
 
 struct multiplayer_scenario_description_item /* fake name */

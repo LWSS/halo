@@ -57,6 +57,8 @@ enum
 
 /* ---------- macros */
 
+#define structure_bsp_definition_get(index) ((struct structure_bsp *)tag_get(STRUCTURE_BSP_TAG, index)) /* fake name */
+
 /* ---------- structures */
 
 struct structure_cluster

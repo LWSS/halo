@@ -29,7 +29,7 @@ struct multiplayer_scenario_description_item *multiplayer_scenario_description_g
 	scenario_list_index = tag_loaded(MULTIPLAYER_SCENARIO_DESCRIPTION_TAG, "ui\\multiplayer_scenarios");
 	if (scenario_list_index != NONE)
 	{
-		struct tag_block *scenario_list = tag_get(MULTIPLAYER_SCENARIO_DESCRIPTION_TAG, scenario_list_index);
+		struct tag_block *scenario_list = multiplayer_scenario_description_definition_get(scenario_list_index);
 
 		match_assert("c:\\halo\\SOURCE\\scenario\\multiplayer_scenario_description.c", 66, scenario_list);
 		result = scenario_list->address;
