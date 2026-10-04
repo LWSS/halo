@@ -15,11 +15,11 @@ enum
 
 /* ---------- macros */
 
-#define multiplayer_scenario_description_definition_get(index) ((struct tag_block *)tag_get(MULTIPLAYER_SCENARIO_DESCRIPTION_TAG, index)) /* fake name */
+#define multiplayer_scenario_description_definition_get(index) ((struct multiplayer_scenario_description *)tag_get(MULTIPLAYER_SCENARIO_DESCRIPTION_TAG, index)) /* fake name */
 
 /* ---------- structures */
 
-struct multiplayer_scenario_description_item /* fake name */
+struct scenario_description
 {
 	struct tag_reference descriptive_bitmap;	// bitmap_group
 	struct tag_reference displayed_map_name;	// unicode_string_list_group_header
@@ -27,11 +27,18 @@ struct multiplayer_scenario_description_item /* fake name */
 	long unused[1];
 };
 
+struct multiplayer_scenario_description
+{
+	struct tag_block multiplayer_scenarios;	// scenario_description
+};
+
 /* ---------- prototypes/MULTIPLAYER_SCENARIO_DESCRIPTION.C */
 
-struct multiplayer_scenario_description_item *multiplayer_scenario_description_get_list(short *count);
-boolean map_name_from_multiplayer_scenario_description_item(struct multiplayer_scenario_description_item const *item, char *buffer, long buffer_size);
+struct scenario_description *multiplayer_scenario_description_get_list(short *count);
+boolean map_name_from_multiplayer_scenario_description_item(struct scenario_description const *item, char *buffer, long buffer_size);
 
 /* ---------- globals */
+
+/* ---------- public code */
 
 #endif // __MULTIPLAYER_SCENARIO_DESCRIPTION_H
