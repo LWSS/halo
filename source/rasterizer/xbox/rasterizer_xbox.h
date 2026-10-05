@@ -41,6 +41,7 @@ void _rasterizer_present(struct bitmap_data *screenshot_bitmap, point2d const *s
 void _rasterizer_dispose(void);
 void _rasterizer_set_vblank_callback(void (*callback)(unsigned long));
 void rasterizer_preinitialize__fill_you_up_with_the_devils_cock(void);
+void *rasterizer_get_bitmap_default_hardware_format(struct bitmap_data const *bitmap);
 point2d *rasterizer_set_texture(short stage, short type, short usage, long bitmap_group_index, short bitmap_index);
 void rasterizer_set_stencil_mode(short stencil_mode);
 void rasterizer_set_framebuffer_blend_function(short framebuffer_blend_function);
