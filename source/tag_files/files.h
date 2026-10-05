@@ -62,36 +62,28 @@ struct file_last_modification_date
 
 void file_location_set_volume(short location, const char *volume_name);
 struct file_reference *file_reference_create(struct file_reference *reference, short location);
-long find_files(unsigned long flags, const struct file_reference *directory, long maximum_count, struct file_reference *references);
-void *file_read_into_memory(struct file_reference *reference, unsigned long *size);
-void file_printf(struct file_reference *file, char *format, ...);
-struct file_reference_info *file_reference_get_info(struct file_reference *reference);
+struct file_reference *file_reference_create_from_path(struct file_reference *reference, const char *path, boolean directory);
 struct file_reference *file_reference_copy(struct file_reference *destination, const struct file_reference *source);
 struct file_reference *file_reference_add_directory(struct file_reference *reference, const char *directory);
 struct file_reference *file_reference_set_name(struct file_reference *reference, const char *name);
 short file_reference_get_location(const struct file_reference *reference);
 char *file_reference_get_name(const struct file_reference *reference, unsigned long flags, char *name);
 boolean file_references_equal(const struct file_reference *reference0, const struct file_reference *reference1);
-struct file_reference *file_reference_create_from_path(struct file_reference *reference, const char *path, boolean is_directory);
+long find_files(unsigned long flags, const struct file_reference *directory, long maximum_count, struct file_reference *references);
+void *file_read_into_memory(struct file_reference *reference, unsigned long *size);
+void file_printf(struct file_reference *file, char *format, ...);
 void directory_create_or_delete_contents(const char *directory_name);
 boolean datastore_read(const char *file_name, const char *field_name, long length, void *data);
 boolean datastore_write(const char *file_name, const char *field_name, long length, const void *data);
+struct file_reference_info *file_reference_get_info(struct file_reference *reference);
 
 /* ---------- prototypes/FILES_WINDOWS.C */
 
-// file_location_is_valid
-// file_compare_last_modification_dates
-void find_files_start(unsigned long flags, const struct file_reference *directory);
-void file_path_add_name(char *path, const char *name);
-void file_path_add_extension(char *path, const char *extension);
-void file_path_remove_name(char *path);
-void file_path_split(char *path, char **directory, char **parent_directory, char **filename, char **extension, boolean has_filename);
-void file_location_get_full_path(short location, const char *path, char *full_path);
-// file_read_only
+boolean file_location_is_valid(short location);
 boolean file_create(struct file_reference *file);
 boolean file_delete(struct file_reference *file);
 boolean file_exists(const struct file_reference *file);
-// file_rename
+boolean file_rename(struct file_reference *file, const char *name);
 boolean file_open(struct file_reference *file, unsigned long flags);
 boolean file_close(struct file_reference *file);
 unsigned long file_get_position(const struct file_reference *file);
@@ -101,10 +93,18 @@ boolean file_set_eof(const struct file_reference *file, unsigned long position);
 boolean file_read(const struct file_reference *file, unsigned long count, void *buffer);
 boolean file_write(const struct file_reference *file, unsigned long count, const void *buffer);
 boolean file_read_from_position(const struct file_reference *file, unsigned long position, unsigned long count, void *buffer);
-// file_write_to_position
-// file_get_last_modification_date
-// file_get_size
+boolean file_write_to_position(const struct file_reference *file, unsigned long position, unsigned long count, const void *buffer);
+boolean file_get_last_modification_date(const struct file_reference *file, struct file_last_modification_date *date);
+long file_compare_last_modification_dates(struct file_last_modification_date *date1, struct file_last_modification_date *date2);
+boolean file_get_size(const struct file_reference *file, unsigned long *size);
+void find_files_start(unsigned long flags, const struct file_reference *directory);
 boolean find_files_next(struct file_reference *file, struct file_last_modification_date *date);
+void file_path_add_name(char *path, const char *name);
+void file_path_add_extension(char *path, const char *extension);
+void file_path_remove_name(char *path);
+void file_path_split(char *path, char **directory, char **parent_directory, char **filename, char **extension, boolean has_filename);
+void file_location_get_full_path(short location, const char *path, char *full_path);
+boolean file_read_only(const struct file_reference *file);
 
 /* ---------- globals */
 
