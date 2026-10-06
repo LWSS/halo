@@ -87,6 +87,14 @@ struct flags_definition
 	char **strings;
 };
 
+struct tag_data_definition
+{
+	char *name;
+	unsigned long flags;
+	long maximum_size;
+	void (*byte_swap_data)(void *, void *, long);
+};
+
 struct tag_block_definition
 {
 	char *name;
