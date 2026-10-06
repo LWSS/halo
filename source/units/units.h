@@ -270,6 +270,21 @@ enum
 	NUMBER_OF_UNIT_WEAPON_CLASS_ANIMATIONS,
 };
 
+enum
+{
+	_unit_weapon_type_animation_primary_reload = 0,
+	_unit_weapon_type_animation_secondary_reload,
+	_unit_weapon_type_animation_primary_chamber,
+	_unit_weapon_type_animation_secondary_chamber,
+	_unit_weapon_type_animation_primary_recoil,
+	_unit_weapon_type_animation_secondary_recoil,
+	_unit_weapon_type_animation_primary_charged,
+	_unit_weapon_type_animation_secondary_charged,
+	_unit_weapon_type_animation_melee,
+	_unit_weapon_type_animation_overheat,
+	NUMBER_OF_UNIT_WEAPON_TYPE_ANIMATIONS,
+};
+
 
 enum
 {

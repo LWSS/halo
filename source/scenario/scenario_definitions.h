@@ -15,6 +15,13 @@ header included in hcex build.
 
 enum
 {
+	_scenario_cortana_hack_bit = 0,
+	_scenario_demo_ui_bit,
+	NUMBER_OF_SCENARIO_FLAGS,
+};
+
+enum
+{
 	SCENARIO_GROUP_TAG = 'scnr'
 };
 

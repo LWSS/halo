@@ -16,6 +16,19 @@ header included in hcex build.
 
 enum
 {
+	_rasterizer_geometry_no_sort_bit = 0,
+	_rasterizer_geometry_no_queue_bit,
+	_rasterizer_geometry_no_fog_bit,
+	_rasterizer_geometry_no_zbuffer_bit,
+	_rasterizer_geometry_sky_bit,
+	_rasterizer_geometry_viewspace_bit,
+	_rasterizer_geometry_atmospheric_fog_but_no_planar_fog_bit,
+	_rasterizer_geometry_first_person_bit,
+	_rasterizer_geometry_parts_define_local_nodes_bit,
+};
+
+enum
+{
 	MAXIMUM_WINDOWS = 4,
 	MAXIMUM_LENS_FLARES_PER_FRAME = 1024,
 	MAXIMUM_LIGHTS_PER_WINDOW = 128,
@@ -255,6 +268,19 @@ struct rasterizer_frame_statistics_s
 	long decal_texture_count;
 };
 
+struct rasterizer_model_begin_parameters
+{
+	unsigned long geometry_flags;
+	unsigned long unique_id;
+	struct render_skinning skinning;
+	struct render_lighting lighting;
+	struct render_animation animation;
+	struct render_model_effect effect;
+	real_point3d centroid;
+	real radius;
+	real_vector2d base_map_scale;
+};
+
 struct rasterizer_lens_flare_submit_parameters
 {
 	struct lens_flare_definition *definition;
@@ -291,6 +317,15 @@ void rasterizer_present(struct bitmap_data *screenshot_bitmap, const point2d *sc
 void rasterizer_dispose(void);
 
 void rasterizer_decals_update_function_pointers(void);
+
+void rasterizer_model_begin(struct rasterizer_model_begin_parameters const *parameters, void *arg1);
+void rasterizer_model_draw(struct shader const *shader, short permutation_index, struct triangle_buffer const *triangles, long first_triangle_index, long triangle_count, struct vertex_buffer const *vertices, long node_table_index);
+void rasterizer_model_transparent_geometry_submit(struct shader const *shader, short permutation_index, struct triangle_buffer const *triangles, long first_triangle_index, long triangle_count, struct vertex_buffer const *vertices, long node_table_index, real_point3d const *centroid, struct render_sort_filth *sort_filth);
+void rasterizer_model_end(void);
+void rasterizer_environment_shadow_model_begin(struct rasterizer_model_begin_parameters const *parameters);
+void rasterizer_environment_shadow_model_draw(struct shader const *shader, short permutation_index, struct triangle_buffer const *triangles, struct vertex_buffer const *vertices);
+void rasterizer_environment_shadow_model_end(void);
+void rasterizer_debug_model_vertices(long object_index, struct render_skinning const *skinning, struct model_geometry_part const *part);
 
 /* ---------- prototypes/RASTERIZER_XBOX_HARDWARE_BITMAPS.C */
 
@@ -349,6 +384,7 @@ struct rasterizer_frame_begin_parameters global_frame_parameters;
 
 extern struct rasterizer_frame_statistics_s rasterizer_frame_statistics;
 extern struct rasterizer_debug_options_struct rasterizer_debug_options;
+extern boolean rasterizer_model_cortana_hack;
 extern struct rasterizer_window_begin_parameters global_window_parameters;
 
 /* ---------- public code */

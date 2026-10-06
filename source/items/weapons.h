@@ -111,6 +111,22 @@ enum
 	NUMBER_OF_FIRST_PERSON_WEAPON_ANIMATIONS,
 };
 
+enum
+{
+	_weapon_animation_idle = 0,
+	_weapon_animation_ready,
+	_weapon_animation_put_away,
+	_weapon_animation_primary_reload,
+	_weapon_animation_secondary_reload,
+	_weapon_animation_primary_chamber,
+	_weapon_animation_secondary_chamber,
+	_weapon_animation_primary_charged,
+	_weapon_animation_secondary_charged,
+	_weapon_animation_primary_recoil,
+	_weapon_animation_secondary_recoil,
+	NUMBER_OF_WEAPON_ANIMATIONS,
+};
+
 /* ---------- macros */
 
 #define weapon_get(index)			((struct weapon_datum*)object_get_and_verify_type(index, _object_mask_weapon))

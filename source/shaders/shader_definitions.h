@@ -30,6 +30,17 @@ enum
 
 enum
 {
+	_shader_model_detail_after_reflection_bit = 0,
+	_shader_model_two_sided_bit,
+	_shader_model_not_alpha_tested_bit,
+	_shader_model_alpha_blended_decal_bit,
+	_shader_model_true_atmospheric_fog_bit,
+	_shader_model_nocull_two_sided_bit,
+	NUMBER_OF_SHADER_MODEL_FLAGS,
+};
+
+enum
+{
 	_shader_radiosity_simple_parameterization_bit = 0,
 	_shader_radiosity_ignore_normals_bit,
 	_shader_radiosity_FILTHY_transparent_lit_bit,

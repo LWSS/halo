@@ -25,6 +25,33 @@ struct render_animation
 	real const *values;
 };
 
+struct render_skinning
+{
+	real_matrix4x3 *node_matrices;
+	short node_matrix_count;
+};
+
+struct render_sort_filth
+{
+	short *prev_group_presorted_index_reference;
+	short *next_group_presorted_index_reference;
+	short group_index;
+	short next_part_index;
+	short part_index;
+	word pad;
+};
+
+struct render_model_effect
+{
+	short type;
+	real intensity;
+	real parameter;
+	long source_object_index;
+	real_point3d source_object_centroid;
+	struct shader *modifier_shader;
+	struct render_animation modifier_animation;
+};
+
 struct render_screen_flash
 {
 	short type;

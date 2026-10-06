@@ -569,6 +569,8 @@ extern const real_vector3d *const global_backward3d;
 extern const real_vector3d *const global_right3d;
 extern const real_vector3d *const global_down3d;
 
+extern const real_quaternion *const global_identity_quaternion;
+
 /* ---------- public code */
 
 __inline real sine(

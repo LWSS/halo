@@ -8,9 +8,9 @@ header included in hcex build.
 #define __MODEL_DEFINITIONS_H
 #pragma once
 
-
 /* ---------- headers */
 
+#include "rasterizer_geometry.h"
 
 /* ---------- constants */
 
@@ -33,6 +33,14 @@ enum
 	MAXIMUM_SHADERS_PER_MODEL = 32,
 	MAXIMUM_FUNCTION_VALUES_PER_MODEL = 4,
 	MAXIMUM_CHANGE_COLORS_PER_MODEL = 4,
+	NUMBER_OF_DETAIL_LEVELS_PER_MODEL = 5,
+};
+
+enum
+{
+	_model_part_stripped_bit = 0,
+	_model_part_local_nodes,
+	NUMBER_OF_MODEL_GEOMETRY_PART_FLAGS,
 };
 
 enum
@@ -97,6 +105,39 @@ struct model_region
 	struct tag_block permutations;			// model_region_permutation
 };
 
+struct model_geometry_part
+{
+	unsigned long flags;
+	short shader_index;
+	char prev_part_index;
+	char next_part_index;
+	short centroid_primary_node_index;
+	short centroid_secondary_node_index;
+	real centroid_primary_node_weight;
+	real centroid_secondary_node_weight;
+	real_point3d centroid;
+	struct tag_block uncompressed_vertices;
+	struct tag_block compressed_vertices;
+	struct tag_block triangles;
+	struct triangle_buffer triangle_buffer;
+	struct vertex_buffer vertex_buffer;
+};
+
+struct model_shader_reference
+{
+	struct tag_reference shader;
+	short permutation_index;
+	word pad;
+	long unused[3];
+};
+
+struct model_geometry
+{
+	unsigned long flags;
+	long unused[8];
+	struct tag_block parts;				// model_geometry_part
+};
+
 struct model
 {
 	unsigned long flags;
@@ -113,11 +154,5 @@ struct model
 	struct tag_block geometries;
 	struct tag_block shaders;
 };
-
-/* ---------- prototypes/MODEL_DEFINITIONS.C */
-
-/* ---------- globals */
-
-/* ---------- public code */
 
 #endif // __MODEL_DEFINITIONS_H

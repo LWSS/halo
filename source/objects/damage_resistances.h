@@ -13,6 +13,22 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	_damage_part_gut = 0,
+	_damage_part_chest,
+	_damage_part_head,
+	_damage_part_left_shoulder,
+	_damage_part_left_arm,
+	_damage_part_left_leg,
+	_damage_part_left_foot,
+	_damage_part_right_shoulder,
+	_damage_part_right_arm,
+	_damage_part_right_leg,
+	_damage_part_right_foot,
+	NUMBER_OF_DAMAGE_PARTS,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */

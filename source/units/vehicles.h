@@ -15,6 +15,19 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	_vehicle_animation_steering = 0,
+	_vehicle_animation_roll,
+	_vehicle_animation_throttle,
+	_vehicle_animation_velocity,
+	_vehicle_animation_braking,
+	_vehicle_animation_ground_speed,
+	_vehicle_animation_occupied,
+	_vehicle_animation_unoccupied,
+	NUMBER_OF_VEHICLE_ANIMATIONS,
+};
+
 /* ---------- macros */
 
 #define vehicle_get(index) ((struct vehicle_datum *)object_get_and_verify_type((index), _object_mask_vehicle))

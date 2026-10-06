@@ -55,9 +55,25 @@ enum
 	NUMBER_OF_RASTERIZER_VERTEX_TYPES,
 };
 
+enum
+{
+	_triangle_buffer_type_triangles = 0,
+	_triangle_buffer_type_precompiled_strip,
+	NUMBER_OF_TRIANGLE_BUFFER_TYPES,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
+
+struct triangle_buffer
+{
+	short type;
+	word pad;
+	long count;
+	long offset;
+	void *hardware_format;
+};
 
 struct vertex_buffer
 {
