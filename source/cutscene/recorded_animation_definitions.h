@@ -23,7 +23,7 @@ enum
 	_recorded_animation_version_1 = 1, /* fake name */
 	_recorded_animation_version_2, /* fake name */
 	_recorded_animation_version_3, /* fake name */
-	_recorded_animation_version_4, /* fake name */
+	_recorded_animation_version_4 /* fake name */
 };
 
 /* ---------- macros */

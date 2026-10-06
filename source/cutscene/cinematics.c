@@ -87,7 +87,7 @@ void cinematic_dispose(
 void cinematic_initialize_for_new_map(
 	void)
 {
-	memset(cinematic_globals, 0, sizeof(struct cinematic_globals_definition));
+	memset(cinematic_globals, 0, sizeof(*cinematic_globals));
 	memset(cinematic_globals->active_titles, NONE, sizeof(cinematic_globals->active_titles));
 
 	return;
@@ -157,7 +157,7 @@ void draw_quad(
 	struct dynamic_screen_vertex vertices[4];
 	struct rasterizer_dynamic_screen_geometry_parameters parameters;
 	real_point2d points[4];
-	short vertex_index;
+	long vertex_index;
 	struct scenario *scenario = global_scenario_get();
 	struct game_globals *game_globals = scenario_get_game_globals();
 	struct game_globals_rasterizer_data *rasterizer_data = game_globals->rasterizer_data.count ? TAG_BLOCK_GET_ELEMENT(&game_globals->rasterizer_data, 0, struct game_globals_rasterizer_data) : NULL;
@@ -198,30 +198,37 @@ void draw_quad(
 	return;
 }
 
+void cinematic_set_title(
+	short index)
+{
+	cinematic_set_title_delayed(index, 0.f);
+
+	return;
+}
+
 void cinematic_set_title_delayed(
 	short index,
 	real delay)
 {
-	short title_index;
+	short active_title_index;
 
-	for (title_index = 0; title_index < MAXIMUM_ACTIVE_CINEMATIC_TITLES; title_index++)
+	for (active_title_index = 0;
+		active_title_index < MAXIMUM_ACTIVE_CINEMATIC_TITLES && cinematic_globals->active_titles[active_title_index].title_index != NONE;
+		active_title_index++)
 	{
-		if (cinematic_globals->active_titles[title_index].title_index == NONE)
-		{
-			break;
-		}
 	}
 
-	if (title_index < MAXIMUM_ACTIVE_CINEMATIC_TITLES)
+	if (active_title_index < MAXIMUM_ACTIVE_CINEMATIC_TITLES)
 	{
-		cinematic_globals->active_titles[title_index].title_index = index;
-		cinematic_globals->active_titles[title_index].title_timer = (short)-fast_ftol(delay * TICKS_PER_SECOND);
+		cinematic_globals->active_titles[active_title_index].title_index = index;
+		cinematic_globals->active_titles[active_title_index].title_timer = (short)-fast_ftol(delay * TICKS_PER_SECOND);
 	}
 	else
 	{
-		struct scenario_cutscene_title *title = TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->cutscene_chapter_titles, index, struct scenario_cutscene_title);
-
-		error(_error_silent, "no free chapter title slots to display title '%s'", title->name);
+		error(
+			_error_silent,
+			"no free chapter title slots to display title '%s'",
+			TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->cutscene_chapter_titles, index, struct scenario_cutscene_title)->name);
 	}
 
 	return;
@@ -244,45 +251,9 @@ void cinematic_suppress_bsp_object_creation(
 	return;
 }
 
-void cinematic_stop(
-	void)
-{
-	cinematic_globals->letter_box = FALSE;
-	player_input_enable(TRUE);
-	ai_globals_dialogue_triggers_enabled(TRUE);
-	cinematic_globals->cinematic_in_progress = FALSE;
-	rasterizer_screen_effects_initialize_for_new_map();
-
-	if (global_rasterizer_model_ambient_reflection_tint)
-	{
-		memset(global_rasterizer_model_ambient_reflection_tint, 0, sizeof(real_argb_color));
-	}
-
-	rasterizer_set_near_clip_distance(0.f);
-	display_errors_deferred_until_cinematic_stop();
-
-	return;
-}
-
-boolean cinematic_in_progress(
-	void)
-{
-	return cinematic_globals->cinematic_in_progress;
-}
-
-void cinematic_set_title(
-	short index)
-{
-	cinematic_set_title_delayed(index, 0.f);
-
-	return;
-}
-
 void cinematic_render(
 	void)
 {
-	short title_index;
-
 	if ((cinematic_globals->letter_box || cinematic_globals->letter_box_amount > 0.f) && !ui_widgets_active())
 	{
 		real const seconds_per_tick = 1.f / TICKS_PER_SECOND;
@@ -304,8 +275,8 @@ void cinematic_render(
 
 		if (cinematic_globals->letter_box_amount > 0.f)
 		{
-			rectangle2d bounds;
 			real letter_box_scale = 0.125f * cinematic_globals->letter_box_amount;
+			rectangle2d bounds;
 			real viewport_height = render.camera.viewport_bounds.y1 - render.camera.viewport_bounds.y0;
 
 			bounds.x0 = fast_ftol(render.camera.viewport_bounds.x0);
@@ -322,81 +293,85 @@ void cinematic_render(
 		}
 	}
 
-	for (title_index = 0; title_index < MAXIMUM_ACTIVE_CINEMATIC_TITLES; title_index++)
 	{
-		struct cinematic_title_datum *title = &cinematic_globals->active_titles[title_index];
+		short active_title_index;
 
-		if (title->title_index != NONE)
+		for (active_title_index = 0; active_title_index < MAXIMUM_ACTIVE_CINEMATIC_TITLES; active_title_index++)
 		{
-			long font_index = hud_globals->messaging.single_player_font.index;
+			struct cinematic_title_datum *title_datum = &cinematic_globals->active_titles[active_title_index];
 
-			if (font_index != NONE)
+			if (title_datum->title_index != NONE)
 			{
-				struct scenario_cutscene_title *definition = TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->cutscene_chapter_titles, title->title_index, struct scenario_cutscene_title);
-				long string_list_index = global_scenario_get()->ingame_help_text.index;
+				long font_index = hud_globals->messaging.single_player_font.index;
 
-				if (string_list_index != NONE)
+				if (font_index != NONE)
 				{
-					struct unicode_string_list_group_header *string_list = unicode_string_list_definition_get(string_list_index);
+					struct scenario_cutscene_title *title = TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->cutscene_chapter_titles, title_datum->title_index, struct scenario_cutscene_title);
+					long string_list_index = global_scenario_get()->ingame_help_text.index;
 
-					if (definition->text_index >= 0 && definition->text_index < string_list->string_references.count)
+					if (string_list_index != NONE)
 					{
-						real_argb_color text_color;
-						rectangle2d *bounds = &definition->bounds;
-						real fade = 1.f;
+						struct unicode_string_list_group_header *string_list = unicode_string_list_definition_get(string_list_index);
 
-						if (bounds->x1 == bounds->x0 || bounds->y1 == bounds->y0)
+						if (title->text_index >= 0 && title->text_index < string_list->string_references.count)
 						{
-							bounds = &hud_globals->defaults.default_title_bounds;
-						}
+							rectangle2d *bounds = &title->bounds;
+							real fade = 1.f;
+							real_argb_color text_color;
 
-						if (!game_in_editor())
-						{
-							if (title->title_timer < definition->fade_in_time)
+							if (bounds->x1 == bounds->x0 || bounds->y1 == bounds->y0)
 							{
-								fade = title->title_timer / definition->fade_in_time;
-							}
-							else if (title->title_timer > definition->up_time)
-							{
-								fade = 1.f - (title->title_timer - definition->up_time) / definition->fade_out_time;
+								bounds = &hud_globals->defaults.default_title_bounds;
 							}
 
-							fade = PIN(fade, 0.f, 1.f);
-						}
+							if (!game_in_editor())
+							{
+								if (title_datum->title_timer < title->fade_in_time)
+								{
+									fade = title_datum->title_timer / title->fade_in_time;
+								}
+								else if (title_datum->title_timer > title->up_time)
+								{
+									fade = 1.f - ((title_datum->title_timer - title->up_time) / title->fade_out_time);
+								}
 
-						pixel32_to_real_argb_color(definition->foreground_color, &text_color);
-						text_color.alpha *= fade;
+								fade = PIN(fade, 0.f, 1.f);
+							}
 
-						if (fabs(text_color.red - 1.f) < _real_epsilon &&
-							fabs(text_color.green - 1.f) < _real_epsilon &&
-							fabs(text_color.blue - 1.f) < _real_epsilon)
-						{
-							text_color.red = MIN(text_color.red, 0.8f);
-							text_color.green = MIN(text_color.green, 0.8f);
-							text_color.blue = MIN(text_color.blue, 0.8f);
-						}
+							pixel32_to_real_argb_color(title->foreground_color, &text_color);
+							text_color.alpha *= fade;
 
-						draw_string_set_draw_mode(
-							font_index,
-							definition->style - 1,
-							definition->justification,
-							definition->text_flags,
-							&text_color);
-						rasterizer_text_set_shadow_color((PIN(fast_ftol((definition->shadow_color >> 24) * fade), 0, UNSIGNED_CHAR_MAX) << 24) | (definition->shadow_color & 0x00ffffff));
-						rasterizer_draw_unicode_string(
-							bounds,
-							NULL,
-							NULL,
-							0,
-							unicode_string_list_get_string(string_list_index, definition->text_index));
-						rasterizer_text_set_shadow_color(0);
+							if (fabs(text_color.red - 1.f) < _real_epsilon &&
+								fabs(text_color.green - 1.f) < _real_epsilon &&
+								fabs(text_color.blue - 1.f) < _real_epsilon)
+							{
+								text_color.red = MIN(text_color.red, 0.8f);
+								text_color.green = MIN(text_color.green, 0.8f);
+								text_color.blue = MIN(text_color.blue, 0.8f);
+							}
 
-						title->title_timer += game_time_get_paused() ? 0 : game_time_get_elapsed();
+							draw_string_set_draw_mode(
+								font_index,
+								title->style - 1,
+								title->justification,
+								title->text_flags,
+								&text_color);
+							rasterizer_text_set_shadow_color((PIN(fast_ftol((title->shadow_color >> 24) * fade), 0, UNSIGNED_CHAR_MAX) << 24) | (title->shadow_color & MASK(24)));
+							rasterizer_draw_unicode_string(
+								bounds,
+								NULL,
+								NULL,
+								0,
+								unicode_string_list_get_string(string_list_index, title->text_index));
+							rasterizer_text_set_shadow_color(0);
 
-						if (!game_in_editor() && title->title_timer >= definition->up_time + definition->fade_out_time)
-						{
-							title->title_index = NONE;
-							title->title_timer = NONE;
+							title_datum->title_timer += game_time_get_paused() ? 0 : game_time_get_elapsed();
+
+							if (!game_in_editor() && title_datum->title_timer >= title->up_time + title->fade_out_time)
+							{
+								title_datum->title_index = NONE;
+								title_datum->title_timer = NONE;
+							}
 						}
 					}
 				}
@@ -405,4 +380,30 @@ void cinematic_render(
 	}
 
 	return;
+}
+
+void cinematic_stop(
+	void)
+{
+	cinematic_globals->letter_box = FALSE;
+	player_input_enable(TRUE);
+	ai_globals_dialogue_triggers_enabled(TRUE);
+	cinematic_globals->cinematic_in_progress = FALSE;
+	rasterizer_screen_effects_initialize_for_new_map();
+
+	if (global_rasterizer_model_ambient_reflection_tint)
+	{
+		memset(global_rasterizer_model_ambient_reflection_tint, 0, sizeof(*global_rasterizer_model_ambient_reflection_tint));
+	}
+
+	rasterizer_set_near_clip_distance(0.f);
+	display_errors_deferred_until_cinematic_stop();
+
+	return;
+}
+
+boolean cinematic_in_progress(
+	void)
+{
+	return cinematic_globals->cinematic_in_progress;
 }

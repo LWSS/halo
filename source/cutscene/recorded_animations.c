@@ -41,8 +41,6 @@ enum
 	DEBUG_RECORDING_DISPLAY_LENGTH = 1024 /* fake name */
 };
 
-/* ---------- macros */
-
 /* ---------- structures */
 
 typedef void (*initialize_event_stream_proc)(struct animation_playback_controller *animation_state, struct unit_control_data *control, char const **playback_stream, byte unit_control_version); /* fake name */
@@ -159,7 +157,7 @@ void recorded_animations_clear_debug_storage(
 	void)
 {
 	match_assert("c:\\halo\\SOURCE\\cutscene\\recorded_animations.c", 153, animation_threads_debug);
-	memset(animation_threads_debug, 0, MAX_RECORDINGS_PLAYING*sizeof(struct animation_thread_debug));
+	memset(animation_threads_debug, 0, MAX_RECORDINGS_PLAYING*sizeof(*animation_threads_debug));
 
 	return;
 }
@@ -171,109 +169,11 @@ void recorded_animation_kill(
 
 	if (thread)
 	{
-		thread->flags |= FLAG(_recording_thread_finished_bit) | FLAG(_recording_thread_killed_bit);
+		SET_FLAG(thread->flags, _recording_thread_finished_bit, TRUE);
+		SET_FLAG(thread->flags, _recording_thread_killed_bit, TRUE);
 	}
 
 	return;
-}
-
-static boolean recorded_animation_play_internal(
-	long unit_index,
-	short animation_index,
-	word extra_flags)
-{
-	boolean result = FALSE;
-
-	if (unit_index != NONE)
-	{
-		if (animation_index != NONE && animation_index < global_scenario_get()->recorded_animations.count)
-		{
-			struct animation_thread *thread;
-			struct recorded_animation_definition *animation;
-			long thread_index;
-
-			unit_get(unit_index);
-			player_index_from_unit_index(unit_index);
-			thread = get_controlling_thread(unit_index, &thread_index);
-			animation = TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->recorded_animations, animation_index, struct recorded_animation_definition);
-
-			if (!recorded_animation_controlling_unit(unit_index))
-			{
-				struct animation_thread_debug *thread_debug;
-
-				if (!thread)
-				{
-					thread_index = datum_new(animation_threads);
-
-					if (thread_index != NONE)
-					{
-						thread = datum_get(animation_threads, thread_index);
-					}
-				}
-
-				if (thread)
-				{
-					match_assert("c:\\halo\\SOURCE\\cutscene\\recorded_animations.c", 233, animation->version>0&&animation->version<=RECORDED_ANIMATION_VERSION&&playback_codec[animation->version-1]);
-					thread->unit_index = unit_index;
-					thread->relative_ticks = 0;
-					thread->ticks_left = animation->ticks;
-					thread->event_stream = tag_data_get_pointer(&animation->animation_data, 0, animation->animation_data.size);
-
-					thread_debug = &animation_threads_debug[DATUM_INDEX_TO_ABSOLUTE_INDEX(thread_index)];
-					thread_debug->valid = TRUE;
-					thread_debug->event_stream_start = thread->event_stream;
-					thread_debug->stream_length = animation->animation_data.size;
-					thread_debug->animation_index = animation_index;
-
-					thread->version = animation->version - 1;
-					thread->flags &= ~FLAG(_recording_thread_finished_bit);
-					playback_codec[thread->version]->initialize_event_stream(
-						&thread->animation_state,
-						&thread->controller,
-						&thread->event_stream,
-						animation->unit_control_data_version);
-
-					unit_set_actively_controlled(unit_index, TRUE);
-					SET_FLAG(thread->flags, _recording_thread_unit_was_controlled_bit, unit_controllable(unit_index));
-					unit_set_controllable(unit_index, FALSE);
-					unit_set_possessed(unit_index, TRUE);
-					object_set_automatic_deactivation(unit_index, FALSE);
-					thread->flags |= extra_flags;
-					result = TRUE;
-				}
-				else
-				{
-					error(_error_silent, "Could not allocate space for a new animation");
-				}
-			}
-			else if (thread)
-			{
-				struct animation_thread_debug *thread_debug = &animation_threads_debug[DATUM_INDEX_TO_ABSOLUTE_INDEX(thread_index)];
-				char const *playing_name = "<unknown>";
-
-				if (thread_debug->valid)
-				{
-					playing_name = TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->recorded_animations, thread_debug->animation_index, struct recorded_animation_definition)->name;
-				}
-
-				error(_error_silent, "trying to play %s while %s is playing", animation->name, playing_name);
-			}
-			else
-			{
-				error(_error_silent, "can't play animation on unit");
-			}
-		}
-		else
-		{
-			error(_error_silent, "this animation doesn't exist");
-		}
-	}
-	else
-	{
-		error(_error_silent, "unit doesn't exist");
-	}
-
-	return result;
 }
 
 boolean recorded_animation_play(
@@ -295,6 +195,105 @@ boolean recorded_animation_play_and_hover(
 	short animation_index)
 {
 	return recorded_animation_play_internal(vehicle_index, animation_index, FLAG(_recording_thread_hover_vehicle_on_complete_bit));
+}
+
+static boolean recorded_animation_play_internal(
+	long unit_index,
+	short animation_index,
+	word extra_flags)
+{
+	boolean success = FALSE;
+
+	if (unit_index != NONE)
+	{
+		if (animation_index != NONE && animation_index < global_scenario_get()->recorded_animations.count)
+		{
+			long thread_index;
+			struct unit_datum *unit = unit_get(unit_index); /* fake name */
+			long player_index = player_index_from_unit_index(unit_index); /* fake name */
+			struct animation_thread *thread = get_controlling_thread(unit_index, &thread_index);
+			struct recorded_animation_definition *animation = TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->recorded_animations, animation_index, struct recorded_animation_definition);
+			boolean valid_unit = !recorded_animation_controlling_unit(unit_index);
+
+			if (valid_unit)
+			{
+				if (!thread)
+				{
+					thread_index = datum_new(animation_threads);
+
+					if (thread_index != NONE)
+					{
+						thread = datum_get(animation_threads, thread_index);
+					}
+				}
+
+				if (thread)
+				{
+					struct animation_thread_debug *thread_debug;
+
+					match_assert("c:\\halo\\SOURCE\\cutscene\\recorded_animations.c", 233, animation->version>0&&animation->version<=RECORDED_ANIMATION_VERSION&&playback_codec[animation->version-1]);
+					thread->unit_index = unit_index;
+					thread->relative_ticks = 0;
+					thread->ticks_left = animation->ticks;
+					thread->event_stream = tag_data_get_pointer(&animation->animation_data, 0, animation->animation_data.size);
+
+					thread_debug = &animation_threads_debug[DATUM_INDEX_TO_ABSOLUTE_INDEX(thread_index)];
+					thread_debug->valid = TRUE;
+					thread_debug->event_stream_start = thread->event_stream;
+					thread_debug->stream_length = animation->animation_data.size;
+					thread_debug->animation_index = animation_index;
+
+					thread->version = animation->version - 1;
+					SET_FLAG(thread->flags, _recording_thread_finished_bit, FALSE);
+					playback_codec[thread->version]->initialize_event_stream(
+						&thread->animation_state,
+						&thread->controller,
+						&thread->event_stream,
+						animation->unit_control_data_version);
+
+					unit_set_actively_controlled(unit_index, TRUE);
+					SET_FLAG(thread->flags, _recording_thread_unit_was_controlled_bit, unit_controllable(unit_index));
+					unit_set_controllable(unit_index, FALSE);
+					unit_set_possessed(unit_index, TRUE);
+					object_set_automatic_deactivation(unit_index, FALSE);
+					thread->flags |= extra_flags;
+					success = TRUE;
+				}
+				else
+				{
+					error(_error_silent, "Could not allocate space for a new animation");
+				}
+			}
+			else if (thread)
+			{
+				struct animation_thread_debug const *thread_debug = &animation_threads_debug[DATUM_INDEX_TO_ABSOLUTE_INDEX(thread_index)];
+				char const *name = "<unknown>";
+
+				if (thread_debug->valid)
+				{
+					struct recorded_animation_definition *current_animation = TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->recorded_animations, thread_debug->animation_index, struct recorded_animation_definition);
+
+					name = current_animation->name;
+				}
+
+				error(_error_silent, "trying to play %s while %s is playing", animation->name, name);
+			}
+			else
+			{
+				error(_error_silent, "can't play animation on unit");
+			}
+		}
+		else
+		{
+			error(_error_silent, "this animation doesn't exist");
+		}
+	}
+	else
+	{
+		error(_error_silent, "unit doesn't exist");
+	}
+
+	return success;
 }
 
 long recorded_animation_get_time_left(
@@ -323,13 +322,14 @@ void recorded_animations_update(
 
 	while (thread = data_iterator_next(&iterator))
 	{
-		if (unit_try_and_get(thread->unit_index))
-		{
-			struct animation_thread_debug *thread_debug;
+		boolean finished;
+		struct unit_datum const *unit = unit_try_and_get(thread->unit_index);
 
+		if (unit)
+		{
 			if (!TEST_FLAG(thread->flags, _recording_thread_finished_bit))
 			{
-				boolean finished;
+				struct animation_thread_debug const *thread_debug;
 
 				thread->ticks_left--;
 				finished = !playback_codec[thread->version]->apply_event_stream(
@@ -351,7 +351,8 @@ void recorded_animations_update(
 			}
 			else
 			{
-				thread_debug = &animation_threads_debug[DATUM_INDEX_TO_ABSOLUTE_INDEX(iterator.index)];
+				struct animation_thread_debug *thread_debug = &animation_threads_debug[DATUM_INDEX_TO_ABSOLUTE_INDEX(iterator.index)];
+
 				match_vassert(
 					"c:\\halo\\SOURCE\\cutscene\\recorded_animations.c",
 					373,
@@ -392,12 +393,12 @@ void recorded_animations_update(
 void recorded_animation_verify(
 	struct recorded_animation_definition const *recording)
 {
-	struct animation_playback_controller animation_state;
 	struct unit_control_data controller;
-	boolean finished;
+	struct animation_playback_controller animation_state;
 	char const *stream = recording->animation_data.address;
 	char const *playback_stream = stream;
 	long size = recording->animation_data.size;
+	boolean finished = FALSE;
 	long ticks_left = recording->ticks;
 	long relative_ticks = 0;
 
@@ -407,7 +408,7 @@ void recorded_animation_verify(
 		&playback_stream,
 		recording->unit_control_data_version);
 
-	do
+	while (!finished)
 	{
 		ticks_left--;
 		finished = !playback_codec[recording->version-1]->apply_event_stream(
@@ -420,7 +421,6 @@ void recorded_animation_verify(
 		match_assert("c:\\halo\\SOURCE\\cutscene\\recorded_animations.c", 430, playback_stream-stream<size||(playback_stream-stream==size&&finished));
 		relative_ticks++;
 	}
-	while (!finished);
 
 	return;
 }
@@ -429,8 +429,8 @@ boolean recorded_animation_controlling_unit(
 	long unit_index)
 {
 	struct data_iterator iterator;
-	struct animation_thread *thread;
-	boolean result = FALSE;
+	struct animation_thread const *thread;
+	boolean controlling_unit = FALSE;
 
 	data_iterator_new(&iterator, animation_threads);
 
@@ -438,12 +438,12 @@ boolean recorded_animation_controlling_unit(
 	{
 		if (thread->unit_index == unit_index && !TEST_FLAG(thread->flags, _recording_thread_finished_bit))
 		{
-			result = TRUE;
+			controlling_unit = TRUE;
 			break;
 		}
 	}
 
-	return result;
+	return controlling_unit;
 }
 
 void render_debug_recording(
@@ -451,46 +451,48 @@ void render_debug_recording(
 {
 	if (debug_recording)
 	{
-		char string[DEBUG_RECORDING_STRING_SIZE];
-		short newline_index;
 		struct data_iterator iterator;
-		struct animation_thread *thread;
+		struct animation_thread const *thread;
+		char buffer[DEBUG_RECORDING_STRING_SIZE];
+		short new_line;
 		short tab_stops[] = { 200, 300 };
 		short length = 0;
 
-		for (newline_index = 0; newline_index < debug_recording_newlines; newline_index++)
+		for (new_line = 0; new_line < debug_recording_newlines; new_line++)
 		{
-			length += sprintf(&string[length], "|n");
+			length += sprintf(&buffer[length], "|n");
 		}
 
-		length += sprintf(&string[length], "recording name|tticks left|tobject name");
+		length += sprintf(&buffer[length], "recording name|tticks left|tobject name");
 
 		data_iterator_new(&iterator, animation_threads);
 
 		while (thread = data_iterator_next(&iterator))
 		{
-			struct object_datum *object = object_try_and_get(thread->unit_index);
-			struct animation_thread_debug *thread_debug = &animation_threads_debug[DATUM_INDEX_TO_ABSOLUTE_INDEX(iterator.index)];
+			struct object_datum const *object = object_try_and_get(thread->unit_index);
+			struct animation_thread_debug const *thread_debug = &animation_threads_debug[DATUM_INDEX_TO_ABSOLUTE_INDEX(iterator.index)];
 
 			if (!TEST_FLAG(thread->flags, _recording_thread_finished_bit) && object && object->object.name_index != NONE)
 			{
 				struct scenario_object_name *object_name = TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->object_names, object->object.name_index, struct scenario_object_name);
-				char const *recording_name = "<unknown>";
+				char const *animation_name = "<unknown>";
 
 				if (thread_debug->valid)
 				{
-					recording_name = TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->recorded_animations, thread_debug->animation_index, struct recorded_animation_definition)->name;
+					struct recorded_animation_definition *animation = TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->recorded_animations, thread_debug->animation_index, struct recorded_animation_definition);
+
+					animation_name = animation->name;
 				}
 
-				length += sprintf(&string[length], "|n%s|t", recording_name);
-				length += sprintf(&string[length], "%d|t", thread->ticks_left);
-				length += sprintf(&string[length], "%s", object_name->name);
+				length += sprintf(&buffer[length], "|n%s|t", animation_name);
+				length += sprintf(&buffer[length], "%d|t", thread->ticks_left);
+				length += sprintf(&buffer[length], "%s", object_name->name);
 			}
 		}
 
-		string[DEBUG_RECORDING_DISPLAY_LENGTH] = '\0';
+		buffer[DEBUG_RECORDING_DISPLAY_LENGTH] = '\0';
 		draw_string_set_tab_stops(tab_stops, NUMBEROF(tab_stops));
-		render_debug_string(TRUE, string);
+		render_debug_string(TRUE, buffer);
 		draw_string_set_tab_stops(tab_stops, 0);
 	}
 
@@ -504,7 +506,7 @@ static struct animation_thread *get_controlling_thread(
 	long *thread_index_reference)
 {
 	struct data_iterator iterator;
-	struct animation_thread *thread;
+	struct animation_thread *thread = NULL;
 	long thread_index = NONE;
 
 	data_iterator_new(&iterator, animation_threads);

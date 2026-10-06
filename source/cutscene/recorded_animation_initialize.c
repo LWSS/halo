@@ -8,10 +8,6 @@ RECORDED_ANIMATION_INITIALIZE.C
 #include "recorded_animation_definitions.h"
 #include "units.h"
 
-/* ---------- constants */
-
-/* ---------- macros */
-
 /* ---------- structures */
 
 struct unit_control_data_entry
@@ -20,8 +16,6 @@ struct unit_control_data_entry
 	long size;
 	long offset;
 };
-
-/* ---------- prototypes */
 
 /* ---------- globals */
 
@@ -125,7 +119,7 @@ void recorded_animation_initialize_unit_control(
 {
 	short version_index;
 
-	memset(control, 0, sizeof(struct unit_control_data));
+	memset(control, 0, sizeof(*control));
 	control->zoom_level = NONE;
 
 	for (version_index = 0; version_index < MAX(unit_version, 1); version_index++)
@@ -166,5 +160,3 @@ void recorded_animation_write_unit_control(
 
 	return;
 }
-
-/* ---------- private code */

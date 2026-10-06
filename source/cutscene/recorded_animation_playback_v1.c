@@ -9,180 +9,20 @@ RECORDED_ANIMATION_PLAYBACK_V1.C
 #include "recorded_animations.h"
 #include "recorded_animation_definitions.h"
 
-/* ---------- constants */
-
 /* ---------- macros */
 
 // each simple event copies one field of the same name into the unit control data
 #define APPLY_EVENT(line, field) /* fake name */ \
 static void apply_##field(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream) \
 { \
+	struct field##_set_event_v1 const *event = (struct field##_set_event_v1 const *)anim_event_v1; \
 	match_assert("c:\\halo\\SOURCE\\cutscene\\recorded_animation_playback_v1.c", line, control); \
 	match_assert("c:\\halo\\SOURCE\\cutscene\\recorded_animation_playback_v1.c", line, anim_event_v1); \
 	match_assert("c:\\halo\\SOURCE\\cutscene\\recorded_animation_playback_v1.c", line, anim_event_v1->type==_playback_v1_##field##_set); \
 	match_assert("c:\\halo\\SOURCE\\cutscene\\recorded_animation_playback_v1.c", line, playback_stream); \
-	control->field = ((struct field##_set_event_v1 const *)anim_event_v1)->field; \
+	control->field = event->field; \
 	*playback_stream += sizeof(struct field##_set_event_v1); \
 }
-
-/* ---------- prototypes */
-
-static void apply_animation_state(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream);
-static void apply_aiming_speed(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream);
-static void apply_control_flags(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream);
-static void apply_weapon_index(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream);
-static void apply_throttle(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream);
-static void apply_facing_vector(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream);
-static void apply_aiming_vector(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream);
-static void apply_looking_vector(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream);
-static void apply_angle_vector(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream);
-static void apply_multi_vector(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream);
-
-/* ---------- globals */
-
-static void (*apply_funcs[NUMBER_OF_PLAYBACK_V1_EVENTS])(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream) =
-{
-	NULL, // _playback_v1_nothing
-	NULL, // _playback_v1_end
-	apply_animation_state,
-	apply_aiming_speed,
-	apply_control_flags,
-	apply_weapon_index,
-	apply_throttle,
-	NULL, // _playback_v1_vectors_synchronize
-	NULL, // _playback_v1_vectors_desynchronize
-	apply_facing_vector,
-	apply_aiming_vector,
-	apply_looking_vector,
-	apply_multi_vector, // _playback_v1_facing_aiming_vector_set
-	apply_multi_vector, // _playback_v1_facing_looking_vector_set
-	apply_multi_vector, // _playback_v1_aiming_looking_vector_set
-	apply_multi_vector, // _playback_v1_facing_aiming_looking_vector_set
-	apply_angle_vector, // _playback_v1_facing_angles_set
-	apply_angle_vector, // _playback_v1_aiming_angles_set
-	apply_angle_vector, // _playback_v1_looking_angles_set
-	apply_angle_vector, // _playback_v1_facing_aiming_angles_set
-	apply_angle_vector, // _playback_v1_facing_looking_angles_set
-	apply_angle_vector, // _playback_v1_aiming_looking_angles_set
-	apply_angle_vector // _playback_v1_facing_aiming_looking_angles_set
-};
-
-static byte_swap_code animation_event_v1_bs_codes[] =
-{
-	_2byte,
-	_2byte
-};
-
-static struct byte_swap_definition animation_event_v1_bs_definition =
-{
-	"animation_event_v1",
-	sizeof(struct animation_event_v1),
-	animation_event_v1_bs_codes,
-	BYTE_SWAP_DEFINITION_SIGNATURE,
-	FALSE
-};
-
-static byte_swap_code animation_state_set_event_v1_bs_codes[] =
-{
-	_1byte
-};
-
-static struct byte_swap_definition animation_state_set_event_v1_bs_definition =
-{
-	"animation_state_set_event_v1",
-	sizeof(struct animation_state_set_event_v1),
-	animation_state_set_event_v1_bs_codes,
-	BYTE_SWAP_DEFINITION_SIGNATURE,
-	FALSE
-};
-
-static byte_swap_code aiming_speed_set_event_v1_bs_codes[] =
-{
-	_1byte
-};
-
-static struct byte_swap_definition aiming_speed_set_event_v1_bs_definition =
-{
-	"aiming_speed_set_event_v1",
-	sizeof(struct aiming_speed_set_event_v1),
-	aiming_speed_set_event_v1_bs_codes,
-	BYTE_SWAP_DEFINITION_SIGNATURE,
-	FALSE
-};
-
-static byte_swap_code control_flags_set_event_v1_bs_codes[] =
-{
-	_2byte
-};
-
-static struct byte_swap_definition control_flags_set_event_v1_bs_definition =
-{
-	"control_flags_set_event_v1",
-	sizeof(struct control_flags_set_event_v1),
-	control_flags_set_event_v1_bs_codes,
-	BYTE_SWAP_DEFINITION_SIGNATURE,
-	FALSE
-};
-
-static byte_swap_code weapon_index_set_event_v1_bs_codes[] =
-{
-	_2byte
-};
-
-static struct byte_swap_definition weapon_index_set_event_v1_bs_definition =
-{
-	"weapon_index_set_event_v1",
-	sizeof(struct weapon_index_set_event_v1),
-	weapon_index_set_event_v1_bs_codes,
-	BYTE_SWAP_DEFINITION_SIGNATURE,
-	FALSE
-};
-
-static byte_swap_code throttle_set_event_v1_bs_codes[] =
-{
-	_4byte,
-	_4byte
-};
-
-static struct byte_swap_definition throttle_set_event_v1_bs_definition =
-{
-	"throttle_set_event_v1",
-	sizeof(struct throttle_set_event_v1),
-	throttle_set_event_v1_bs_codes,
-	BYTE_SWAP_DEFINITION_SIGNATURE,
-	FALSE
-};
-
-static byte_swap_code multi_vector_set_event_v1_bs_codes[] =
-{
-	_4byte,
-	_4byte,
-	_4byte
-};
-
-static struct byte_swap_definition multi_vector_set_event_v1_bs_definition =
-{
-	"multi_vector_set_event_v1",
-	sizeof(struct multi_vector_set_event_v1),
-	multi_vector_set_event_v1_bs_codes,
-	BYTE_SWAP_DEFINITION_SIGNATURE,
-	FALSE
-};
-
-static byte_swap_code angle_vector_set_event_v1_bs_codes[] =
-{
-	_4byte,
-	_4byte
-};
-
-static struct byte_swap_definition angle_vector_set_event_v1_bs_definition =
-{
-	"angle_vector_set_event_v1",
-	sizeof(struct angle_vector_set_event_v1),
-	angle_vector_set_event_v1_bs_codes,
-	BYTE_SWAP_DEFINITION_SIGNATURE,
-	FALSE
-};
 
 /* ---------- private code */
 
@@ -230,17 +70,17 @@ static void apply_angle_vector(
 
 	vector3d_from_euler_angles2d(&vector, &event->angles);
 
-	if (anim_event_v1->type != _playback_v1_aiming_looking_angles_set)
+	if (anim_event_v1->type != _playback_v1_aiming_looking_angles_set || anim_event_v1->type == _playback_v1_facing_angles_set)
 	{
 		control->facing_vector = vector;
 	}
 
-	if (anim_event_v1->type != _playback_v1_facing_looking_angles_set)
+	if (anim_event_v1->type != _playback_v1_facing_looking_angles_set || anim_event_v1->type == _playback_v1_aiming_angles_set)
 	{
 		control->aiming_vector = vector;
 	}
 
-	if (anim_event_v1->type != _playback_v1_facing_aiming_angles_set)
+	if (anim_event_v1->type != _playback_v1_facing_aiming_angles_set || anim_event_v1->type == _playback_v1_looking_angles_set)
 	{
 		control->looking_vector = vector;
 	}
@@ -282,6 +122,152 @@ static void apply_multi_vector(
 	return;
 }
 
+/* ---------- globals */
+
+static void (*apply_funcs[NUMBER_OF_PLAYBACK_V1_EVENTS])(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream) =
+{
+	NULL, // _playback_v1_nothing
+	NULL, // _playback_v1_end
+	apply_animation_state,
+	apply_aiming_speed,
+	apply_control_flags,
+	apply_weapon_index,
+	apply_throttle,
+	NULL, // _playback_v1_vectors_synchronize
+	NULL, // _playback_v1_vectors_desynchronize
+	apply_facing_vector,
+	apply_aiming_vector,
+	apply_looking_vector,
+	apply_multi_vector, // _playback_v1_facing_aiming_vector_set
+	apply_multi_vector, // _playback_v1_facing_looking_vector_set
+	apply_multi_vector, // _playback_v1_aiming_looking_vector_set
+	apply_multi_vector, // _playback_v1_facing_aiming_looking_vector_set
+	apply_angle_vector, // _playback_v1_facing_angles_set
+	apply_angle_vector, // _playback_v1_aiming_angles_set
+	apply_angle_vector, // _playback_v1_looking_angles_set
+	apply_angle_vector, // _playback_v1_facing_aiming_angles_set
+	apply_angle_vector, // _playback_v1_facing_looking_angles_set
+	apply_angle_vector, // _playback_v1_aiming_looking_angles_set
+	apply_angle_vector // _playback_v1_facing_aiming_looking_angles_set
+};
+
+static byte_swap_code animation_event_v1_bs_codes[] =
+{
+	_2byte,
+	_2byte
+};
+
+struct byte_swap_definition animation_event_v1_bs_definition =
+{
+	"animation_event_v1",
+	sizeof(struct animation_event_v1),
+	animation_event_v1_bs_codes,
+	BYTE_SWAP_DEFINITION_SIGNATURE,
+	FALSE
+};
+
+static byte_swap_code animation_state_set_event_v1_bs_codes[] =
+{
+	_1byte
+};
+
+struct byte_swap_definition animation_state_set_event_v1_bs_definition =
+{
+	"animation_state_set_event_v1",
+	sizeof(struct animation_state_set_event_v1),
+	animation_state_set_event_v1_bs_codes,
+	BYTE_SWAP_DEFINITION_SIGNATURE,
+	FALSE
+};
+
+static byte_swap_code aiming_speed_set_event_v1_bs_codes[] =
+{
+	_1byte
+};
+
+struct byte_swap_definition aiming_speed_set_event_v1_bs_definition =
+{
+	"aiming_speed_set_event_v1",
+	sizeof(struct aiming_speed_set_event_v1),
+	aiming_speed_set_event_v1_bs_codes,
+	BYTE_SWAP_DEFINITION_SIGNATURE,
+	FALSE
+};
+
+static byte_swap_code control_flags_set_event_v1_bs_codes[] =
+{
+	_2byte
+};
+
+struct byte_swap_definition control_flags_set_event_v1_bs_definition =
+{
+	"control_flags_set_event_v1",
+	sizeof(struct control_flags_set_event_v1),
+	control_flags_set_event_v1_bs_codes,
+	BYTE_SWAP_DEFINITION_SIGNATURE,
+	FALSE
+};
+
+static byte_swap_code weapon_index_set_event_v1_bs_codes[] =
+{
+	_2byte
+};
+
+struct byte_swap_definition weapon_index_set_event_v1_bs_definition =
+{
+	"weapon_index_set_event_v1",
+	sizeof(struct weapon_index_set_event_v1),
+	weapon_index_set_event_v1_bs_codes,
+	BYTE_SWAP_DEFINITION_SIGNATURE,
+	FALSE
+};
+
+static byte_swap_code throttle_set_event_v1_bs_codes[] =
+{
+	_4byte,
+	_4byte
+};
+
+struct byte_swap_definition throttle_set_event_v1_bs_definition =
+{
+	"throttle_set_event_v1",
+	sizeof(struct throttle_set_event_v1),
+	throttle_set_event_v1_bs_codes,
+	BYTE_SWAP_DEFINITION_SIGNATURE,
+	FALSE
+};
+
+static byte_swap_code multi_vector_set_event_v1_bs_codes[] =
+{
+	_4byte,
+	_4byte,
+	_4byte
+};
+
+struct byte_swap_definition multi_vector_set_event_v1_bs_definition =
+{
+	"multi_vector_set_event_v1",
+	sizeof(struct multi_vector_set_event_v1),
+	multi_vector_set_event_v1_bs_codes,
+	BYTE_SWAP_DEFINITION_SIGNATURE,
+	FALSE
+};
+
+static byte_swap_code angle_vector_set_event_v1_bs_codes[] =
+{
+	_4byte,
+	_4byte
+};
+
+struct byte_swap_definition angle_vector_set_event_v1_bs_definition =
+{
+	"angle_vector_set_event_v1",
+	sizeof(struct angle_vector_set_event_v1),
+	angle_vector_set_event_v1_bs_codes,
+	BYTE_SWAP_DEFINITION_SIGNATURE,
+	FALSE
+};
+
 /* ---------- public code */
 
 void recorded_animation_initialize_event_stream_v1(
@@ -302,7 +288,7 @@ boolean recorded_animation_apply_event_stream_v1(
 	char const **playback_stream)
 {
 	struct animation_event_v1 const *anim_event_v1;
-	boolean result = TRUE;
+	boolean success = TRUE;
 
 	match_assert("c:\\halo\\SOURCE\\cutscene\\recorded_animation_playback_v1.c", 162, control);
 	match_assert("c:\\halo\\SOURCE\\cutscene\\recorded_animation_playback_v1.c", 163, ticks);
@@ -313,11 +299,9 @@ boolean recorded_animation_apply_event_stream_v1(
 
 	while (*ticks >= anim_event_v1->time_delta && anim_event_v1->type != _playback_v1_end)
 	{
-		void (*apply_func)(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream) = apply_funcs[anim_event_v1->type];
-
-		if (apply_func)
+		if (apply_funcs[anim_event_v1->type])
 		{
-			apply_func(control, anim_event_v1, playback_stream);
+			apply_funcs[anim_event_v1->type](control, anim_event_v1, playback_stream);
 		}
 		else
 		{
@@ -328,12 +312,9 @@ boolean recorded_animation_apply_event_stream_v1(
 		anim_event_v1 = (struct animation_event_v1 const *)*playback_stream;
 	}
 
-	if (anim_event_v1->type == _playback_v1_end && *ticks == anim_event_v1->time_delta)
-	{
-		result = FALSE;
-	}
+	success = !(anim_event_v1->type == _playback_v1_end && *ticks == anim_event_v1->time_delta);
 
-	return result;
+	return success;
 }
 
 void byte_swap_recording_stream_v1(

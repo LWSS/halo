@@ -10,12 +10,6 @@ RECORDED_ANIMATION_DEFINITIONS.C
 #include "recorded_animation_playback_v1.h"
 #include "scenario_definitions.h"
 
-/* ---------- constants */
-
-/* ---------- macros */
-
-/* ---------- structures */
-
 /* ---------- prototypes */
 
 static void byte_swap_recording(void *recording, void *data, long size);
@@ -87,7 +81,7 @@ short scenario_get_animation_by_name(
 	char const *animation_name)
 {
 	short animation_index;
-	short result = NONE;
+	short index = NONE;
 
 	for (animation_index = 0; animation_index < scenario->recorded_animations.count; animation_index++)
 	{
@@ -95,10 +89,10 @@ short scenario_get_animation_by_name(
 
 		if (!_stricmp(animation->name, animation_name))
 		{
-			result = animation_index;
+			index = animation_index;
 			break;
 		}
 	}
 
-	return result;
+	return index;
 }
