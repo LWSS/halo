@@ -20,6 +20,8 @@ enum
 
 /* ---------- macros */
 
+#define bitmap_group_get(index) ((struct bitmap_group *)tag_get(BITMAP_GROUP_TAG, (index))) /* fake name */
+
 /* ---------- structures */
 
 struct bitmap_group

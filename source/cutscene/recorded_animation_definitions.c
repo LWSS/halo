@@ -67,12 +67,12 @@ static void byte_swap_recording(
 
 	switch (animation->version)
 	{
-	case 1:
-	case 2:
-	case 3:
+	case _recorded_animation_version_1:
+	case _recorded_animation_version_2:
+	case _recorded_animation_version_3:
 		byte_swap_recording_stream_v1(data, size, animation->unit_control_data_version);
 		break;
-	case RECORDED_ANIMATION_VERSION:
+	case _recorded_animation_version_4:
 		byte_swap_recording_stream(data, size, animation->unit_control_data_version);
 		break;
 	}
@@ -86,8 +86,8 @@ short scenario_get_animation_by_name(
 	struct scenario *scenario,
 	char const *animation_name)
 {
-	short result = NONE;
 	short animation_index;
+	short result = NONE;
 
 	for (animation_index = 0; animation_index < scenario->recorded_animations.count; animation_index++)
 	{

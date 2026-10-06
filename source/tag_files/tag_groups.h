@@ -73,7 +73,7 @@ typedef void (*byte_swap_block_proc)(void *);
 typedef boolean (*postprocess_block_proc)(void *, boolean);
 typedef byte *(*format_block_proc)(long, struct tag_block *, long, byte *);
 typedef void (*delete_block_proc)(struct tag_block *, long);
-typedef void (*byte_swap_data_proc)(void *, void *, long); // [fake name]
+typedef void (*byte_swap_data_proc)(void *, void *, long); /* fake name */
 
 struct tag_field
 {
@@ -94,19 +94,6 @@ struct tag_data_definition
 	unsigned long flags;
 	long maximum_size;
 	byte_swap_data_proc byte_swap_data;
-};
-
-struct tag_field
-{
-	short type;
-	char *name;
-	void *definition;
-};
-
-struct flags_definition
-{
-	short count;
-	char **strings;
 };
 
 struct tag_block_definition

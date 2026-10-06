@@ -24,6 +24,8 @@ enum
 
 /* ---------- macros */
 
+#define unicode_string_list_definition_get(index) ((struct unicode_string_list_group_header *)tag_get(UNICODE_STRING_LISTS_GROUP_TAG, (index))) /* fake name */
+
 /* ---------- structures */
 
 struct string_list_string_reference

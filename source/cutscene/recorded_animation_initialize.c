@@ -138,6 +138,7 @@ void recorded_animation_initialize_unit_control(
 			{
 				memcpy((byte *)control + entry->offset, *playback_stream, entry->size);
 			}
+
 			*playback_stream += entry->size;
 		}
 	}

@@ -34,7 +34,7 @@ CINEMATICS.C
 
 enum
 {
-	MAXIMUM_ACTIVE_CINEMATIC_TITLES = 4 // [fake name]
+	MAXIMUM_ACTIVE_CINEMATIC_TITLES = 4 /* fake name */
 };
 
 /* ---------- macros */
@@ -69,7 +69,10 @@ struct cinematic_globals_definition *cinematic_globals = NULL;
 void cinematic_initialize(
 	void)
 {
-	cinematic_globals = game_state_malloc("cinematic globals", NULL, sizeof(struct cinematic_globals_definition));
+	cinematic_globals = game_state_malloc(
+		"cinematic globals",
+		NULL,
+		sizeof(struct cinematic_globals_definition));
 	match_assert("c:\\halo\\SOURCE\\cutscene\\cinematics.c", 24, cinematic_globals);
 
 	return;
@@ -138,6 +141,7 @@ void cinematic_show_letterbox(
 	boolean show)
 {
 	cinematic_globals->letter_box = show;
+
 	if (show)
 	{
 		cinematic_globals->letter_box_last_game_time = game_time_get();
@@ -150,14 +154,14 @@ void draw_quad(
 	rectangle2d *rect,
 	pixel32 color)
 {
-	struct scenario *scenario = global_scenario_get();
-	struct game_globals *game_globals = scenario_get_game_globals();
-	struct game_globals_rasterizer_data *rasterizer_data = game_globals->rasterizer_data.count ? TAG_BLOCK_GET_ELEMENT(&game_globals->rasterizer_data, 0, struct game_globals_rasterizer_data) : NULL;
-	struct bitmap_data *bitmap = TAG_BLOCK_GET_ELEMENT(&((struct bitmap_group *)tag_get(BITMAP_GROUP_TAG, rasterizer_data->default_textures[0].index))->bitmaps, 1, struct bitmap_data);
 	struct dynamic_screen_vertex vertices[4];
 	struct rasterizer_dynamic_screen_geometry_parameters parameters;
 	real_point2d points[4];
 	short vertex_index;
+	struct scenario *scenario = global_scenario_get();
+	struct game_globals *game_globals = scenario_get_game_globals();
+	struct game_globals_rasterizer_data *rasterizer_data = game_globals->rasterizer_data.count ? TAG_BLOCK_GET_ELEMENT(&game_globals->rasterizer_data, 0, struct game_globals_rasterizer_data) : NULL;
+	struct bitmap_data *bitmap = TAG_BLOCK_GET_ELEMENT(&bitmap_group_get(rasterizer_data->default_textures[0].index)->bitmaps, 1, struct bitmap_data);
 
 	rasterizer_globals.current_lock_operation = _rasterizer_lock_cinematics;
 
@@ -180,8 +184,10 @@ void draw_quad(
 
 	memset(&parameters, 0, sizeof(parameters));
 	parameters.framebuffer_blend_function = _shader_framebuffer_blend_function_alpha_blend;
-	parameters.map_texture_scale[0].i = parameters.map_texture_scale[0].j = 1.f;
-	parameters.map_scale[0].i = parameters.map_scale[0].j = 1.f;
+	parameters.map_texture_scale[0].j = 1.f;
+	parameters.map_texture_scale[0].i = 1.f;
+	parameters.map_scale[0].j = 1.f;
+	parameters.map_scale[0].i = 1.f;
 	parameters.meter_parameters = NULL;
 	parameters.point_sampled = FALSE;
 	parameters.map[0] = bitmap;
@@ -246,10 +252,12 @@ void cinematic_stop(
 	ai_globals_dialogue_triggers_enabled(TRUE);
 	cinematic_globals->cinematic_in_progress = FALSE;
 	rasterizer_screen_effects_initialize_for_new_map();
+
 	if (global_rasterizer_model_ambient_reflection_tint)
 	{
 		memset(global_rasterizer_model_ambient_reflection_tint, 0, sizeof(real_argb_color));
 	}
+
 	rasterizer_set_near_clip_distance(0.f);
 	display_errors_deferred_until_cinematic_stop();
 
@@ -282,6 +290,7 @@ void cinematic_render(
 		long elapsed_ticks = game_time - cinematic_globals->letter_box_last_game_time;
 
 		cinematic_globals->letter_box_last_game_time = game_time;
+
 		if (cinematic_globals->letter_box)
 		{
 			cinematic_globals->letter_box_amount += elapsed_ticks * seconds_per_tick;
@@ -295,8 +304,8 @@ void cinematic_render(
 
 		if (cinematic_globals->letter_box_amount > 0.f)
 		{
-			real letter_box_scale = 0.125f * cinematic_globals->letter_box_amount;
 			rectangle2d bounds;
+			real letter_box_scale = 0.125f * cinematic_globals->letter_box_amount;
 			real viewport_height = render.camera.viewport_bounds.y1 - render.camera.viewport_bounds.y0;
 
 			bounds.x0 = fast_ftol(render.camera.viewport_bounds.x0);
@@ -328,13 +337,13 @@ void cinematic_render(
 
 				if (string_list_index != NONE)
 				{
-					struct unicode_string_list_group_header *string_list = tag_get(UNICODE_STRING_LISTS_GROUP_TAG, string_list_index);
+					struct unicode_string_list_group_header *string_list = unicode_string_list_definition_get(string_list_index);
 
-					if (VALID_INDEX(definition->text_index, string_list->string_references.count))
+					if (definition->text_index >= 0 && definition->text_index < string_list->string_references.count)
 					{
+						real_argb_color text_color;
 						rectangle2d *bounds = &definition->bounds;
 						real fade = 1.f;
-						real_argb_color text_color;
 
 						if (bounds->x1 == bounds->x0 || bounds->y1 == bounds->y0)
 						{
@@ -351,25 +360,39 @@ void cinematic_render(
 							{
 								fade = 1.f - (title->title_timer - definition->up_time) / definition->fade_out_time;
 							}
+
 							fade = PIN(fade, 0.f, 1.f);
 						}
 
 						pixel32_to_real_argb_color(definition->foreground_color, &text_color);
 						text_color.alpha *= fade;
 
-						if (fabs(text_color.red - 1.f) < _real_epsilon && fabs(text_color.green - 1.f) < _real_epsilon && fabs(text_color.blue - 1.f) < _real_epsilon)
+						if (fabs(text_color.red - 1.f) < _real_epsilon &&
+							fabs(text_color.green - 1.f) < _real_epsilon &&
+							fabs(text_color.blue - 1.f) < _real_epsilon)
 						{
 							text_color.red = MIN(text_color.red, 0.8f);
 							text_color.green = MIN(text_color.green, 0.8f);
 							text_color.blue = MIN(text_color.blue, 0.8f);
 						}
 
-						draw_string_set_draw_mode(font_index, definition->style - 1, definition->justification, definition->text_flags, &text_color);
+						draw_string_set_draw_mode(
+							font_index,
+							definition->style - 1,
+							definition->justification,
+							definition->text_flags,
+							&text_color);
 						rasterizer_text_set_shadow_color((PIN(fast_ftol((definition->shadow_color >> 24) * fade), 0, UNSIGNED_CHAR_MAX) << 24) | (definition->shadow_color & 0x00ffffff));
-						rasterizer_draw_unicode_string(bounds, NULL, NULL, 0, unicode_string_list_get_string(string_list_index, definition->text_index));
+						rasterizer_draw_unicode_string(
+							bounds,
+							NULL,
+							NULL,
+							0,
+							unicode_string_list_get_string(string_list_index, definition->text_index));
 						rasterizer_text_set_shadow_color(0);
 
 						title->title_timer += game_time_get_paused() ? 0 : game_time_get_elapsed();
+
 						if (!game_in_editor() && title->title_timer >= definition->up_time + definition->fade_out_time)
 						{
 							title->title_index = NONE;
