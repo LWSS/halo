@@ -275,8 +275,8 @@ void cinematic_render(
 
 		if (cinematic_globals->letter_box_amount > 0.f)
 		{
-			real letter_box_scale = 0.125f * cinematic_globals->letter_box_amount;
 			rectangle2d bounds;
+			real letter_box_scale = 0.125f * cinematic_globals->letter_box_amount;
 			real viewport_height = render.camera.viewport_bounds.y1 - render.camera.viewport_bounds.y0;
 
 			bounds.x0 = fast_ftol(render.camera.viewport_bounds.x0);
@@ -315,9 +315,9 @@ void cinematic_render(
 
 						if (title->text_index >= 0 && title->text_index < string_list->string_references.count)
 						{
+							real_argb_color text_color;
 							rectangle2d *bounds = &title->bounds;
 							real fade = 1.f;
-							real_argb_color text_color;
 
 							if (bounds->x1 == bounds->x0 || bounds->y1 == bounds->y0)
 							{

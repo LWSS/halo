@@ -11,7 +11,6 @@ RECORDED_ANIMATION_PLAYBACK_V1.C
 
 /* ---------- macros */
 
-// each simple event copies one field of the same name into the unit control data
 #define APPLY_EVENT(line, field) /* fake name */ \
 static void apply_##field(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream) \
 { \
@@ -24,8 +23,13 @@ static void apply_##field(struct unit_control_data *control, struct animation_ev
 	*playback_stream += sizeof(struct field##_set_event_v1); \
 }
 
+/* ---------- structures */
+
+typedef void (*apply_event_v1_proc)(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream); /* fake name */
+
 /* ---------- private code */
 
+/* Line numbers indicate this was out of order */
 APPLY_EVENT(25, animation_state)
 APPLY_EVENT(26, aiming_speed)
 APPLY_EVENT(27, control_flags)
@@ -124,7 +128,7 @@ static void apply_multi_vector(
 
 /* ---------- globals */
 
-static void (*apply_funcs[NUMBER_OF_PLAYBACK_V1_EVENTS])(struct unit_control_data *control, struct animation_event_v1 const *anim_event_v1, char const **playback_stream) =
+static apply_event_v1_proc apply_funcs[NUMBER_OF_PLAYBACK_V1_EVENTS] =
 {
 	NULL, // _playback_v1_nothing
 	NULL, // _playback_v1_end

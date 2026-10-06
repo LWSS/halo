@@ -13,7 +13,6 @@ RECORDED_ANIMATION_PLAYBACK.C
 
 #define CONTROLLER_ANGLE_STEPS 1000 /* fake name */
 
-// each simple event copies one field of the same name into the unit control data
 #define APPLY_EVENT(line, field) /* fake name */ \
 static void apply_##field(struct animation_playback_controller *animation_state, struct unit_control_data *control, struct animation_event_header const *header, char const **playback_stream) \
 { \
@@ -25,8 +24,13 @@ static void apply_##field(struct animation_playback_controller *animation_state,
 	*playback_stream += sizeof(struct field##_event_data); \
 }
 
+/* ---------- structures */
+
+typedef void (*apply_event_proc)(struct animation_playback_controller *animation_state, struct unit_control_data *control, struct animation_event_header const *header, char const **playback_stream); /* fake name */
+
 /* ---------- private code */
 
+/* Line numbers indicate this was out of order */
 APPLY_EVENT(25, animation_state)
 APPLY_EVENT(26, aiming_speed)
 APPLY_EVENT(27, control_flags)
@@ -225,7 +229,7 @@ static void apply_vector_short_difference(
 
 /* ---------- globals */
 
-static void (*apply_funcs[])(struct animation_playback_controller *animation_state, struct unit_control_data *control, struct animation_event_header const *header, char const **playback_stream) =
+static apply_event_proc apply_funcs[] =
 {
 	NULL, // _playback_nothing
 	NULL, // _playback_end
