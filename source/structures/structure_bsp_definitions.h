@@ -18,7 +18,8 @@ header included in hcex build.
 
 enum
 {
-	STRUCTURE_BSP_TAG = 'sbsp'
+	STRUCTURE_BSP_TAG = 'sbsp',
+	STRUCTURE_BSP_VERSION = 5,
 };
 
 enum
@@ -60,6 +61,20 @@ enum
 #define structure_bsp_definition_get(index) ((struct structure_bsp *)tag_get(STRUCTURE_BSP_TAG, index)) /* fake name */
 
 /* ---------- structures */
+
+struct structure_lens_flare
+{
+	struct tag_reference lens_flare;
+};
+
+struct structure_lens_flare_marker
+{
+	real_point3d position;
+	char i_direction;
+	char j_direction;
+	char k_direction;
+	byte lens_flare_index;
+};
 
 struct structure_cluster
 {
