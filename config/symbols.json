@@ -22181,7 +22181,7 @@
 { "file_offset": 3171480, "flags": 0, "name": "_data_00306498" },
 { "file_offset": 3173008, "flags": 0, "name": "_default_projectile_material_response" },
 { "file_offset": 3173168, "flags": 0, "name": "_projectile_update_section", "static": true },
-{ "file_offset": 3174696, "flags": 0, "name": "_projectile_collision_marker_names", "static": true },
+{ "file_offset": 3174696, "flags": 0, "name": "_effect_marker_names", "static": true },
 { "file_offset": 3174720, "flags": 0, "name": "_data_00307140" },
 { "file_offset": 3176256, "flags": 0, "name": "_console_color" },
 { "file_offset": 3176272, "flags": 0, "name": "_global_debug_key_list" },

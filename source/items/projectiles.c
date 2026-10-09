@@ -47,12 +47,12 @@ enum
 
 enum
 {
-	_projectile_collision_marker_normal = 0, /* fake name */
-	_projectile_collision_marker_incident, /* fake name */
-	_projectile_collision_marker_negative_incident, /* fake name */
-	_projectile_collision_marker_reflection, /* fake name */
-	_projectile_collision_marker_gravity, /* fake name */
-	NUMBER_OF_PROJECTILE_COLLISION_MARKERS, /* fake name */
+	_effect_vector_normal = 0,
+	_effect_vector_incident,
+	_effect_vector_negative_incident,
+	_effect_vector_reflected,
+	_effect_vector_gravity,
+	NUMBER_OF_EFFECT_MARKERS,
 };
 
 /* ---------- prototypes */
@@ -68,28 +68,46 @@ static void projectile_detonate(long projectile_index, boolean first_collision, 
 
 /* ---------- globals */
 
-static struct profile_section projectile_update_section = {"projectile_update", NONE, TRUE};
-static char const *projectile_collision_marker_names[NUMBER_OF_PROJECTILE_COLLISION_MARKERS] = {"normal", "incident", "negative incident", "reflection", "gravity"}; /* fake name */
+static struct profile_section projectile_update_section =
+{
+	"projectile_update",
+	NONE,
+	TRUE
+};
+
+static char const *effect_marker_names[NUMBER_OF_EFFECT_MARKERS] =
+{
+	"normal",
+	"incident",
+	"negative incident",
+	"reflection",
+	"gravity"
+};
+
 static real const seconds_per_tick = SECONDS_PER_TICK;
 
 /* ---------- public code */
 
-void projectiles_initialize(void)
+void projectiles_initialize(
+	void)
 {
 	return;
 }
 
-void projectiles_initialize_for_new_map(void)
+void projectiles_initialize_for_new_map(
+	void)
 {
 	return;
 }
 
-void projectiles_dispose_from_old_map(void)
+void projectiles_dispose_from_old_map(
+	void)
 {
 	return;
 }
 
-void projectiles_dispose(void)
+void projectiles_dispose(
+	void)
 {
 	return;
 }
@@ -104,7 +122,8 @@ void projectile_kill_tracer(
 	return;
 }
 
-void projectiles_delete_all(void)
+void projectiles_delete_all(
+	void)
 {
 	struct object_iterator iterator;
 
@@ -254,17 +273,19 @@ boolean projectile_update(
 	}
 
 	if (TEST_FLAG(projectile->projectile.flags, _projectile_counting_down_bit) ||
-		TEST_FLAG(projectile->projectile.flags, _projectile_attached_bit) ||
-		start_timer)
+		TEST_FLAG(projectile->projectile.flags, _projectile_attached_bit))
+	{
+		start_timer = TRUE;
+	}
+
+	if (start_timer)
 	{
 		if (!TEST_FLAG(projectile->projectile.flags, _projectile_counting_down_bit))
 		{
 			SET_FLAG(projectile->projectile.flags, _projectile_counting_down_bit, TRUE);
 		}
 
-		projectile->projectile.detonation_timer += projectile->projectile.detonation_timer_delta;
-
-		if (projectile->projectile.detonation_timer >= 1.f)
+		if ((projectile->projectile.detonation_timer += projectile->projectile.detonation_timer_delta) >= 1.f)
 		{
 			projectile_set_action(projectile_index, _projectile_action_detonate);
 		}
@@ -651,100 +672,100 @@ boolean projectile_aim_ballistic(
 {
 	real_vector3d aim_vector;
 	real_vector3d target_vector;
+	real vertical_distance;
 	real horizontal_distance_squared;
 	real gravity;
-	real a;
-	real b_minimum;
-	real b;
-	real c;
-	real t_squared_max;
-	real t_max;
-	real velocity_minimum;
-	real gravity_rise;
-	real velocity;
-	real ticks;
+	real calculated_ticks;
+	real calculated_distance;
 	real vertical_velocity;
 	real horizontal_velocity;
-	real distance;
-	real velocity_maximum = base_velocity;
-	boolean can_aim = TRUE;
-	boolean found_solution = FALSE;
+	real calculated_velocity = base_velocity;
+	boolean aiming_successful = TRUE;
 
-	target_vector.i = target_point->x - origin->x;
-	target_vector.j = target_point->y - origin->y;
-	target_vector.k = target_point->z - origin->z;
-	horizontal_distance_squared = target_vector.i * target_vector.i + target_vector.j * target_vector.j;
+	vector_from_points3d(origin, target_point, &target_vector);
+	vertical_distance = target_vector.k;
+	horizontal_distance_squared = magnitude_squared2d((real_vector2d *)&target_vector);
 	gravity = MAX(0.f, global_gravity * gravity_scale);
-	c = gravity * gravity * 0.25f;
-	a = horizontal_distance_squared + target_vector.k * target_vector.k;
-	match_assert("c:\\halo\\SOURCE\\items\\projectiles.c", 760, 4.0f * a * c > 0.0f);
-	b_minimum = -square_root(4.0f * a * c);
-	t_squared_max = -(b_minimum / (2.f * c));
-	match_assert("c:\\halo\\SOURCE\\items\\projectiles.c", 764, t_squared_max >= 0.0f);
-	t_max = square_root(t_squared_max);
-	gravity_rise = gravity * target_vector.k;
-	velocity_minimum = (gravity_rise - b_minimum < 0.f) ? 0.f : square_root(gravity_rise - b_minimum);
 
-	if (forced_velocity)
 	{
-		velocity = *forced_velocity;
-	}
-	else
-	{
-		velocity = velocity_maximum;
+		real t_max;
+		real v_min;
+		real c = gravity * gravity / 4.f;
+		real a = vertical_distance * vertical_distance + horizontal_distance_squared;
+		boolean found_solution = FALSE;
 
-		if (target_ballistic_fraction_min && *target_ballistic_fraction_min > 0.f)
 		{
-			real v_desired_sq;
-			real t = t_max * *target_ballistic_fraction_min;
-			real t_squared = t * t;
+			real b_max;
+			real t_squared_max;
+			real v_squared_min;
 
-			b = -(a / t_squared + t_squared * c);
-			v_desired_sq = gravity_rise - b;
-			match_assert("c:\\halo\\SOURCE\\items\\projectiles.c", 806, v_desired_sq > 0.0f);
+			match_assert("c:\\halo\\SOURCE\\items\\projectiles.c", 760, 4.0f * a * c > 0.0f);
+			b_max = -square_root(4.0f * a * c);
+			t_squared_max = -b_max / (2.f * c);
+			match_assert("c:\\halo\\SOURCE\\items\\projectiles.c", 764, t_squared_max >= 0.0f);
+			t_max = square_root(t_squared_max);
+			v_squared_min = gravity * vertical_distance - b_max;
+			v_min = (v_squared_min < 0.f) ? 0.f : square_root(v_squared_min);
+		}
 
-			if (velocity_maximum > square_root(v_desired_sq))
+		if (forced_velocity)
+		{
+			calculated_velocity = *forced_velocity;
+		}
+		else
+		{
+			calculated_velocity = base_velocity;
+
+			if (target_ballistic_fraction_min && *target_ballistic_fraction_min > 0.f)
 			{
-				velocity = square_root(v_desired_sq);
+				real b_desired;
+				real v_desired_sq;
+				real v_desired;
+				real t_desired = *target_ballistic_fraction_min * t_max;
+				real t_desired_sq = t_desired * t_desired;
+
+				b_desired = -(c * t_desired_sq + a / t_desired_sq);
+				v_desired_sq = gravity * vertical_distance - b_desired;
+				match_assert("c:\\halo\\SOURCE\\items\\projectiles.c", 806, v_desired_sq > 0.0f);
+				v_desired = square_root(v_desired_sq);
+				calculated_velocity = MIN(calculated_velocity, v_desired);
 			}
+		}
+
+		if (calculated_velocity >= v_min)
+		{
+			real b = gravity * vertical_distance - calculated_velocity * calculated_velocity;
+			real disc = b * b - 4.0f * c * a;
+
+			if (b < 0.f && disc >= 0.f)
+			{
+				real t_squared = (-b + (lob ? 1 : -1) * square_root(disc)) / (2.f * c);
+
+				if (t_squared > 0.f)
+				{
+					calculated_ticks = square_root(t_squared);
+					found_solution = TRUE;
+				}
+			}
+		}
+
+		if (!found_solution)
+		{
+			aiming_successful = FALSE;
+			calculated_ticks = t_max;
+			calculated_velocity = v_min;
 		}
 	}
 
-	if (velocity >= velocity_minimum)
-	{
-		real discriminant;
-
-		b = gravity_rise - velocity * velocity;
-		discriminant = b * b - 4.0f * a * c;
-
-		if (b < 0.f && discriminant >= 0.f)
-		{
-			real t_squared = (square_root(discriminant) * (lob ? 1 : -1) - b) / (2.f * c);
-
-			if (t_squared > 0.f)
-			{
-				ticks = square_root(t_squared);
-				found_solution = TRUE;
-			}
-		}
-	}
-
-	if (!found_solution)
-	{
-		can_aim = FALSE;
-		ticks = t_max;
-		velocity = velocity_minimum;
-	}
-
-	scale_vector3d(&target_vector, 1.f / ticks, &aim_vector);
-	aim_vector.k += ticks * gravity * 0.5f;
-	horizontal_velocity = square_root(aim_vector.i * aim_vector.i + aim_vector.j * aim_vector.j);
+	scale_vector3d(&target_vector, 1.f / calculated_ticks, &aim_vector);
+	aim_vector.k += calculated_ticks * gravity * 0.5f;
+	horizontal_velocity = magnitude2d((real_vector2d *)&aim_vector);
 	vertical_velocity = aim_vector.k;
-	distance = ticks * velocity;
+	calculated_distance = calculated_ticks * calculated_velocity;
 
 	if (normalize3d(&aim_vector) == 0.f)
 	{
-		can_aim = FALSE;
+		aiming_successful = FALSE;
 		aim_vector = target_vector;
 
 		if (normalize3d(&aim_vector) == 0.f)
@@ -758,12 +779,12 @@ boolean projectile_aim_ballistic(
 
 	if (result_distance)
 	{
-		*result_distance = distance;
+		*result_distance = calculated_distance;
 	}
 
 	if (result_velocity)
 	{
-		*result_velocity = velocity;
+		*result_velocity = calculated_velocity;
 	}
 
 	if (result_vertical_velocity)
@@ -778,10 +799,10 @@ boolean projectile_aim_ballistic(
 
 	if (result_ticks)
 	{
-		*result_ticks = ticks;
+		*result_ticks = calculated_ticks;
 	}
 
-	return can_aim;
+	return aiming_successful;
 }
 
 boolean projectile_aim_linear(
@@ -794,19 +815,20 @@ boolean projectile_aim_linear(
 	real *result_distance)
 {
 	real_vector3d aim_vector;
-	real distance;
-	real ticks;
+	real calculated_distance;
+	real calculated_ticks;
+	real calculated_velocity = base_velocity;
 
 	vector_from_points3d(origin, target_point, &aim_vector);
-	distance = normalize3d(&aim_vector);
+	calculated_distance = normalize3d(&aim_vector);
 
-	if (base_velocity > 0.f)
+	if (calculated_velocity > 0.f)
 	{
-		ticks = distance / base_velocity;
+		calculated_ticks = calculated_distance / calculated_velocity;
 	}
 	else
 	{
-		ticks = 0.f;
+		calculated_ticks = 0.f;
 	}
 
 	match_assert("c:\\halo\\SOURCE\\items\\projectiles.c", 921, result_aim_vector);
@@ -814,17 +836,17 @@ boolean projectile_aim_linear(
 
 	if (result_distance)
 	{
-		*result_distance = distance;
+		*result_distance = calculated_distance;
 	}
 
 	if (result_velocity)
 	{
-		*result_velocity = base_velocity;
+		*result_velocity = calculated_velocity;
 	}
 
 	if (result_ticks)
 	{
-		*result_ticks = ticks;
+		*result_ticks = calculated_ticks;
 	}
 
 	return TRUE;
@@ -845,13 +867,22 @@ boolean projectile_aim(
 	real *result_distance,
 	boolean *result_linear)
 {
-	boolean result;
-	real velocity = !override_velocity_max ? projectile_definition->projectile.initial_velocity : *override_velocity_max;
+	boolean aiming_successful;
+	real base_velocity;
+
+	if (!override_velocity_max)
+	{
+		base_velocity = projectile_definition->projectile.initial_velocity;
+	}
+	else
+	{
+		base_velocity = *override_velocity_max;
+	}
 
 	if (TEST_FLAG(projectile_definition->projectile.flags, _projectile_aim_ballistic_bit) && projectile_definition->projectile.air_gravity_scale > 0.f)
 	{
-		result = projectile_aim_ballistic(
-			velocity,
+		aiming_successful = projectile_aim_ballistic(
+			base_velocity,
 			projectile_definition->projectile.air_gravity_scale,
 			origin,
 			target_point,
@@ -873,8 +904,8 @@ boolean projectile_aim(
 	}
 	else
 	{
-		result = projectile_aim_linear(
-			velocity,
+		aiming_successful = projectile_aim_linear(
+			base_velocity,
 			origin,
 			target_point,
 			result_aim_vector,
@@ -888,7 +919,7 @@ boolean projectile_aim(
 		}
 	}
 
-	return result;
+	return aiming_successful;
 }
 
 real projectile_estimate_time_to_target(
@@ -946,7 +977,8 @@ void projectile_accelerate(
 	return;
 }
 
-boolean dangerous_projectiles_near_player(void)
+boolean dangerous_projectiles_near_player(
+	void)
 {
 	struct object_iterator iterator;
 	struct projectile_datum *projectile;
@@ -978,8 +1010,6 @@ void projectile_handle_deleted_object(
 	return;
 }
 
-/* ---------- private code */
-
 static void projectile_set_action(
 	long projectile_index,
 	short action)
@@ -1004,10 +1034,9 @@ static void projectile_collision(
 	real_vector3d original_direction;
 	real magnitude;
 	real velocity_fraction;
-	real angle_noise;
-	real impact_velocity;
-	real impact_angle;
-	real speed_squared;
+	real velocity_into_surface;
+	real angle_of_incidence;
+	real velocity_squared;
 	short response;
 	long effect_definition_index;
 	struct projectile_material_response_definition *material_response;
@@ -1080,13 +1109,12 @@ static void projectile_collision(
 		material_response = &default_projectile_material_response;
 	}
 
-	impact_velocity = -dot_product3d(new_velocity, &collision->plane.n) + real_random_range(-material_response->velocity_noise, 0.f);
-	angle_noise = real_random_range(-material_response->angle_noise, material_response->angle_noise);
-	impact_angle = angle_between_vectors3d(new_velocity, &collision->plane.n) - _half_pi + angle_noise;
+	velocity_into_surface = -dot_product3d(&collision->plane.n, new_velocity) + real_random_range(-material_response->velocity_noise, 0.f);
+	angle_of_incidence = angle_between_vectors3d(new_velocity, &collision->plane.n) - _half_pi + real_random_range(-material_response->angle_noise, material_response->angle_noise);
 
 	if (material_response->possible_response != _projectile_response_disappear &&
-		(material_response->possible_response_maximum_angle == 0.f || (impact_angle >= material_response->possible_response_minimum_angle && impact_angle <= material_response->possible_response_maximum_angle)) &&
-		(material_response->possible_response_maximum_velocity == 0.f || (impact_velocity >= material_response->possible_response_minimum_velocity && impact_velocity <= material_response->possible_response_maximum_velocity)) &&
+		(material_response->possible_response_maximum_angle == 0.f || (angle_of_incidence >= material_response->possible_response_minimum_angle && angle_of_incidence <= material_response->possible_response_maximum_angle)) &&
+		(material_response->possible_response_maximum_velocity == 0.f || (velocity_into_surface >= material_response->possible_response_minimum_velocity && velocity_into_surface <= material_response->possible_response_maximum_velocity)) &&
 		(!TEST_FLAG(material_response->possible_response_flags, _projectile_possible_response_only_against_units_bit) ||
 		(collision->type == _collision_result_object && object_try_and_get_and_verify_type(collision->object_index, _object_mask_unit))) &&
 		real_random() >= material_response->possible_response_skip_fraction)
@@ -1139,9 +1167,7 @@ static void projectile_collision(
 		{
 			SET_FLAG(projectile->object.flags, _object_wholly_under_media_bit, !TEST_FLAG(projectile->object.flags, _object_wholly_under_media_bit));
 			projectile_calculate_deceleration(projectile_index);
-			new_position->x -= collision->plane.n.i * 0.001f;
-			new_position->y -= collision->plane.n.j * 0.001f;
-			new_position->z -= collision->plane.n.k * 0.001f;
+			point_from_line3d(new_position, &collision->plane.n, -0.001f, new_position);
 		}
 		else if (collision->type == _collision_result_object)
 		{
@@ -1186,18 +1212,18 @@ static void projectile_collision(
 
 	if (material_response->velocity_noise != 0.f)
 	{
-		real speed = normalize3d(new_velocity);
+		real new_velocity_speed = normalize3d(new_velocity);
 
-		if (speed != 0.f)
+		if (new_velocity_speed != 0.f)
 		{
 			scale_vector3d(
 				new_velocity,
-				real_random_range(-material_response->velocity_noise, material_response->velocity_noise) + speed,
+				real_random_range(-material_response->velocity_noise, material_response->velocity_noise) + new_velocity_speed,
 				new_velocity);
 		}
 	}
 
-	speed_squared = magnitude_squared3d(new_velocity);
+	velocity_squared = magnitude_squared3d(new_velocity);
 
 	if (response != _projectile_response_attach &&
 		magnitude_squared3d(new_velocity) < definition->projectile.detonation_minimum_velocity * definition->projectile.detonation_minimum_velocity)
@@ -1205,7 +1231,7 @@ static void projectile_collision(
 		projectile_set_action(projectile_index, _projectile_action_detonate);
 	}
 
-	if (speed_squared < _real_epsilon)
+	if (velocity_squared < _real_epsilon)
 	{
 		SET_FLAG(projectile->projectile.flags, _projectile_stopped_after_collision_bit, TRUE);
 
@@ -1226,7 +1252,7 @@ static void projectile_collision(
 		effect_scale = velocity_fraction;
 		break;
 	case _projectile_material_response_scale_effects_by_angle:
-		effect_scale = impact_angle / _half_pi;
+		effect_scale = angle_of_incidence * (1.f / _half_pi);
 		break;
 	}
 
@@ -1234,25 +1260,25 @@ static void projectile_collision(
 	material_effect_scale = PIN(material_effect_scale, 0.f, 1.f);
 
 	{
-		real_point3d effect_points[NUMBER_OF_PROJECTILE_COLLISION_MARKERS];
-		real_vector3d effect_vectors[NUMBER_OF_PROJECTILE_COLLISION_MARKERS];
+		real_vector3d effect_vectors[NUMBER_OF_EFFECT_MARKERS];
+		real_point3d effect_points[NUMBER_OF_EFFECT_MARKERS];
 		short marker_index;
 
-		scale_vector3d(&original_direction, -1.f, &effect_vectors[_projectile_collision_marker_incident]);
-		effect_vectors[_projectile_collision_marker_negative_incident] = original_direction;
-		effect_vectors[_projectile_collision_marker_gravity] = *global_down3d;
-		effect_vectors[_projectile_collision_marker_normal] = collision->plane.n;
+		scale_vector3d(&original_direction, -1.f, &effect_vectors[_effect_vector_incident]);
+		effect_vectors[_effect_vector_negative_incident] = original_direction;
+		effect_vectors[_effect_vector_gravity] = *global_down3d;
+		effect_vectors[_effect_vector_normal] = collision->plane.n;
 		reflect_vector3d(
 			&original_direction,
 			&collision->plane.n,
-			&effect_vectors[_projectile_collision_marker_reflection]);
+			&effect_vectors[_effect_vector_reflected]);
 
-		for (marker_index = 0; marker_index < NUMBER_OF_PROJECTILE_COLLISION_MARKERS; marker_index++)
+		for (marker_index = 0; marker_index < NUMBER_OF_EFFECT_MARKERS; marker_index++)
 		{
 			effect_points[marker_index] = collision->point;
 		}
 
-		if (impact_velocity > SECONDS_PER_TICK / 4.f)
+		if (velocity_into_surface > SECONDS_PER_TICK / 4.f)
 		{
 			projectile_effect_new(
 				projectile_index,
@@ -1360,8 +1386,8 @@ static void projectile_effect_new(
 			projectile_index,
 			collision->object_index,
 			collision->node_index,
-			NUMBER_OF_PROJECTILE_COLLISION_MARKERS,
-			projectile_collision_marker_names,
+			NUMBER_OF_EFFECT_MARKERS,
+			effect_marker_names,
 			points,
 			vectors,
 			scale_a,
@@ -1375,8 +1401,8 @@ static void projectile_effect_new(
 			definition_index,
 			projectile_index,
 			NULL,
-			NUMBER_OF_PROJECTILE_COLLISION_MARKERS,
-			projectile_collision_marker_names,
+			NUMBER_OF_EFFECT_MARKERS,
+			effect_marker_names,
 			points,
 			vectors,
 			scale_a,
@@ -1393,17 +1419,17 @@ static void projectile_adjust_for_angular_velocity_change(
 	long object_index)
 {
 	struct projectile_datum *projectile = projectile_get(object_index);
-	real magnitude = magnitude3d(&projectile->object.angular_velocity);
+	real angular_velocity_magnitude = magnitude3d(&projectile->object.angular_velocity);
 
-	if (magnitude != 0.f)
+	if (angular_velocity_magnitude != 0.f)
 	{
 		SET_FLAG(projectile->projectile.flags, _projectile_has_nonzero_angular_velocity_bit, TRUE);
 		scale_vector3d(
 			&projectile->object.angular_velocity,
-			1.f / magnitude,
+			1.f / angular_velocity_magnitude,
 			&projectile->projectile.rotation_axis);
-		projectile->projectile.rotation_sine = sine(magnitude);
-		projectile->projectile.rotation_cosine = cosine(magnitude);
+		projectile->projectile.rotation_sine = sine(angular_velocity_magnitude);
+		projectile->projectile.rotation_cosine = cosine(angular_velocity_magnitude);
 	}
 	else
 	{
@@ -1600,7 +1626,7 @@ static void projectile_detonate(
 	real_vector3d up;
 	struct projectile_datum *projectile = projectile_get(projectile_index);
 	struct projectile_definition *definition = projectile_definition_get(projectile->definition_index);
-	char const *effect_marker_names[2] = {"", "gravity"};
+	char *effect_marker_names[2] = {"", "gravity"};
 	long effect_definition_index = definition->projectile.detonation_effect.index;
 
 	if (TEST_FLAG(definition->projectile.flags, _projectile_super_combining_explosion_bit) &&
@@ -1774,3 +1800,5 @@ boolean projectile_handle_parent_destroyed(
 
 	return TRUE;
 }
+
+/* ---------- private code */
