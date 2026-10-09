@@ -76,8 +76,6 @@ struct unit_hud_globals_definition
 
 /* ---------- prototypes */
 
-long verify_tag_reference(struct tag_reference const *reference);
-
 void *_texture_cache_bitmap_get_hardware_format(struct bitmap_data const *bitmap, boolean block, boolean load);
 
 static void unit_hud_outline_mapper_tick(void);
