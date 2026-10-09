@@ -524,42 +524,37 @@ boolean projectile_update(
 
 				for (local_player_index = 0; local_player_index < MAXIMUM_NUMBER_OF_LOCAL_PLAYERS; local_player_index++)
 				{
-					if (local_player_get_player_index(local_player_index) != NONE)
+					long unit_index = local_player_get_player_index(local_player_index) == NONE ? NONE : player_get(local_player_get_player_index(local_player_index))->unit_index;
+
+					if (unit_index != NONE && unit_index != ignore_object_index)
 					{
-						long unit_index = player_get(local_player_get_player_index(local_player_index))->unit_index;
+						real_vector3d ps;
+						real_vector3d perp;
+						real_vector3d parallel;
+						real distance_along_travel;
+						real_point3d *center = &object_get(unit_index)->object.bounding_sphere_center;
+						real maximum_distance = sound_definition_get_maximum_distance(definition->projectile.flyby_sound.index);
 
-						if (unit_index != NONE && unit_index != ignore_object_index)
+						vector_from_points3d(&projectile->object.position, center, &ps);
+						component_vectors_from_direction3d(&ps, &travel, &parallel, &perp);
+						distance_along_travel = dot_product3d(&parallel, &travel);
+
+						if (distance_along_travel >= 0.f &&
+							distance_along_travel < magnitude_squared3d(&travel) &&
+							magnitude_squared3d(&perp) < maximum_distance * maximum_distance)
 						{
-							real_vector3d ps;
-							real_vector3d perp;
-							real_vector3d parallel;
-							real distance_along_travel;
-							real_point3d *center = &object_get(unit_index)->object.bounding_sphere_center;
-							real maximum_distance = sound_definition_get_maximum_distance(definition->projectile.flyby_sound.index);
+							struct sound_location sound_location;
 
-							ps.i = center->x - projectile->object.position.x;
-							ps.j = center->y - projectile->object.position.y;
-							ps.k = center->z - projectile->object.position.z;
-							component_vectors_from_direction3d(&ps, &travel, &parallel, &perp);
-							distance_along_travel = dot_product3d(&parallel, &travel);
-
-							if (distance_along_travel >= 0.f &&
-								distance_along_travel < magnitude_squared3d(&travel) &&
-								magnitude_squared3d(&perp) < maximum_distance * maximum_distance)
-							{
-								struct sound_location sound_location;
-
-								point_from_line3d(center, &perp, -1.f, &sound_location.position);
-								sound_location.forward = travel;
-								normalize3d(&sound_location.forward);
-								sound_location.translational_velocity = *global_zero_vector3d;
-								sound_location.game_location = collision.location;
-								unattached_impulse_sound_new(
-									definition->projectile.flyby_sound.index,
-									&sound_location,
-									1.f);
-								flyby_played = TRUE;
-							}
+							point_from_line3d(center, &perp, -1.f, &sound_location.position);
+							sound_location.forward = travel;
+							normalize3d(&sound_location.forward);
+							sound_location.translational_velocity = *global_zero_vector3d;
+							sound_location.game_location = collision.location;
+							unattached_impulse_sound_new(
+								definition->projectile.flyby_sound.index,
+								&sound_location,
+								1.f);
+							flyby_played = TRUE;
 						}
 					}
 				}
@@ -722,8 +717,10 @@ boolean projectile_aim_ballistic(
 				real v_desired_sq;
 				real v_desired;
 				real t_desired = *target_ballistic_fraction_min * t_max;
-				real t_desired_sq = t_desired * t_desired;
+				real t_desired_sq;
 
+				PIN(t_desired, 0.001f, t_max);
+				t_desired_sq = t_desired * t_desired;
 				b_desired = -(c * t_desired_sq + a / t_desired_sq);
 				v_desired_sq = gravity * vertical_distance - b_desired;
 				match_assert("c:\\halo\\SOURCE\\items\\projectiles.c", 806, v_desired_sq > 0.0f);
