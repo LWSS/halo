@@ -129,6 +129,7 @@ boolean ai_release_inactive_encounters(char *result_description, unsigned char *
 
 void ai_handle_allegiance_broken_notification(short team1_index, short team2_index, boolean broken);
 
+boolean ai_adjust_damage(long actor_index, struct damage_data *damage_data, real *damage);
 void ai_handle_damage(long unit_index, long shooter_object_index, short damage_category, float fraction, union real_vector3d *damage_velocity, boolean delayed);
 void ai_handle_deleted_object(long deleted_object_index);
 void ai_handle_unit_effect(long owner_unit_index, short effect_type, short volume);
