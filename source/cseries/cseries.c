@@ -38,8 +38,6 @@ enum
 
 /* ---------- prototypes */
 
-extern void stack_walk(boolean);
-
 /* ---------- globals */
 
 char temporary[256];

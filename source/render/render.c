@@ -155,7 +155,7 @@ void render_frame_pregame(
 
 	rasterizer_frame_begin(&parameters);
 	rasterizer_windows_begin();
-	profile_render_window_start(NULL);
+	profile_render_window_start(FALSE);
 
 	memset(&rasterizer_parameters, 0, sizeof(rasterizer_parameters));
 

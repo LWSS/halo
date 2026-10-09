@@ -59,12 +59,6 @@ struct scenario_global_data
 	struct sound_environment sound_environment_interpolator;
 };
 
-struct memory_status /* fake name */
-{
-	unsigned long minimum_free;
-	unsigned long maximum_free;
-};
-
 /* ---------- prototypes */
 
 static void scenario_call_disconnect_from_structure_bsp_procs(void);
