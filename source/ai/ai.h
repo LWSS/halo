@@ -39,6 +39,23 @@ enum
 	NUMBER_OF_AI_SOUND_VOLUMES,
 };
 
+enum
+{
+	_ai_information_none = 0,
+	_ai_information_allegiance,
+	_ai_information_combat_stimulus,
+	_ai_information_target_knowledge,
+	_ai_information_flee,
+	NUMBER_OF_AI_INFORMATION_TYPES,
+};
+
+enum
+{
+	_ai_information_look_none = 0,
+	_ai_information_look_unit,
+	_ai_information_look_object,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
@@ -110,6 +127,8 @@ boolean ai_release_inactive_swarms(char *result_description, unsigned char *more
 void ai_find_inactive_encounters(unsigned char *working_memory, short working_memory_size);
 boolean ai_release_inactive_encounters(char *result_description, unsigned char *more_to_release, unsigned char *working_memory, short working_memory_size);
 
+void ai_handle_allegiance_broken_notification(short team1_index, short team2_index, boolean broken);
+
 void ai_handle_damage(long unit_index, long shooter_object_index, short damage_category, float fraction, union real_vector3d *damage_velocity, boolean delayed);
 void ai_handle_deleted_object(long deleted_object_index);
 void ai_handle_unit_effect(long owner_unit_index, short effect_type, short volume);
@@ -120,6 +139,7 @@ void ai_handle_spatial_effect(long object_index, real_point3d const *position, s
 void ai_globals_dialogue_triggers_enabled(boolean enable);
 void ai_disconnect_from_structure_bsp(void);
 void ai_reconnect_to_structure_bsp(void);
+short ai_get_race_from_team_index(short team_index);
 
 /* ---------- globals */
 
