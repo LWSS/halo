@@ -92,6 +92,7 @@ void ai_find_inactive_encounters(unsigned char *working_memory, short working_me
 boolean ai_release_inactive_encounters(char *result_description, unsigned char *more_to_release, unsigned char *working_memory, short working_memory_size);
 
 void ai_handle_damage(long unit_index, long shooter_object_index, short damage_category, float fraction, union real_vector3d *damage_velocity, boolean delayed);
+void ai_handle_spatial_effect(long object_index, real_point3d const *position, short effect_type, short volume, short count);
 
 void ai_globals_dialogue_triggers_enabled(boolean enable);
 void ai_disconnect_from_structure_bsp(void);
