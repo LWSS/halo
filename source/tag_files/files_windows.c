@@ -35,8 +35,6 @@ enum
 	NUMBER_OF_REFERENCE_INFO_FLAGS
 };
 
-/* ---------- macros */
-
 /* ---------- structures */
 
 struct find_files_state
@@ -60,7 +58,7 @@ struct file_reference_info
 
 /* ---------- prototypes */
 
-static void file_error(const char *function_name, const struct file_reference *file);
+static void file_error(char const *function_name, struct file_reference const *file);
 
 /* ---------- globals */
 
@@ -161,7 +159,7 @@ boolean file_delete(
 }
 
 boolean file_exists(
-	const struct file_reference *file)
+	struct file_reference const *file)
 {
 	struct file_reference_info *info = file_reference_get_info((struct file_reference *)file);
 	char full_path[MAXIMUM_FILENAME_LENGTH+1] = {0};
@@ -183,7 +181,7 @@ boolean file_exists(
 
 boolean file_rename(
 	struct file_reference *file,
-	const char *name)
+	char const *name)
 {
 	struct file_reference_info *info = file_reference_get_info(file);
 	char old_full_path[MAXIMUM_FILENAME_LENGTH+1] = {0};
@@ -282,7 +280,7 @@ boolean file_close(
 }
 
 unsigned long file_get_position(
-	const struct file_reference *file)
+	struct file_reference const *file)
 {
 	struct file_reference_info *info = file_reference_get_info((struct file_reference *)file);
 	unsigned long position = SetFilePointer(info->file_handle, 0, NULL, FILE_CURRENT);
@@ -296,7 +294,7 @@ unsigned long file_get_position(
 }
 
 boolean file_set_position(
-	const struct file_reference *file,
+	struct file_reference const *file,
 	unsigned long position)
 {
 	struct file_reference_info *info = file_reference_get_info((struct file_reference *)file);
@@ -311,7 +309,7 @@ boolean file_set_position(
 }
 
 unsigned long file_get_eof(
-	const struct file_reference *file)
+	struct file_reference const *file)
 {
 	struct file_reference_info *info = file_reference_get_info((struct file_reference *)file);
 	unsigned long eof = GetFileSize(info->file_handle, NULL);
@@ -325,7 +323,7 @@ unsigned long file_get_eof(
 }
 
 boolean file_set_eof(
-	const struct file_reference *file,
+	struct file_reference const *file,
 	unsigned long position)
 {
 	struct file_reference_info *info = file_reference_get_info((struct file_reference *)file);
@@ -340,7 +338,7 @@ boolean file_set_eof(
 }
 
 boolean file_read(
-	const struct file_reference *file,
+	struct file_reference const *file,
 	unsigned long count,
 	void *buffer)
 {
@@ -371,9 +369,9 @@ boolean file_read(
 }
 
 boolean file_write(
-	const struct file_reference *file,
+	struct file_reference const *file,
 	unsigned long count,
-	const void *buffer)
+	void const *buffer)
 {
 	unsigned long bytes_written;
 	struct file_reference_info *info = file_reference_get_info((struct file_reference *)file);
@@ -395,7 +393,7 @@ boolean file_write(
 }
 
 boolean file_read_from_position(
-	const struct file_reference *file,
+	struct file_reference const *file,
 	unsigned long position,
 	unsigned long count,
 	void *buffer)
@@ -404,16 +402,16 @@ boolean file_read_from_position(
 }
 
 boolean file_write_to_position(
-	const struct file_reference *file,
+	struct file_reference const *file,
 	unsigned long position,
 	unsigned long count,
-	const void *buffer)
+	void const *buffer)
 {
 	return file_set_position(file, position) && file_write(file, count, buffer);
 }
 
 boolean file_get_last_modification_date(
-	const struct file_reference *file,
+	struct file_reference const *file,
 	struct file_last_modification_date *date)
 {
 	WIN32_FILE_ATTRIBUTE_DATA data;
@@ -446,7 +444,7 @@ long file_compare_last_modification_dates(
 }
 
 boolean file_get_size(
-	const struct file_reference *file,
+	struct file_reference const *file,
 	unsigned long *size)
 {
 	WIN32_FILE_ATTRIBUTE_DATA data;
@@ -474,7 +472,7 @@ boolean file_get_size(
 
 void find_files_start(
 	unsigned long flags,
-	const struct file_reference *directory)
+	struct file_reference const *directory)
 {
 	struct file_reference_info *info = file_reference_get_info((struct file_reference *)directory);
 	short depth = find_files_globals.depth;
@@ -589,7 +587,7 @@ boolean find_files_next(
 
 void file_path_add_name(
 	char *path,
-	const char *name)
+	char const *name)
 {
 	if (name[0]!='\0')
 	{
@@ -613,7 +611,7 @@ void file_path_add_name(
 
 void file_path_add_extension(
 	char *path,
-	const char *extension)
+	char const *extension)
 {
 	if (extension[0]!='\0')
 	{
@@ -709,7 +707,7 @@ void file_path_split(
 
 void file_location_get_full_path(
 	short location,
-	const char *path,
+	char const *path,
 	char *full_path)
 {
 	match_assert("c:\\halo\\SOURCE\\tag_files\\files_windows.c", 788, path && full_path);
@@ -727,7 +725,7 @@ void file_location_get_full_path(
 }
 
 boolean file_read_only(
-	const struct file_reference *file)
+	struct file_reference const *file)
 {
 	char full_path[MAXIMUM_FILENAME_LENGTH+1];
 	unsigned long attributes;
@@ -748,8 +746,8 @@ boolean file_read_only(
 /* ---------- private code */
 
 static void file_error(
-	const char *function_name,
-	const struct file_reference *file)
+	char const *function_name,
+	struct file_reference const *file)
 {
 	struct file_reference_info *info = file_reference_get_info((struct file_reference *)file);
 	unsigned long error_code = GetLastError();

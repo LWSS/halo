@@ -6,22 +6,12 @@ TAG_GROUPS.C
 
 #include "cseries.h"
 
-/* ---------- constants */
-
-/* ---------- macros */
-
-/* ---------- structures */
-
-/* ---------- prototypes */
-
-/* ---------- globals */
-
 /* ---------- public code */
 
-// [NOTE: 3000 lines of tool-specific code lives here]
+// NOTE: 3000 lines of tool-specific code lives here
 
 long verify_tag_reference(
-	const struct tag_reference *reference)
+	struct tag_reference const *reference)
 {
 	long index;
 
@@ -40,7 +30,7 @@ long verify_tag_reference(
 }
 
 void *tag_data_get_pointer(
-	const struct tag_data *data,
+	struct tag_data const *data,
 	long offset,
 	long size)
 {
@@ -51,7 +41,7 @@ void *tag_data_get_pointer(
 }
 
 void *tag_block_get_element_with_size(
-	const struct tag_block *block,
+	struct tag_block const *block,
 	long index,
 	long element_size)
 {
@@ -69,5 +59,3 @@ void *tag_block_get_element_with_size(
 
 	return (void *)((byte *)block->address + index*element_size);
 }
-
-/* ---------- private code */

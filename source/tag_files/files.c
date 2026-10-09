@@ -26,8 +26,6 @@ enum
 	DATASTORE_MAX_FIELD_NAME_SIZE = 255
 };
 
-/* ---------- macros */
-
 /* ---------- structures */
 
 struct datastore_entry
@@ -49,8 +47,6 @@ struct file_reference_info
 	char path[MAXIMUM_FILENAME_LENGTH+1];
 };
 
-/* ---------- prototypes */
-
 /* ---------- globals */
 
 char file_location_volume_names[NUMBER_OF_FILE_REFERENCE_LOCATIONS-1][256];
@@ -59,7 +55,7 @@ char file_location_volume_names[NUMBER_OF_FILE_REFERENCE_LOCATIONS-1][256];
 
 void file_location_set_volume(
 	short location,
-	const char *volume_name)
+	char const *volume_name)
 {
 	match_assert("c:\\halo\\SOURCE\\tag_files\\files.c", 75, location>0 && location<NUMBER_OF_FILE_REFERENCE_LOCATIONS);
 	match_assert("c:\\halo\\SOURCE\\tag_files\\files.c", 76, strlen(file_location_volume_names[location])==0);
@@ -89,7 +85,7 @@ struct file_reference *file_reference_create(
 
 struct file_reference *file_reference_create_from_path(
 	struct file_reference *reference,
-	const char *path,
+	char const *path,
 	boolean directory)
 {
 	file_reference_create(reference, NONE);
@@ -108,7 +104,7 @@ struct file_reference *file_reference_create_from_path(
 
 struct file_reference *file_reference_copy(
 	struct file_reference *destination,
-	const struct file_reference *source)
+	struct file_reference const *source)
 {
 	file_reference_get_info((struct file_reference *)source);
 	memcpy(destination, source, sizeof(struct file_reference_info));
@@ -118,7 +114,7 @@ struct file_reference *file_reference_copy(
 
 struct file_reference *file_reference_add_directory(
 	struct file_reference *reference,
-	const char *directory)
+	char const *directory)
 {
 	struct file_reference_info *info = file_reference_get_info(reference);
 
@@ -132,7 +128,7 @@ struct file_reference *file_reference_add_directory(
 
 struct file_reference *file_reference_set_name(
 	struct file_reference *reference,
-	const char *name)
+	char const *name)
 {
 	struct file_reference_info *info = file_reference_get_info(reference);
 
@@ -150,7 +146,7 @@ struct file_reference *file_reference_set_name(
 }
 
 short file_reference_get_location(
-	const struct file_reference *reference)
+	struct file_reference const *reference)
 {
 	struct file_reference_info *info = file_reference_get_info((struct file_reference *)reference);
 
@@ -158,7 +154,7 @@ short file_reference_get_location(
 }
 
 char *file_reference_get_name(
-	const struct file_reference *reference,
+	struct file_reference const *reference,
 	unsigned long flags,
 	char *name)
 {
@@ -210,8 +206,8 @@ char *file_reference_get_name(
 }
 
 boolean file_references_equal(
-	const struct file_reference *reference0,
-	const struct file_reference *reference1)
+	struct file_reference const *reference0,
+	struct file_reference const *reference1)
 {
 	struct file_reference_info *info0 = file_reference_get_info((struct file_reference *)reference0);
 	struct file_reference_info *info1 = file_reference_get_info((struct file_reference *)reference1);
@@ -227,7 +223,7 @@ boolean file_references_equal(
 
 long find_files(
 	unsigned long flags,
-	const struct file_reference *directory,
+	struct file_reference const *directory,
 	long maximum_count,
 	struct file_reference *references)
 {
@@ -300,7 +296,7 @@ void file_printf(
 }
 
 void directory_create_or_delete_contents(
-	const char *directory_name)
+	char const *directory_name)
 {
 	struct file_reference directory;
 	struct file_reference file;
@@ -325,8 +321,8 @@ void directory_create_or_delete_contents(
 }
 
 boolean datastore_read(
-	const char *file_name,
-	const char *field_name,
+	char const *file_name,
+	char const *field_name,
 	long length,
 	void *data)
 {
@@ -387,10 +383,10 @@ boolean datastore_read(
 }
 
 boolean datastore_write(
-	const char *file_name,
-	const char *field_name,
+	char const *file_name,
+	char const *field_name,
 	long length,
-	const void *data)
+	void const *data)
 {
 	struct file_reference file_ref;
 	boolean success = FALSE;
@@ -480,5 +476,3 @@ struct file_reference_info *file_reference_get_info(
 
 	return info;
 }
-
-/* ---------- private code */

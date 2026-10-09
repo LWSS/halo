@@ -6,24 +6,14 @@ TAG_FILES.C
 
 #include "cseries.h"
 
-/* ---------- constants */
-
-/* ---------- macros */
-
-/* ---------- structures */
-
-/* ---------- prototypes */
-
-/* ---------- globals */
-
 /* ---------- public code */
 
-// [NOTE: 1300 lines of tool-specific code lives here]
+// NOTE: 1300 lines of tool-specific code lives here
 
-const char *tag_name_strip_path(
-	const char *name)
+char const *tag_name_strip_path(
+	char const *name)
 {
-	const char *stripped_name;
+	char const *stripped_name;
 
 	match_assert("c:\\halo\\SOURCE\\tag_files\\tag_files.c", 1374, name);
 	stripped_name = strrchr(name, '\\');
@@ -39,5 +29,3 @@ const char *tag_name_strip_path(
 
 	return stripped_name;
 }
-
-/* ---------- private code */
