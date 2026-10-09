@@ -13,7 +13,7 @@ TAG_GROUPS.C
 long verify_tag_reference(
 	struct tag_reference const *reference)
 {
-	long index;
+	long index = NONE;
 
 	match_assert("c:\\halo\\SOURCE\\tag_files\\tag_groups.c", 3055, reference);
 	index = tag_loaded(reference->group_tag, reference->name);

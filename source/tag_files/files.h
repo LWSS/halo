@@ -104,7 +104,7 @@ void file_path_add_extension(char *path, char const *extension);
 void file_path_remove_name(char *path);
 void file_path_split(char *path, char **directory, char **parent_directory, char **filename, char **extension, boolean has_filename);
 void file_location_get_full_path(short location, char const *path, char *full_path);
-boolean file_read_only(struct file_reference const *file);
+boolean file_read_only(struct file_reference *file);
 
 /* ---------- globals */
 

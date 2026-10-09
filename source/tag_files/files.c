@@ -19,12 +19,11 @@ enum
 	NUMBER_OF_REFERENCE_INFO_FLAGS
 };
 
-enum
-{
-	NUMBER_OF_DATASTORE_ENTRIES = 200, /* fake name */
-	DATASTORE_MAX_DATA_SIZE = 255,
-	DATASTORE_MAX_FIELD_NAME_SIZE = 255
-};
+/* ---------- macros */
+
+#define NUMBER_OF_DATASTORE_ENTRIES 200 /* fake name */
+#define DATASTORE_MAX_DATA_SIZE 255
+#define DATASTORE_MAX_FIELD_NAME_SIZE 255
 
 /* ---------- structures */
 
@@ -106,8 +105,9 @@ struct file_reference *file_reference_copy(
 	struct file_reference *destination,
 	struct file_reference const *source)
 {
-	file_reference_get_info((struct file_reference *)source);
-	memcpy(destination, source, sizeof(struct file_reference_info));
+	struct file_reference_info const *info = file_reference_get_info((struct file_reference *)source);
+
+	memcpy(destination, source, sizeof(*info));
 
 	return destination;
 }
@@ -148,7 +148,7 @@ struct file_reference *file_reference_set_name(
 short file_reference_get_location(
 	struct file_reference const *reference)
 {
-	struct file_reference_info *info = file_reference_get_info((struct file_reference *)reference);
+	struct file_reference_info const *info = file_reference_get_info((struct file_reference *)reference);
 
 	return info->location;
 }
@@ -158,12 +158,12 @@ char *file_reference_get_name(
 	unsigned long flags,
 	char *name)
 {
-	char *filename;
+	struct file_reference_info const *info = file_reference_get_info((struct file_reference *)reference);
+	char full_path[MAXIMUM_FILENAME_LENGTH+1] = {0};
 	char *directory;
 	char *parent_directory;
+	char *filename;
 	char *extension;
-	struct file_reference_info *info = file_reference_get_info((struct file_reference *)reference);
-	char full_path[MAXIMUM_FILENAME_LENGTH+1] = {0};
 
 	match_assert("c:\\halo\\SOURCE\\tag_files\\files.c", 185, name);
 	match_assert("c:\\halo\\SOURCE\\tag_files\\files.c", 186, VALID_FLAGS(info->flags, NUMBER_OF_NAME_FLAGS));
@@ -209,8 +209,8 @@ boolean file_references_equal(
 	struct file_reference const *reference0,
 	struct file_reference const *reference1)
 {
-	struct file_reference_info *info0 = file_reference_get_info((struct file_reference *)reference0);
-	struct file_reference_info *info1 = file_reference_get_info((struct file_reference *)reference1);
+	struct file_reference_info const *info0 = file_reference_get_info((struct file_reference *)reference0);
+	struct file_reference_info const *info1 = file_reference_get_info((struct file_reference *)reference1);
 	boolean equal = FALSE;
 
 	if (info0->location==info1->location && !strcmp(info0->path, info1->path))
@@ -227,22 +227,19 @@ long find_files(
 	long maximum_count,
 	struct file_reference *references)
 {
-	long file_count = 0;
+	long count = 0;
 
 	match_assert("c:\\halo\\SOURCE\\tag_files\\files.c", 257, maximum_count>0);
 	match_assert("c:\\halo\\SOURCE\\tag_files\\files.c", 258, references);
 
 	find_files_start(flags, directory);
 
-	for (file_count; file_count<maximum_count; file_count++, references++)
+	while (count<maximum_count && find_files_next(&references[count], NULL))
 	{
-		if (!find_files_next(references, NULL))
-		{
-			break;
-		}
+		count++;
 	}
 
-	return file_count;
+	return count;
 }
 
 void *file_read_into_memory(
@@ -253,10 +250,8 @@ void *file_read_into_memory(
 
 	if (file_open(reference, FLAG(_permission_read_bit)))
 	{
-		unsigned long eof = file_get_eof(reference);
-
-		*size = eof;
-		buffer = match_malloc("c:\\halo\\SOURCE\\tag_files\\files.c", 280, eof);
+		*size = file_get_eof(reference);
+		buffer = match_malloc("c:\\halo\\SOURCE\\tag_files\\files.c", 280, *size);
 
 		if (buffer)
 		{
@@ -281,16 +276,15 @@ void file_printf(
 	char buffer[1024];
 	va_list arglist;
 
-	va_start(arglist, format);
-
 	if (format)
 	{
+		va_start(arglist, format);
 		vsprintf(buffer, format, arglist);
+		va_end(arglist);
+
 		file_write(file, strlen(buffer), buffer);
 		file_set_eof(file, file_get_position(file));
 	}
-
-	va_end(arglist);
 
 	return;
 }
@@ -299,12 +293,13 @@ void directory_create_or_delete_contents(
 	char const *directory_name)
 {
 	struct file_reference directory;
-	struct file_reference file;
 
 	file_reference_create_from_path(&directory, directory_name, TRUE);
 
 	if (file_exists(&directory))
 	{
+		struct file_reference file;
+
 		find_files_start(0, &directory);
 
 		while (find_files_next(&file, NULL))
@@ -326,9 +321,10 @@ boolean datastore_read(
 	long length,
 	void *data)
 {
-	struct file_reference file_ref;
 	boolean success;
-	long datastore_size = 0;
+	struct file_reference file_ref;
+	struct datastore *datastore = NULL;
+	unsigned long datastore_size = 0;
 
 	match_assert("c:\\halo\\SOURCE\\tag_files\\files.c", 369, NULL != file_name);
 	match_assert("c:\\halo\\SOURCE\\tag_files\\files.c", 370, NULL != field_name);
@@ -341,14 +337,14 @@ boolean datastore_read(
 
 	if (file_exists(&file_ref))
 	{
-		struct datastore *datastore = file_read_into_memory(&file_ref, (unsigned long *)&datastore_size);
+		datastore = file_read_into_memory(&file_ref, &datastore_size);
 
 		if (!datastore)
 		{
 			file_delete(&file_ref);
 		}
 
-		if (datastore_size!=sizeof(struct datastore))
+		if (datastore_size!=sizeof(*datastore))
 		{
 			match_free("c:\\halo\\SOURCE\\tag_files\\files.c", 389, datastore);
 			datastore = NULL;
@@ -358,18 +354,18 @@ boolean datastore_read(
 
 		if (datastore)
 		{
-			long entry_index;
+			long itr;
 
-			for (entry_index = 0; entry_index<NUMBER_OF_DATASTORE_ENTRIES; entry_index++)
+			for (itr = 0; itr<NUMBER_OF_DATASTORE_ENTRIES; itr++)
 			{
-				if (!strcmp(datastore->entry[entry_index].name, field_name))
+				if (!strcmp(datastore->entry[itr].name, field_name))
 				{
-					memcpy(data, datastore->entry[entry_index].data, length);
+					memcpy(data, datastore->entry[itr].data, length);
 					success = TRUE;
 					break;
 				}
 
-				if (datastore->entry[entry_index].name[0]=='\0')
+				if (datastore->entry[itr].name[0]=='\0')
 				{
 					break;
 				}
@@ -388,10 +384,10 @@ boolean datastore_write(
 	long length,
 	void const *data)
 {
-	struct file_reference file_ref;
 	boolean success = FALSE;
-	long datastore_size = 0;
+	struct file_reference file_ref;
 	struct datastore *datastore = NULL;
+	unsigned long datastore_size = 0;
 
 	match_assert("c:\\halo\\SOURCE\\tag_files\\files.c", 430, NULL != file_name);
 	match_assert("c:\\halo\\SOURCE\\tag_files\\files.c", 431, NULL != field_name);
@@ -404,14 +400,14 @@ boolean datastore_write(
 
 	if (file_exists(&file_ref))
 	{
-		datastore = file_read_into_memory(&file_ref, (unsigned long *)&datastore_size);
+		datastore = file_read_into_memory(&file_ref, &datastore_size);
 
 		if (!datastore)
 		{
 			file_delete(&file_ref);
 		}
 
-		if (datastore_size!=sizeof(struct datastore))
+		if (datastore_size!=sizeof(*datastore))
 		{
 			match_free("c:\\halo\\SOURCE\\tag_files\\files.c", 450, datastore);
 			datastore = NULL;
@@ -422,24 +418,24 @@ boolean datastore_write(
 
 	if (!datastore)
 	{
-		datastore = match_malloc("c:\\halo\\SOURCE\\tag_files\\files.c", 461, sizeof(struct datastore));
+		datastore = match_malloc("c:\\halo\\SOURCE\\tag_files\\files.c", 461, sizeof(*datastore));
 
 		if (datastore)
 		{
-			memset(datastore, 0, sizeof(struct datastore));
+			memset(datastore, 0, sizeof(*datastore));
 		}
 	}
 
 	if (datastore)
 	{
-		long entry_index;
+		long itr;
 
-		for (entry_index = 0; entry_index<NUMBER_OF_DATASTORE_ENTRIES; entry_index++)
+		for (itr = 0; itr<NUMBER_OF_DATASTORE_ENTRIES; itr++)
 		{
-			if (datastore->entry[entry_index].name[0]=='\0' || !strcmp(datastore->entry[entry_index].name, field_name))
+			if (datastore->entry[itr].name[0]=='\0' || !strcmp(datastore->entry[itr].name, field_name))
 			{
-				strcpy(datastore->entry[entry_index].name, field_name);
-				memcpy(datastore->entry[entry_index].data, data, length);
+				strcpy(datastore->entry[itr].name, field_name);
+				memcpy(datastore->entry[itr].data, data, length);
 				success = TRUE;
 				break;
 			}
@@ -452,7 +448,7 @@ boolean datastore_write(
 
 		if (file_open(&file_ref, FLAG(_permission_write_bit)))
 		{
-			file_write(&file_ref, sizeof(struct datastore), datastore);
+			file_write(&file_ref, sizeof(*datastore), datastore);
 			file_close(&file_ref);
 		}
 
