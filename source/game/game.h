@@ -167,6 +167,11 @@ boolean game_team_is_ally(short our_team, short other_team);
 short game_allegiance_get_incidents(short our_team_index, short other_team_index, short *incident_threshold);
 boolean game_allegiance_incident(short aggressor_team_index, short victim_team_index, short type, boolean *notify_immediately);
 
+/* ---------- prototypes/GAME_STATISTICS.C */
+
+void game_statistics_record_damage(long object_index, real damage, long owner_player_index, long owner_object_index, short owner_team_index);
+void game_statistics_record_kill(long object_index, long owner_player_index, long owner_object_index, short owner_team_index);
+
 /* ---------- prototypes/GAME_TIME.C */
 
 boolean game_time_initialized(void);

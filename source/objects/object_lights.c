@@ -1748,7 +1748,7 @@ static void light_compute_bounding_sphere(
 		*bounding_sphere_center = light->position;
 		*bounding_sphere_radius = definition->geometry.lens_flare_radius;
 	}
-	else if (definition->geometry.cutoff_angle < _half_pi)
+	else if (definition->geometry.cutoff_angle < _pi2)
 	{
 		if (definition->geometry.cutoff_angle < _pi / 4.f)
 		{

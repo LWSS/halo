@@ -160,7 +160,6 @@
 					"source/game/game_engine.h",
 					"source/game/game_engine_list.h",
 					"source/game/game_globals.h",
-					"source/game/game_statistics.h",
 					"source/game/players.h",
 					"source/hs/hs.h",
 					"source/hs/hs_enum.h",

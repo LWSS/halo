@@ -123,13 +123,31 @@ struct ai_information_packet
 
 /* ---------- prototypes/AI.C */
 
+void ai_initialize(void);
+void ai_dispose(void);
+void ai_initialize_for_new_map(void);
+void ai_dispose_from_old_map(void);
+void ai_place(void);
+void ai_update(void);
+void ai_globals_ai_active(boolean enable);
+void ai_globals_grenades_enabled(boolean enable);
+void ai_get_major_upgrade_chance(short upgrade_type, boolean *force_major, boolean *is_random, real *random_chance);
+boolean ai_consider_major_upgrade(long encounter_index, short squad_index, real upgrade_chance);
+void ai_erase(long encounter_index, long platoon_index, long squad_index, boolean immediate);
+
 boolean ai_release_inactive_swarms(char *result_description, unsigned char *more_to_release, unsigned char *working_memory, short working_memory_size);
 void ai_find_inactive_encounters(unsigned char *working_memory, short working_memory_size);
 boolean ai_release_inactive_encounters(char *result_description, unsigned char *more_to_release, unsigned char *working_memory, short working_memory_size);
 
+boolean ai_test_line_of_fire(long actor_index, long ignore_unit_index, real_point3d const *origin, real_vector3d const *vector, long *prop_index_reference);
+boolean ai_try_vehicle_eviction(long actor_index, long requesting_unit_index, boolean actually_evict);
+long ai_get_responsible_unit(long object_index, boolean responsible_for_weapon_fire);
+
 void ai_handle_allegiance_broken_notification(short team1_index, short team2_index, boolean broken);
 
 boolean ai_adjust_damage(long actor_index, struct damage_data *damage_data, real *damage);
+void ai_handle_death(long unit_index, long owner_object_index, short damage_category);
+boolean ai_handle_killing_spree(long unit_index, short killing_spree_count);
 void ai_handle_damage(long unit_index, long shooter_object_index, short damage_category, float fraction, union real_vector3d *damage_velocity, boolean delayed);
 void ai_handle_deleted_object(long deleted_object_index);
 void ai_handle_unit_effect(long owner_unit_index, short effect_type, short volume);

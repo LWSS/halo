@@ -31,7 +31,6 @@ DAMAGE.C
 #include "cheats.h"
 #include "game.h"
 #include "game_engine.h"
-#include "game_statistics.h"
 #include "ai.h"
 #include "units.h"
 #include "unit_definitions.h"

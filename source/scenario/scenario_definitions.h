@@ -136,17 +136,6 @@ struct scenario_vehicle_datum
 	long unused[7];
 };
 
-struct scenario_weapon_datum
-{
-	struct scenario_object_datum object;
-	struct scenario_object_permutation permutation;
-	short rounds_total;
-	short rounds_loaded;
-	word flags;
-	word pad;
-	unsigned long unused[3];
-};
-
 struct scenario_device_group
 {
 	char name[TAG_STRING_LENGTH+1];

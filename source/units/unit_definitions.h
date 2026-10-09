@@ -71,6 +71,15 @@ enum
 	MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS,
 };
 
+enum
+{
+	MAXIMUM_SEATS_PER_UNIT_DEFINITION = 16,
+	MAXIMUM_INITIAL_WEAPONS_PER_UNIT = 4,
+	MAXIMUM_IK_MARKERS_PER_SEAT = 4,
+	MAXIMUM_DIALOGUE_VARIANTS_PER_UNIT = 16,
+	MAXIMUM_HUDS_PER_SEAT = 16,
+};
+
 /* ---------- macros */
 
 #define unit_definition_get(index) ((struct unit_definition *)tag_get(UNIT_DEFINITION_TAG, index))
