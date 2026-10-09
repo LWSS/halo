@@ -942,34 +942,32 @@ void projectile_accelerate(
 
 	match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\items\\projectiles.c", 1007, acceleration);
 
-	if (projectile->object.parent_object_index != NONE)
+	if (projectile->object.parent_object_index == NONE)
 	{
-		return;
-	}
-
-	match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\items\\projectiles.c", 1011, &projectile->object.translational_velocity);
-	add_vectors3d(
-		&projectile->object.translational_velocity,
-		acceleration,
-		&projectile->object.translational_velocity);
-
-	{
-		real_vector3d random_angular_velocity;
-
-		random_direction3d(&random_angular_velocity);
-		scale_vector3d(
-			&random_angular_velocity,
-			real_random() * magnitude3d(acceleration) * _half_pi,
-			&random_angular_velocity);
+		match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\items\\projectiles.c", 1011, &projectile->object.translational_velocity);
 		add_vectors3d(
-			&projectile->object.angular_velocity,
-			&random_angular_velocity,
-			&projectile->object.angular_velocity);
-	}
+			&projectile->object.translational_velocity,
+			acceleration,
+			&projectile->object.translational_velocity);
 
-	projectile_adjust_for_angular_velocity_change(projectile_index);
-	SET_FLAG(projectile->object.flags, _object_at_rest_bit, FALSE);
-	match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\items\\projectiles.c", 1029, &projectile->object.translational_velocity);
+		{
+			real_vector3d random_angular_velocity;
+
+			random_direction3d(&random_angular_velocity);
+			scale_vector3d(
+				&random_angular_velocity,
+				real_random() * magnitude3d(acceleration) * _half_pi,
+				&random_angular_velocity);
+			add_vectors3d(
+				&projectile->object.angular_velocity,
+				&random_angular_velocity,
+				&projectile->object.angular_velocity);
+		}
+
+		projectile_adjust_for_angular_velocity_change(projectile_index);
+		SET_FLAG(projectile->object.flags, _object_at_rest_bit, FALSE);
+		match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\items\\projectiles.c", 1029, &projectile->object.translational_velocity);
+	}
 
 	return;
 }
@@ -979,6 +977,7 @@ boolean dangerous_projectiles_near_player(
 {
 	struct object_iterator iterator;
 	struct projectile_datum *projectile;
+	boolean result;
 
 	object_iterator_new(&iterator, _object_mask_projectile, 0);
 	projectile = object_iterator_next(&iterator);
@@ -987,10 +986,14 @@ boolean dangerous_projectiles_near_player(
 	{
 		struct projectile_definition *definition = projectile_definition_get(projectile->definition_index);
 
-		return TRUE;
+		result = TRUE;
+	}
+	else
+	{
+		result = FALSE;
 	}
 
-	return FALSE;
+	return result;
 }
 
 void projectile_handle_deleted_object(
