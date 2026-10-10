@@ -82,38 +82,56 @@ enum
 
 /* ---------- macros */
 
-#define TAG_GROUP(name, group, size)		\
-											\
-extern struct tag_field name##_fields[];	\
-											\
-struct tag_group =							\
-{											\
-	#name,									\
-	FLAG(_tag_group_can_be_reloaded_bit),	\
-	(group),								\
-	sizeof(struct bitmap_group)				\
-};											\
-static struct tag_field name##_fields [] =
+#define TAG_GROUP(name, prefix, size, flags, parent_tag, postprocess)	\
+														\
+extern struct tag_field name##_fields[];				\
+														\
+static struct tag_block_definition name##_block =		\
+{														\
+	#name,												\
+	0,													\
+	1,													\
+	(size),												\
+	NULL,												\
+	name##_fields										\
+};														\
+														\
+struct tag_group name##_group =							\
+{														\
+	#name,												\
+	(flags),											\
+	prefix##_TAG,										\
+	(parent_tag),										\
+	prefix##_VERSION,									\
+	(postprocess),										\
+	&name##_block										\
+};														\
+														\
+static struct tag_field name##_fields[] =
 
-#define TAG_BLOCK(block_name, maximum_number, size, byte_swap_block, postprocess_block, delete_block, format_block)	\
-													\
-extern struct tag_field block_name##_fields[];		\
-													\
-static struct tag_block_definition block_name =		\
-{													\
-	#block_name,									\
-	0,												\
-	maximum_number,									\
-	size,											\
-	NULL,											\
-	block_name##_fields,							\
-	byte_swap_block,								\
-	postprocess_block,								\
-	delete_block,									\
-	format_block									\
-};													\
-static struct tag_field block_name##_fields [] =
+#define TAG_BLOCK(name, string, maximum_count, size, byte_swap_block, postprocess_block, format_block, delete_block)	\
+														\
+extern struct tag_field name##_fields[];				\
+														\
+struct tag_block_definition name =						\
+{														\
+	(string),											\
+	0,													\
+	(maximum_count),									\
+	(size),												\
+	NULL,												\
+	name##_fields,										\
+	(byte_swap_block),									\
+	(postprocess_block),								\
+	(format_block),										\
+	(delete_block)										\
+};														\
+														\
+static struct tag_field name##_fields[] =
 
+#define TAG_REFERENCE_DEFINITION(name, group_tag) struct tag_reference_definition name = { 0, (group_tag) }
+
+#define FIELD_PAD(size) {_field_pad, NULL, (void *)(size)}
 
 #define TAG_BLOCK_GET_ELEMENT(block_address, index, type) ((type *)tag_block_get_element_with_size((block_address), (index), sizeof(type)))
 
@@ -204,7 +222,7 @@ struct tag_iterator
 	unsigned long key_group_tag;
 };
 
-typedef boolean (*postprocess_tag_proc)(long, boolean); /* fake name */
+typedef boolean (*postprocess_tag_proc)(long, boolean);
 
 struct tag_group
 {

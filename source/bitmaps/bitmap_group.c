@@ -23,17 +23,12 @@ static boolean postprocess_bitmap_group(long bitmap_group_index, boolean editing
 
 /* ---------- globals */
 
-struct tag_reference_definition global_bitmap_reference =
-{
-	0,
-	BITMAP_GROUP_TAG
-};
+static struct tag_block_definition bitmap_data_block;
+static struct tag_block_definition bitmap_group_sprite_block;
+static struct tag_block_definition bitmap_group_sequence_block;
 
-struct tag_reference_definition global_bitmap_reference_optional =
-{
-	0,
-	BITMAP_GROUP_TAG
-};
+TAG_REFERENCE_DEFINITION(global_bitmap_reference, BITMAP_GROUP_TAG);
+TAG_REFERENCE_DEFINITION(global_bitmap_reference_optional, BITMAP_GROUP_TAG);
 
 static char *bitmap_types_strings[] =
 {
@@ -92,9 +87,9 @@ static struct flags_definition bitmap_flags =
 	bitmap_flags_strings
 };
 
-TAG_BLOCK(bitmap_data_block, MAXIMUM_BITMAPS_PER_BITMAP_GROUP, sizeof(struct bitmap_data), NULL, (postprocess_block_proc)postprocess_bitmap, NULL, delete_bitmap)
+TAG_BLOCK(bitmap_data_block, "bitmap_data_block", MAXIMUM_BITMAPS_PER_BITMAP_GROUP, sizeof(struct bitmap_data), NULL, (postprocess_block_proc)postprocess_bitmap, NULL, delete_bitmap)
 {
-	{ _field_tag, "signature*" },
+	{_field_tag, "signature*"},
 	{_field_short_integer, "width*:pixels"},
 	{_field_short_integer, "height*:pixels"},
 	{_field_short_integer, "depth*:pixels#depth is 1 for 2D textures and cube maps"},
@@ -103,20 +98,20 @@ TAG_BLOCK(bitmap_data_block, MAXIMUM_BITMAPS_PER_BITMAP_GROUP, sizeof(struct bit
 	{_field_word_flags, "flags*", &bitmap_flags},
 	{_field_point2d, "registration point*"},
 	{_field_short_integer, "mipmap count*"},
-	{_field_pad, NULL, (void *)sizeof(short)},
+	FIELD_PAD(sizeof(short)),
 	{_field_long_integer, "pixels offset*"},
-	{_field_pad, NULL, (void *)sizeof(long)},
-	{_field_pad, NULL, (void *)sizeof(long)},
-	{_field_pad, NULL, (void *)sizeof(long)},
-	{_field_pad, NULL, (void *)(2*sizeof(void *))},
+	FIELD_PAD(sizeof(long)),
+	FIELD_PAD(sizeof(long)),
+	FIELD_PAD(sizeof(long)),
+	FIELD_PAD(2*sizeof(void *)),
 	{_field_terminator}
 };
 
-TAG_BLOCK(bitmap_group_sprite_block, MAXIMUM_SPRITES_PER_SEQUENCE, sizeof(struct bitmap_group_sprite), NULL, NULL, NULL, NULL)
+TAG_BLOCK(bitmap_group_sprite_block, "bitmap_group_sprite_block", MAXIMUM_SPRITES_PER_SEQUENCE, sizeof(struct bitmap_group_sprite), NULL, NULL, NULL, NULL)
 {
-	{ _field_short_integer, "bitmap index*" },
-	{_field_pad, NULL, (void *)sizeof(short)},
-	{_field_pad, NULL, (void *)sizeof(long)},
+	{_field_short_integer, "bitmap index*"},
+	FIELD_PAD(sizeof(short)),
+	FIELD_PAD(sizeof(long)),
 	{_field_real, "left*"},
 	{_field_real, "right*"},
 	{_field_real, "top*"},
@@ -125,12 +120,12 @@ TAG_BLOCK(bitmap_group_sprite_block, MAXIMUM_SPRITES_PER_SEQUENCE, sizeof(struct
 	{_field_terminator}
 };
 
-TAG_BLOCK(bitmap_group_sequence_block, MAXIMUM_SEQUENCES_PER_BITMAP_GROUP, sizeof(struct bitmap_group_sequence), NULL, NULL, NULL, NULL)
+TAG_BLOCK(bitmap_group_sequence_block, "bitmap_group_sequence_block", MAXIMUM_SEQUENCES_PER_BITMAP_GROUP, sizeof(struct bitmap_group_sequence), NULL, NULL, NULL, NULL)
 {
-	{ _field_string, "name^" },
+	{_field_string, "name^"},
 	{_field_short_integer, "first bitmap index*"},
 	{_field_short_integer, "bitmap count*"},
-	{_field_pad, NULL, (void *)(4*sizeof(long))},
+	FIELD_PAD(4*sizeof(long)),
 	{_field_block, "sprites*", &bitmap_group_sprite_block},
 	{_field_terminator}
 };
@@ -238,61 +233,40 @@ struct tag_data_definition color_plate_data =
 	MAXIMUM_BITMAP_PIXELS_SIZE
 };
 
-static struct tag_field bitmap_fields[] =
+TAG_GROUP(bitmap, BITMAP_GROUP, sizeof(struct bitmap_group), FLAG(_tag_group_can_be_reloaded_bit), NONE, postprocess_bitmap_group)
 {
-	{ _field_custom, NULL, (void *)BITMAP_GROUP_SHOW_BITMAP_CUSTOM_ID },
-	{ _field_explanation, "type", "Type controls bitmap 'geometry'. All dimensions must be a power of two except for SPRITES and INTERFACE BITMAPS:\n\n* 2D TEXTURES: Ordinary, 2D textures will be generated.\n* 3D TEXTURES: Volume textures will be generated from each sequence of 2D texture 'slices'.\n* CUBE MAPS: Cube maps will be generated from each consecutive set of six 2D textures in each sequence, all faces of a cube map must be square and the same size.\n* SPRITES: Sprite texture pages will be generated.\n* INTERFACE BITMAPS: Similar to 2D TEXTURES, but without mipmaps and without the power of two restriction." },
-	{ _field_enum, "type", &bitmap_group_types },
-	{ _field_explanation, "format", "Format controls how pixels will be stored internally:\n\n* COMPRESSED WITH COLOR-KEY TRANSPARENCY: DXT1 compression, uses 4 bits per pixel. 4x4 blocks of pixels are reduced to 2 colors and interpolated, alpha channel uses color-key transparency instead of alpha from the plate (all zero-alpha pixels also have zero-color).\n* COMPRESSED WITH EXPLICIT ALPHA: DXT2/3 compression, uses 8 bits per pixel. Same as DXT1 without the color key transparency, alpha channel uses alpha from plate quantized down to 4 bits per pixel.\n* COMPRESSED WITH INTERPOLATED ALPHA: DXT4/5 compression, uses 8 bits per pixel. Same as DXT2/3, except alpha is smoother. Better for smooth alpha gradients, worse for noisy alpha.\n* 16-BIT COLOR: Uses 16 bits per pixel. Depending on the alpha channel, bitmaps are quantized to either r5g6b5 (no alpha), a1r5g5b5 (1-bit alpha), or a4r4g4b4 (>1-bit alpha).\n* 32-BIT COLOR: Uses 32 bits per pixel. Very high quality, can have alpha at no added cost. This format takes up the most memory, however. Bitmap formats are x8r8g8b8 and a8r8g8b.\n* MONOCHROME: Uses either 8 or 16 bits per pixel. Bitmap formats are a8 (alpha), y8 (intensity), ay8 (combined alpha-intensity) and a8y8 (separate alpha-intensity).\n\nNote: Height maps (a.k.a. bump maps) should use 32-bit color; this is internally converted to a palettized format which takes less memory." },
-	{ _field_enum, "format", &bitmap_group_formats },
-	{ _field_explanation, "usage", "Usage controls how mipmaps are generated:\n\n* ALPHA BLEND: Pixels with zero alpha are ignored in mipmaps, to prevent bleeding the transparent color.\n* DEFAULT: Downsampling works normally, as in Photoshop.\n* HEIGHT MAP: The bitmap (normally grayscale) is a height map which gets converted to a bump map. Uses <bump height> below. Alpha is passed through unmodified.\n* DETAIL MAP: Mipmap color fades to gray, controlled by <detail fade factor> below. Alpha fades to white.\n* LIGHT MAP: Generates no mipmaps. Do not use!\n* VECTOR MAP: Used mostly for special effects; pixels are treated as XYZ vectors and normalized after downsampling. Alpha is passed through unmodified." },
-	{ _field_enum, "usage", &bitmap_group_usages },
-	{ _field_word_flags, "flags", &bitmap_group_flags },
-	{ _field_explanation, "post-processing", "These properties control how mipmaps are post-processed." },
-	{ _field_real_fraction, "detail fade factor:[0,1]#0 means fade to gray by last mipmap, 1 means fade to gray by first mipmap" },
-	{ _field_real_fraction, "sharpen amount:[0,1]#sharpens mipmap after downsampling" },
-	{ _field_real_fraction, "bump height:repeats#the apparent height of the bump map above the triangle it is textured onto, in texture repeats (i.e., 1.0 would be as high as the texture is wide)" },
-	{ _field_explanation, "sprite processing", "When creating a sprite group, specify the number and size of textures that the group is allowed to occupy. During importing, you'll receive feedback about how well the alloted space was used." },
-	{ _field_enum, "sprite budget size", &bitmap_group_sprite_budgets },
-	{ _field_short_integer, "sprite budget count" },
-	{ _field_explanation, "color plate", "The original TIFF file used to import the bitmap group." },
-	{ _field_short_integer, "color plate width*:pixels" },
-	{ _field_short_integer, "color plate height*:pixels" },
-	{ _field_data, "compressed color plate data*", &color_plate_data },
-	{ _field_explanation, "processed pixel data", "Pixel data after being processed by the tool." },
-	{ _field_data, "processed pixel data*", &bitmap_pixel_data },
-	{ _field_explanation, "miscellaneous", "" },
-	{ _field_real, "blur filter size:[0,10] pixels#blurs the bitmap before generating mipmaps" },
-	{ _field_real, "alpha bias:[-1,1]#affects alpha mipmap generation" },
-	{ _field_short_integer, "mipmap count:levels#0 defaults to all levels" },
-	{ _field_explanation, "...more sprite processing", "Sprite usage controls the background color of sprite plates." },
-	{ _field_enum, "sprite usage", &bitmap_group_sprite_usages },
-	{ _field_short_integer, "sprite spacing*" },
-	{ _field_pad, NULL, (void *)sizeof(short) },
-	{ _field_block, "sequences*", &bitmap_group_sequence_block },
-	{ _field_block, "bitmaps*", &bitmap_data_block },
-	{ _field_terminator }
-};
-
-static struct tag_block_definition bitmap_block =
-{
-	"bitmap",
-	0,
-	1,
-	sizeof(struct bitmap_group),
-	NULL,
-	bitmap_fields
-};
-
-struct tag_group bitmap_group =
-{
-	"bitmap",
-	FLAG(_tag_group_can_be_reloaded_bit),
-	BITMAP_GROUP_TAG,
-	NONE,
-	BITMAP_GROUP_VERSION,
-	postprocess_bitmap_group,
-	&bitmap_block
+	{_field_custom, NULL, (void *)BITMAP_GROUP_SHOW_BITMAP_CUSTOM_ID},
+	{_field_explanation, "type", "Type controls bitmap 'geometry'. All dimensions must be a power of two except for SPRITES and INTERFACE BITMAPS:\n\n* 2D TEXTURES: Ordinary, 2D textures will be generated.\n* 3D TEXTURES: Volume textures will be generated from each sequence of 2D texture 'slices'.\n* CUBE MAPS: Cube maps will be generated from each consecutive set of six 2D textures in each sequence, all faces of a cube map must be square and the same size.\n* SPRITES: Sprite texture pages will be generated.\n* INTERFACE BITMAPS: Similar to 2D TEXTURES, but without mipmaps and without the power of two restriction."},
+	{_field_enum, "type", &bitmap_group_types},
+	{_field_explanation, "format", "Format controls how pixels will be stored internally:\n\n* COMPRESSED WITH COLOR-KEY TRANSPARENCY: DXT1 compression, uses 4 bits per pixel. 4x4 blocks of pixels are reduced to 2 colors and interpolated, alpha channel uses color-key transparency instead of alpha from the plate (all zero-alpha pixels also have zero-color).\n* COMPRESSED WITH EXPLICIT ALPHA: DXT2/3 compression, uses 8 bits per pixel. Same as DXT1 without the color key transparency, alpha channel uses alpha from plate quantized down to 4 bits per pixel.\n* COMPRESSED WITH INTERPOLATED ALPHA: DXT4/5 compression, uses 8 bits per pixel. Same as DXT2/3, except alpha is smoother. Better for smooth alpha gradients, worse for noisy alpha.\n* 16-BIT COLOR: Uses 16 bits per pixel. Depending on the alpha channel, bitmaps are quantized to either r5g6b5 (no alpha), a1r5g5b5 (1-bit alpha), or a4r4g4b4 (>1-bit alpha).\n* 32-BIT COLOR: Uses 32 bits per pixel. Very high quality, can have alpha at no added cost. This format takes up the most memory, however. Bitmap formats are x8r8g8b8 and a8r8g8b.\n* MONOCHROME: Uses either 8 or 16 bits per pixel. Bitmap formats are a8 (alpha), y8 (intensity), ay8 (combined alpha-intensity) and a8y8 (separate alpha-intensity).\n\nNote: Height maps (a.k.a. bump maps) should use 32-bit color; this is internally converted to a palettized format which takes less memory."},
+	{_field_enum, "format", &bitmap_group_formats},
+	{_field_explanation, "usage", "Usage controls how mipmaps are generated:\n\n* ALPHA BLEND: Pixels with zero alpha are ignored in mipmaps, to prevent bleeding the transparent color.\n* DEFAULT: Downsampling works normally, as in Photoshop.\n* HEIGHT MAP: The bitmap (normally grayscale) is a height map which gets converted to a bump map. Uses <bump height> below. Alpha is passed through unmodified.\n* DETAIL MAP: Mipmap color fades to gray, controlled by <detail fade factor> below. Alpha fades to white.\n* LIGHT MAP: Generates no mipmaps. Do not use!\n* VECTOR MAP: Used mostly for special effects; pixels are treated as XYZ vectors and normalized after downsampling. Alpha is passed through unmodified."},
+	{_field_enum, "usage", &bitmap_group_usages},
+	{_field_word_flags, "flags", &bitmap_group_flags},
+	{_field_explanation, "post-processing", "These properties control how mipmaps are post-processed."},
+	{_field_real_fraction, "detail fade factor:[0,1]#0 means fade to gray by last mipmap, 1 means fade to gray by first mipmap"},
+	{_field_real_fraction, "sharpen amount:[0,1]#sharpens mipmap after downsampling"},
+	{_field_real_fraction, "bump height:repeats#the apparent height of the bump map above the triangle it is textured onto, in texture repeats (i.e., 1.0 would be as high as the texture is wide)"},
+	{_field_explanation, "sprite processing", "When creating a sprite group, specify the number and size of textures that the group is allowed to occupy. During importing, you'll receive feedback about how well the alloted space was used."},
+	{_field_enum, "sprite budget size", &bitmap_group_sprite_budgets},
+	{_field_short_integer, "sprite budget count"},
+	{_field_explanation, "color plate", "The original TIFF file used to import the bitmap group."},
+	{_field_short_integer, "color plate width*:pixels"},
+	{_field_short_integer, "color plate height*:pixels"},
+	{_field_data, "compressed color plate data*", &color_plate_data},
+	{_field_explanation, "processed pixel data", "Pixel data after being processed by the tool."},
+	{_field_data, "processed pixel data*", &bitmap_pixel_data},
+	{_field_explanation, "miscellaneous", ""},
+	{_field_real, "blur filter size:[0,10] pixels#blurs the bitmap before generating mipmaps"},
+	{_field_real, "alpha bias:[-1,1]#affects alpha mipmap generation"},
+	{_field_short_integer, "mipmap count:levels#0 defaults to all levels"},
+	{_field_explanation, "...more sprite processing", "Sprite usage controls the background color of sprite plates."},
+	{_field_enum, "sprite usage", &bitmap_group_sprite_usages},
+	{_field_short_integer, "sprite spacing*"},
+	FIELD_PAD(sizeof(short)),
+	{_field_block, "sequences*", &bitmap_group_sequence_block},
+	{_field_block, "bitmaps*", &bitmap_data_block},
+	{_field_terminator}
 };
 
 /* ---------- private code */
