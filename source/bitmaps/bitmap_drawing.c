@@ -699,7 +699,7 @@ void bitmap_tile_and_bevel_rectangle(
 
 	if (bitmap_group_index!=NONE && (!clip_rectangle || intersect_rectangles2d(clip_rectangle, &bounds, &bounds)))
 	{
-		struct bitmap_group *bitmap_group = tag_get(BITMAP_GROUP_TAG, bitmap_group_index);
+		struct bitmap_group *bitmap_group = bitmap_group_get(bitmap_group_index);
 
 		if (sequence_index<bitmap_group->sequences.count)
 		{

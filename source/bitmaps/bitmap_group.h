@@ -102,7 +102,7 @@ struct bitmap_group_sprite
 
 struct bitmap_group_sequence
 {
-	char name[32];
+	char name[TAG_STRING_LENGTH+1];
 	short first_bitmap_index;
 	short bitmap_count;
 	long unused[4];

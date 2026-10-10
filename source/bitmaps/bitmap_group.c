@@ -48,7 +48,7 @@ static struct enum_definition bitmap_types =
 	bitmap_types_strings
 };
 
-static char *bitmap_formats_strings[] =
+static char *bitmap_formats_strings[NUMBER_OF_BITMAP_FORMATS] =
 {
 	"a8",
 	"y8",
@@ -92,81 +92,47 @@ static struct flags_definition bitmap_flags =
 	bitmap_flags_strings
 };
 
-static struct tag_field bitmap_data_block_fields[] =
+TAG_BLOCK(bitmap_data_block, MAXIMUM_BITMAPS_PER_BITMAP_GROUP, sizeof(struct bitmap_data), NULL, (postprocess_block_proc)postprocess_bitmap, NULL, delete_bitmap)
 {
 	{ _field_tag, "signature*" },
-	{ _field_short_integer, "width*:pixels" },
-	{ _field_short_integer, "height*:pixels" },
-	{ _field_short_integer, "depth*:pixels#depth is 1 for 2D textures and cube maps" },
-	{ _field_enum, "type*#determines bitmap 'geometry'", &bitmap_types },
-	{ _field_enum, "format*#determines how pixels are represented internally", &bitmap_formats },
-	{ _field_word_flags, "flags*", &bitmap_flags },
-	{ _field_point2d, "registration point*" },
-	{ _field_short_integer, "mipmap count*" },
-	{ _field_pad, NULL, (void *)sizeof(short) },
-	{ _field_long_integer, "pixels offset*" },
-	{ _field_pad, NULL, (void *)sizeof(long) },
-	{ _field_pad, NULL, (void *)sizeof(long) },
-	{ _field_pad, NULL, (void *)sizeof(long) },
-	{ _field_pad, NULL, (void *)(2*sizeof(void *)) },
-	{ _field_terminator }
+	{_field_short_integer, "width*:pixels"},
+	{_field_short_integer, "height*:pixels"},
+	{_field_short_integer, "depth*:pixels#depth is 1 for 2D textures and cube maps"},
+	{_field_enum, "type*#determines bitmap 'geometry'", &bitmap_types},
+	{_field_enum, "format*#determines how pixels are represented internally", &bitmap_formats},
+	{_field_word_flags, "flags*", &bitmap_flags},
+	{_field_point2d, "registration point*"},
+	{_field_short_integer, "mipmap count*"},
+	{_field_pad, NULL, (void *)sizeof(short)},
+	{_field_long_integer, "pixels offset*"},
+	{_field_pad, NULL, (void *)sizeof(long)},
+	{_field_pad, NULL, (void *)sizeof(long)},
+	{_field_pad, NULL, (void *)sizeof(long)},
+	{_field_pad, NULL, (void *)(2*sizeof(void *))},
+	{_field_terminator}
 };
 
-static struct tag_block_definition bitmap_data_block =
-{
-	"bitmap_data_block",
-	0,
-	MAXIMUM_BITMAPS_PER_BITMAP_GROUP,
-	sizeof(struct bitmap_data),
-	NULL,
-	bitmap_data_block_fields,
-	NULL,
-	(postprocess_block_proc)postprocess_bitmap,
-	NULL,
-	delete_bitmap
-};
-
-static struct tag_field bitmap_group_sprite_block_fields[] =
+TAG_BLOCK(bitmap_group_sprite_block, MAXIMUM_SPRITES_PER_SEQUENCE, sizeof(struct bitmap_group_sprite), NULL, NULL, NULL, NULL)
 {
 	{ _field_short_integer, "bitmap index*" },
-	{ _field_pad, NULL, (void *)sizeof(short) },
-	{ _field_pad, NULL, (void *)sizeof(long) },
-	{ _field_real, "left*" },
-	{ _field_real, "right*" },
-	{ _field_real, "top*" },
-	{ _field_real, "bottom*" },
-	{ _field_real_point2d, "registration point*" },
-	{ _field_terminator }
+	{_field_pad, NULL, (void *)sizeof(short)},
+	{_field_pad, NULL, (void *)sizeof(long)},
+	{_field_real, "left*"},
+	{_field_real, "right*"},
+	{_field_real, "top*"},
+	{_field_real, "bottom*"},
+	{_field_real_point2d, "registration point*"},
+	{_field_terminator}
 };
 
-static struct tag_block_definition bitmap_group_sprite_block =
-{
-	"bitmap_group_sprite_block",
-	0,
-	MAXIMUM_SPRITES_PER_SEQUENCE,
-	sizeof(struct bitmap_group_sprite),
-	NULL,
-	bitmap_group_sprite_block_fields
-};
-
-static struct tag_field bitmap_group_sequence_block_fields[] =
+TAG_BLOCK(bitmap_group_sequence_block, MAXIMUM_SEQUENCES_PER_BITMAP_GROUP, sizeof(struct bitmap_group_sequence), NULL, NULL, NULL, NULL)
 {
 	{ _field_string, "name^" },
-	{ _field_short_integer, "first bitmap index*" },
-	{ _field_short_integer, "bitmap count*" },
-	{ _field_pad, NULL, (void *)(4*sizeof(long)) },
-	{ _field_block, "sprites*", &bitmap_group_sprite_block },
-	{ _field_terminator }
-};
-
-static struct tag_block_definition bitmap_group_sequence_block =
-{
-	"bitmap_group_sequence_block",
-	0,
-	MAXIMUM_SEQUENCES_PER_BITMAP_GROUP,
-	sizeof(struct bitmap_group_sequence),
-	NULL,
-	bitmap_group_sequence_block_fields
+	{_field_short_integer, "first bitmap index*"},
+	{_field_short_integer, "bitmap count*"},
+	{_field_pad, NULL, (void *)(4*sizeof(long))},
+	{_field_block, "sprites*", &bitmap_group_sprite_block},
+	{_field_terminator}
 };
 
 static char *bitmap_group_flags_strings[] =
@@ -353,7 +319,7 @@ static boolean postprocess_bitmap_group(
 {
 	short bitmap_index;
 	short sequence_index;
-	struct bitmap_group *group = tag_get(BITMAP_GROUP_TAG, bitmap_group_index);
+	struct bitmap_group *group = bitmap_group_get(bitmap_group_index);
 	boolean success = TRUE;
 
 	for (bitmap_index = 0; bitmap_index<group->bitmaps.count; bitmap_index++)
@@ -499,7 +465,7 @@ struct bitmap_data *bitmap_group_try_and_get_bitmap(
 	long bitmap_group_index,
 	short bitmap_index)
 {
-	struct bitmap_group *group = tag_get(BITMAP_GROUP_TAG, bitmap_group_index);
+	struct bitmap_group *group = bitmap_group_get(bitmap_group_index);
 	struct bitmap_data *bitmap = NULL;
 
 	if (group && bitmap_index>=0 && bitmap_index<group->bitmaps.count)
@@ -522,7 +488,7 @@ struct bitmap_data *bitmap_group_get_bitmap_from_sequence(
 		struct bitmap_group *group;
 
 		match_assert("c:\\halo\\SOURCE\\bitmaps\\bitmap_group.c", 678, sequence_index>=0 && frame_index>=0);
-		group = tag_get(BITMAP_GROUP_TAG, bitmap_group_index);
+		group = bitmap_group_get(bitmap_group_index);
 		if (group)
 		{
 			short bitmap_index = NONE;
