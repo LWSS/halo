@@ -69,7 +69,9 @@ enum
 	_bitmap_swizzled_bit,
 	_bitmap_linear_bit,
 	_bitmap_format_v16u16_bit,
-	_bitmap_free_on_delete_bit,
+	NUMBER_OF_ON_DISK_BITMAP_FLAGS,
+
+	_bitmap_free_on_delete_bit = NUMBER_OF_ON_DISK_BITMAP_FLAGS,
 	_bitmap_cached_bit,
 	NUMBER_OF_BITMAP_FLAGS
 };

@@ -30,20 +30,14 @@ static struct tag_block_definition bitmap_group_sequence_block;
 TAG_REFERENCE_DEFINITION(global_bitmap_reference, BITMAP_GROUP_TAG);
 TAG_REFERENCE_DEFINITION(global_bitmap_reference_optional, BITMAP_GROUP_TAG);
 
-static char *bitmap_types_strings[] =
+TAG_ENUM(bitmap_types, NUMBER_OF_BITMAP_TYPES)
 {
 	"2D texture",
 	"3D texture",
 	"cube map"
 };
 
-static struct enum_definition bitmap_types =
-{
-	NUMBEROF(bitmap_types_strings),
-	bitmap_types_strings
-};
-
-static char *bitmap_formats_strings[NUMBER_OF_BITMAP_FORMATS] =
+TAG_ENUM(bitmap_formats, NUMBER_OF_BITMAP_FORMATS)
 {
 	"a8",
 	"y8",
@@ -65,13 +59,7 @@ static char *bitmap_formats_strings[NUMBER_OF_BITMAP_FORMATS] =
 	"p8-bump"
 };
 
-static struct enum_definition bitmap_formats =
-{
-	NUMBEROF(bitmap_formats_strings),
-	bitmap_formats_strings
-};
-
-static char *bitmap_flags_strings[] =
+TAG_FLAGS(bitmap_flags, NUMBER_OF_ON_DISK_BITMAP_FLAGS)
 {
 	"power of two dimensions",
 	"compressed",
@@ -81,13 +69,7 @@ static char *bitmap_flags_strings[] =
 	"v16u16"
 };
 
-static struct flags_definition bitmap_flags =
-{
-	NUMBEROF(bitmap_flags_strings),
-	bitmap_flags_strings
-};
-
-TAG_BLOCK(bitmap_data_block, "bitmap_data_block", MAXIMUM_BITMAPS_PER_BITMAP_GROUP, sizeof(struct bitmap_data), NULL, (postprocess_block_proc)postprocess_bitmap, NULL, delete_bitmap)
+TAG_BLOCK(bitmap_data_block, MAXIMUM_BITMAPS_PER_BITMAP_GROUP, sizeof(struct bitmap_data), NULL, (postprocess_block_proc)postprocess_bitmap, NULL, delete_bitmap)
 {
 	{_field_tag, "signature*"},
 	{_field_short_integer, "width*:pixels"},
@@ -107,7 +89,7 @@ TAG_BLOCK(bitmap_data_block, "bitmap_data_block", MAXIMUM_BITMAPS_PER_BITMAP_GRO
 	{_field_terminator}
 };
 
-TAG_BLOCK(bitmap_group_sprite_block, "bitmap_group_sprite_block", MAXIMUM_SPRITES_PER_SEQUENCE, sizeof(struct bitmap_group_sprite), NULL, NULL, NULL, NULL)
+TAG_BLOCK(bitmap_group_sprite_block, MAXIMUM_SPRITES_PER_SEQUENCE, sizeof(struct bitmap_group_sprite), NULL, NULL, NULL, NULL)
 {
 	{_field_short_integer, "bitmap index*"},
 	FIELD_PAD(sizeof(short)),
@@ -120,7 +102,7 @@ TAG_BLOCK(bitmap_group_sprite_block, "bitmap_group_sprite_block", MAXIMUM_SPRITE
 	{_field_terminator}
 };
 
-TAG_BLOCK(bitmap_group_sequence_block, "bitmap_group_sequence_block", MAXIMUM_SEQUENCES_PER_BITMAP_GROUP, sizeof(struct bitmap_group_sequence), NULL, NULL, NULL, NULL)
+TAG_BLOCK(bitmap_group_sequence_block, MAXIMUM_SEQUENCES_PER_BITMAP_GROUP, sizeof(struct bitmap_group_sequence), NULL, NULL, NULL, NULL)
 {
 	{_field_string, "name^"},
 	{_field_short_integer, "first bitmap index*"},
@@ -130,7 +112,7 @@ TAG_BLOCK(bitmap_group_sequence_block, "bitmap_group_sequence_block", MAXIMUM_SE
 	{_field_terminator}
 };
 
-static char *bitmap_group_flags_strings[] =
+TAG_FLAGS(bitmap_group_flags, NUMBER_OF_BITMAP_GROUP_FLAGS)
 {
 	"enable diffusion dithering",
 	"disable height map compression",
@@ -138,13 +120,7 @@ static char *bitmap_group_flags_strings[] =
 	"filthy sprite bug fix"
 };
 
-static struct flags_definition bitmap_group_flags =
-{
-	NUMBEROF(bitmap_group_flags_strings),
-	bitmap_group_flags_strings
-};
-
-static char *bitmap_group_types_strings[] =
+TAG_ENUM(bitmap_group_types, NUMBER_OF_BITMAP_GROUP_TYPES)
 {
 	"2D textures",
 	"3D textures",
@@ -153,13 +129,7 @@ static char *bitmap_group_types_strings[] =
 	"interface bitmaps"
 };
 
-static struct enum_definition bitmap_group_types =
-{
-	NUMBEROF(bitmap_group_types_strings),
-	bitmap_group_types_strings
-};
-
-static char *bitmap_group_usages_strings[] =
+TAG_ENUM(bitmap_group_usages, NUMBER_OF_BITMAP_GROUP_USAGES)
 {
 	"alpha-blend",
 	"default",
@@ -169,13 +139,7 @@ static char *bitmap_group_usages_strings[] =
 	"vector map"
 };
 
-static struct enum_definition bitmap_group_usages =
-{
-	NUMBEROF(bitmap_group_usages_strings),
-	bitmap_group_usages_strings
-};
-
-static char *bitmap_group_formats_strings[] =
+TAG_ENUM(bitmap_group_formats, NUMBER_OF_BITMAP_GROUP_FORMATS)
 {
 	"compressed with color-key transparency",
 	"compressed with explicit alpha",
@@ -185,13 +149,7 @@ static char *bitmap_group_formats_strings[] =
 	"monochrome"
 };
 
-static struct enum_definition bitmap_group_formats =
-{
-	NUMBEROF(bitmap_group_formats_strings),
-	bitmap_group_formats_strings
-};
-
-static char *bitmap_group_sprite_budgets_strings[] =
+TAG_ENUM(bitmap_group_sprite_budgets, NUMBER_OF_BITMAP_GROUP_SPRITE_BUDGETS)
 {
 	"32x32",
 	"64x64",
@@ -200,23 +158,11 @@ static char *bitmap_group_sprite_budgets_strings[] =
 	"512x512"
 };
 
-static struct enum_definition bitmap_group_sprite_budgets =
-{
-	NUMBEROF(bitmap_group_sprite_budgets_strings),
-	bitmap_group_sprite_budgets_strings
-};
-
-static char *bitmap_group_sprite_usages_strings[] =
+TAG_ENUM(bitmap_group_sprite_usages, NUMBER_OF_BITMAP_GROUP_SPRITE_USAGES)
 {
 	"blend/add/subtract/max",
 	"multiply/min",
 	"double multiply"
-};
-
-static struct enum_definition bitmap_group_sprite_usages =
-{
-	NUMBEROF(bitmap_group_sprite_usages_strings),
-	bitmap_group_sprite_usages_strings
 };
 
 struct tag_data_definition bitmap_pixel_data =
@@ -235,7 +181,7 @@ struct tag_data_definition color_plate_data =
 
 TAG_GROUP(bitmap, BITMAP_GROUP, sizeof(struct bitmap_group), FLAG(_tag_group_can_be_reloaded_bit), NONE, postprocess_bitmap_group)
 {
-	{_field_custom, NULL, (void *)BITMAP_GROUP_SHOW_BITMAP_CUSTOM_ID},
+	{_field_custom, NULL, FIELD_CUSTOM(BITMAP_GROUP_SHOW_BITMAP_CUSTOM_ID)},
 	{_field_explanation, "type", "Type controls bitmap 'geometry'. All dimensions must be a power of two except for SPRITES and INTERFACE BITMAPS:\n\n* 2D TEXTURES: Ordinary, 2D textures will be generated.\n* 3D TEXTURES: Volume textures will be generated from each sequence of 2D texture 'slices'.\n* CUBE MAPS: Cube maps will be generated from each consecutive set of six 2D textures in each sequence, all faces of a cube map must be square and the same size.\n* SPRITES: Sprite texture pages will be generated.\n* INTERFACE BITMAPS: Similar to 2D TEXTURES, but without mipmaps and without the power of two restriction."},
 	{_field_enum, "type", &bitmap_group_types},
 	{_field_explanation, "format", "Format controls how pixels will be stored internally:\n\n* COMPRESSED WITH COLOR-KEY TRANSPARENCY: DXT1 compression, uses 4 bits per pixel. 4x4 blocks of pixels are reduced to 2 colors and interpolated, alpha channel uses color-key transparency instead of alpha from the plate (all zero-alpha pixels also have zero-color).\n* COMPRESSED WITH EXPLICIT ALPHA: DXT2/3 compression, uses 8 bits per pixel. Same as DXT1 without the color key transparency, alpha channel uses alpha from plate quantized down to 4 bits per pixel.\n* COMPRESSED WITH INTERPOLATED ALPHA: DXT4/5 compression, uses 8 bits per pixel. Same as DXT2/3, except alpha is smoother. Better for smooth alpha gradients, worse for noisy alpha.\n* 16-BIT COLOR: Uses 16 bits per pixel. Depending on the alpha channel, bitmaps are quantized to either r5g6b5 (no alpha), a1r5g5b5 (1-bit alpha), or a4r4g4b4 (>1-bit alpha).\n* 32-BIT COLOR: Uses 32 bits per pixel. Very high quality, can have alpha at no added cost. This format takes up the most memory, however. Bitmap formats are x8r8g8b8 and a8r8g8b.\n* MONOCHROME: Uses either 8 or 16 bits per pixel. Bitmap formats are a8 (alpha), y8 (intensity), ay8 (combined alpha-intensity) and a8y8 (separate alpha-intensity).\n\nNote: Height maps (a.k.a. bump maps) should use 32-bit color; this is internally converted to a palettized format which takes less memory."},

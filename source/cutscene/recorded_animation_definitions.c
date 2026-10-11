@@ -24,16 +24,16 @@ struct tag_data_definition recorded_animation_event_stream_data =
 	byte_swap_recording
 };
 
-TAG_BLOCK(recorded_animation_block, "recorded_animation_block", MAXIMUM_RECORDED_ANIMATIONS_PER_MAP, sizeof(struct recorded_animation_definition), NULL, NULL, NULL, NULL)
+TAG_BLOCK(recorded_animation_block, MAXIMUM_RECORDED_ANIMATIONS_PER_MAP, sizeof(struct recorded_animation_definition), NULL, NULL, NULL, NULL)
 {
 	{_field_string, "name^"},
 	{_field_char_integer, "version*"},
 	{_field_char_integer, "raw animation data*"},
 	{_field_char_integer, "unit control data version*"},
-	FIELD_PAD(1),
+	FIELD_PAD(sizeof(byte)),
 	{_field_short_integer, "length of animation*:ticks"},
-	FIELD_PAD(2),
-	FIELD_PAD(4),
+	FIELD_PAD(sizeof(short)),
+	FIELD_PAD(sizeof(long)),
 	{_field_data, "recorded animation event stream*", &recorded_animation_event_stream_data},
 	{_field_terminator}
 };
@@ -45,7 +45,7 @@ static void byte_swap_recording(
 	void *data,
 	long size)
 {
-	struct recorded_animation_definition *animation = recording;
+	struct recorded_animation_definition const *animation = (struct recorded_animation_definition *)recording;
 
 	switch (animation->version)
 	{

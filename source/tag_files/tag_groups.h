@@ -109,7 +109,8 @@ struct tag_group name##_group =							\
 														\
 static struct tag_field name##_fields[] =
 
-#define TAG_BLOCK(name, string, maximum_count, size, byte_swap_block, postprocess_block, format_block, delete_block)	\
+
+#define TAG_BLOCK_NAMED(name, string, maximum_count, size, byte_swap_block, postprocess_block, format_block, delete_block)	\
 														\
 extern struct tag_field name##_fields[];				\
 														\
@@ -129,9 +130,39 @@ struct tag_block_definition name =						\
 														\
 static struct tag_field name##_fields[] =
 
+#define TAG_BLOCK(name, maximum_count, size, byte_swap_block, postprocess_block, format_block, delete_block)	\
+TAG_BLOCK_NAMED(name, #name, maximum_count, size, byte_swap_block, postprocess_block, format_block, delete_block)
+
 #define TAG_REFERENCE_DEFINITION(name, group_tag) struct tag_reference_definition name = { 0, (group_tag) }
 
+#define FIELD_CUSTOM(id)	((void *)(id))
 #define FIELD_PAD(size) {_field_pad, NULL, (void *)(size)}
+
+#define TAG_ENUM(name, size)			\
+										\
+extern char *name##_strings[];			\
+										\
+static struct enum_definition name =	\
+{										\
+	size,								\
+	name##_strings						\
+};										\
+										\
+static char *name##_strings[] =			\
+
+
+#define TAG_FLAGS(name, size)			\
+										\
+extern char *name##_strings[];			\
+										\
+static struct flags_definition name =	\
+{										\
+	size,								\
+	name##_strings						\
+};										\
+										\
+static char *name##_strings[] =			\
+
 
 #define TAG_BLOCK_GET_ELEMENT(block_address, index, type) ((type *)tag_block_get_element_with_size((block_address), (index), sizeof(type)))
 

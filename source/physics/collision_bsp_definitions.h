@@ -31,12 +31,14 @@ enum
 	_collision_surface_two_sided_bit = 0,
 	_collision_surface_invisible_bit,
 	_collision_surface_climbable_bit,
-	_collision_surface_breakable_bit
+	_collision_surface_breakable_bit,
+	NUMBER_OF_COLLISION_SURFACE_FLAGS
 };
 
 enum
 {
-	_collision_leaf_contains_two_sided_bit = 0
+	_collision_leaf_contains_two_sided_bit = 0,
+	NUMBER_OF_COLLISION_LEAF_FLAGS
 };
 
 /* ---------- macros */
