@@ -48,14 +48,14 @@ real weapon_definition_get_damage_potential(
 		{
 			struct damage_effect_definition const *damage_effect_definition = damage_effect_definition_get(projectile_definition->projectile.impact_damage.index);
 
-			damage_potential = (damage_effect_definition->damage.damage_lower_bound + damage_effect_definition->damage.damage_upper_bound) * 0.5f;
+			damage_potential += (damage_effect_definition->damage.damage_lower_bound + damage_effect_definition->damage.damage_upper_bound) / 2.f;
 		}
 
 		if (projectile_definition->projectile.detonation_damage.index != NONE)
 		{
 			struct damage_effect_definition const *damage_effect_definition = damage_effect_definition_get(projectile_definition->projectile.detonation_damage.index);
 
-			damage_potential += (damage_effect_definition->damage.damage_lower_bound + damage_effect_definition->damage.damage_upper_bound) * 0.5f;
+			damage_potential += (damage_effect_definition->damage.damage_lower_bound + damage_effect_definition->damage.damage_upper_bound) / 2.f;
 		}
 	}
 

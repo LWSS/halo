@@ -228,23 +228,26 @@ boolean weapon_update(
 
 	if (weapon->weapon.integrated_light_power > 0.f)
 	{
-		boolean controlled_by_unit = FALSE;
+		boolean light_decays = TRUE;
 
 		if (weapon->object.parent_object_index != NONE)
 		{
 			struct unit_datum *unit = unit_try_and_get(weapon->object.parent_object_index);
 
-			if (unit && unit->definition_index != NONE && TEST_FLAG(unit_definition_get(unit->definition_index)->unit.flags, _unit_integrated_light_controls_weapon_directly_bit))
+			if (unit && unit->definition_index != NONE)
 			{
-				controlled_by_unit = TRUE;
+				struct unit_definition const *unit_definition = unit_definition_get(unit->definition_index);
+
+				if (TEST_FLAG(unit_definition->unit.flags, _unit_integrated_light_controls_weapon_directly_bit))
+				{
+					light_decays = FALSE;
+				}
 			}
 		}
 
-		if (!controlled_by_unit)
+		if (light_decays)
 		{
-			weapon->weapon.integrated_light_power -= 1.f / 24.f;
-
-			if (weapon->weapon.integrated_light_power < 0.f)
+			if ((weapon->weapon.integrated_light_power -= 1.f / 24.f) < 0.f)
 			{
 				weapon->weapon.integrated_light_power = 0.f;
 			}
@@ -290,11 +293,15 @@ boolean weapon_update(
 				weapon->weapon.heat = 0.f;
 			}
 
-			if (TEST_FLAG(weapon->weapon.flags, _weapon_overheated_bit) &&
-				!TEST_FLAG(weapon->weapon.flags, _weapon_overheated_exit_bit) &&
-				(weapon->weapon.heat - weapon_definition->weapon.heat_recovery_threshold) / heat_loss <= 1.f)
+			if (TEST_FLAG(weapon->weapon.flags, _weapon_overheated_bit) && !TEST_FLAG(weapon->weapon.flags, _weapon_overheated_exit_bit))
 			{
-				SET_FLAG(weapon->weapon.flags, _weapon_overheated_exit_bit, TRUE);
+				short exit_ticks = 1;
+				real heat_loss_per_tick = heat_loss;
+
+				if ((weapon->weapon.heat - weapon_definition->weapon.heat_recovery_threshold) / heat_loss_per_tick <= exit_ticks)
+				{
+					SET_FLAG(weapon->weapon.flags, _weapon_overheated_exit_bit, TRUE);
+				}
 			}
 		}
 
@@ -317,15 +324,15 @@ boolean weapon_update(
 		weapon->weapon.state_timer--;
 	}
 
-	if (!TEST_FLAG(weapon->weapon.control_flags, _weapon_control_user_busy_bit) && weapon->weapon.state_timer <= 0)
-	{
-		trigger_down[_weapon_trigger_primary] = TEST_FLAG(weapon->weapon.control_flags, _weapon_control_primary_trigger_bit);
-		trigger_down[_weapon_trigger_secondary] = TEST_FLAG(weapon_definition->weapon.flags, _weapon_secondary_trigger_overrides_grenades_bit) && TEST_FLAG(weapon->weapon.control_flags, _weapon_control_secondary_trigger_bit);
-	}
-	else
+	if (TEST_FLAG(weapon->weapon.control_flags, _weapon_control_user_busy_bit) || weapon->weapon.state_timer > 0)
 	{
 		trigger_down[_weapon_trigger_primary] = FALSE;
 		trigger_down[_weapon_trigger_secondary] = FALSE;
+	}
+	else
+	{
+		trigger_down[_weapon_trigger_primary] = TEST_FLAG(weapon->weapon.control_flags, _weapon_control_primary_trigger_bit);
+		trigger_down[_weapon_trigger_secondary] = TEST_FLAG(weapon_definition->weapon.flags, _weapon_secondary_trigger_overrides_grenades_bit) && TEST_FLAG(weapon->weapon.control_flags, _weapon_control_secondary_trigger_bit);
 	}
 
 	switch (weapon_definition->weapon.secondary_trigger_mode)
@@ -369,9 +376,8 @@ boolean weapon_update(
 			short fractional_rounds_recharged = magazine_definition->rounds_recharged_per_second % TICKS_PER_SECOND;
 
 			magazine->rounds_loaded += rounds_recharged;
-			magazine->rounds_fractional_recharged += fractional_rounds_recharged;
 
-			if (magazine->rounds_fractional_recharged >= TICKS_PER_SECOND)
+			if ((magazine->rounds_fractional_recharged += fractional_rounds_recharged) >= TICKS_PER_SECOND)
 			{
 				magazine->rounds_loaded++;
 				magazine->rounds_fractional_recharged -= TICKS_PER_SECOND;
@@ -446,14 +452,12 @@ boolean weapon_update(
 
 		if (!trigger_down[trigger_index])
 		{
-			SET_FLAG(trigger->flags, _weapon_trigger_released_since_last_shot_bit, TRUE);
+			trigger->flags |= FLAG(_weapon_trigger_released_since_last_shot_bit);
 		}
 
 		if (trigger->ejection_port_position > 0.f)
 		{
-			trigger->ejection_port_position -= trigger_definition->runtime_ejection_port_recovery_time;
-
-			if (trigger->ejection_port_position <= 0.f)
+			if ((trigger->ejection_port_position -= trigger_definition->runtime_ejection_port_recovery_time) <= 0.f)
 			{
 				trigger->ejection_port_position = 0.f;
 			}
@@ -461,9 +465,7 @@ boolean weapon_update(
 
 		if (trigger->illumination > 0.f)
 		{
-			trigger->illumination -= trigger_definition->runtime_illumination_recovery_time;
-
-			if (trigger->illumination <= 0.f)
+			if ((trigger->illumination -= trigger_definition->runtime_illumination_recovery_time) <= 0.f)
 			{
 				trigger->illumination = 0.f;
 			}
@@ -616,9 +618,7 @@ boolean weapon_update(
 
 		if (trigger_down[trigger_index])
 		{
-			trigger->rate_of_fire += trigger_definition->runtime_rate_of_fire_acceleration_time;
-
-			if (trigger->rate_of_fire > 1.f)
+			if ((trigger->rate_of_fire += trigger_definition->runtime_rate_of_fire_acceleration_time) > 1.f)
 			{
 				trigger->rate_of_fire = 1.f;
 			}
@@ -632,14 +632,12 @@ boolean weapon_update(
 					blurred_permutation_names[trigger_index],
 					NONE,
 					TRUE);
-				SET_FLAG(trigger->flags, _weapon_trigger_blurred_bit, TRUE);
+				trigger->flags |= FLAG(_weapon_trigger_blurred_bit);
 			}
 		}
 		else
 		{
-			trigger->rate_of_fire -= trigger_definition->runtime_rate_of_fire_deceleration_time;
-
-			if (trigger->rate_of_fire < 0.f)
+			if ((trigger->rate_of_fire -= trigger_definition->runtime_rate_of_fire_deceleration_time) < 0.f)
 			{
 				trigger->rate_of_fire = 0.f;
 			}
@@ -651,24 +649,20 @@ boolean weapon_update(
 					blurred_permutation_names[trigger_index],
 					NONE,
 					FALSE);
-				SET_FLAG(trigger->flags, _weapon_trigger_blurred_bit, FALSE);
+				trigger->flags &= ~FLAG(_weapon_trigger_blurred_bit);
 			}
 		}
 
 		if (trigger->state == _trigger_spewing || trigger->state == _trigger_recovering || trigger_down[trigger_index])
 		{
-			trigger->error += trigger_definition->runtime_error_acceleration_time;
-
-			if (trigger->error > 1.f)
+			if ((trigger->error += trigger_definition->runtime_error_acceleration_time) > 1.f)
 			{
 				trigger->error = 1.f;
 			}
 		}
 		else
 		{
-			trigger->error -= trigger_definition->runtime_error_deceleration_time;
-
-			if (trigger->error < 0.f)
+			if ((trigger->error -= trigger_definition->runtime_error_deceleration_time) < 0.f)
 			{
 				trigger->error = 0.f;
 			}
@@ -749,7 +743,7 @@ void weapon_export_function_values(
 					trigger->illumination = function_value;
 				}
 
-				heat_illumination = weapon_definition->weapon.heat_illumination * weapon->weapon.heat;
+				heat_illumination = weapon->weapon.heat * weapon_definition->weapon.heat_illumination;
 				function_value = MAX(function_value, heat_illumination);
 				break;
 			}
@@ -1149,49 +1143,47 @@ real weapon_estimate_time_to_target(
 	return time;
 }
 
+/* Used to determine if a weapon can ever be fired again. Used to determine if a weapon should be deleted in multiplayer */
 boolean weapon_can_be_fired(
 	long weapon_index)
 {
-	boolean can_be_fired;
 	struct weapon_datum *weapon = weapon_get(weapon_index);
 	struct weapon_definition const *weapon_definition = weapon_definition_get(weapon->definition_index);
 
+	// Weapons that use battery/age can't be refilled so they cannot be fired again
 	if (weapon->weapon.age >= 1.f)
 	{
-		can_be_fired = FALSE;
+		return FALSE;
 	}
+	// If not in multiplayer a player might pick up new ammo for a weapon. So it can technically be fired
+	// Weapons that can't have ammo can still be "fired"
 	else if (game_engine_running() &&
 		weapon_definition->weapon.magazines.count > 0 &&
 		TAG_BLOCK_GET_ELEMENT(&weapon_definition->weapon.magazines, 0, struct weapon_magazine_definition)->rounds_loaded_maximum > 0 &&
 		!weapon->weapon.magazines[_weapon_magazine_primary].rounds_loaded &&
 		!weapon->weapon.magazines[_weapon_magazine_primary].rounds_total)
 	{
-		can_be_fired = FALSE;
+		return FALSE;
 	}
 	else
 	{
-		can_be_fired = TRUE;
+		return TRUE;
 	}
-
-	return can_be_fired;
 }
 
 boolean weapon_useful(
 	long weapon_index)
 {
-	boolean useful;
 	struct weapon_datum *weapon = weapon_get(weapon_index);
 
 	if (weapon->weapon.age >= 1.f)
 	{
-		useful = FALSE;
+		return FALSE;
 	}
 	else
 	{
-		useful = TRUE;
+		return TRUE;
 	}
-
-	return useful;
 }
 
 real weapon_compute_movement_penalty(
@@ -1237,9 +1229,13 @@ short weapon_rotate_zoom_level(
 		{
 			zoom_level++;
 		}
+		else if (zoom_level == weapon_definition->weapon.zoom_level_count - 1)
+		{
+			zoom_level = NONE;
+		}
 		else
 		{
-			zoom_level = zoom_level == weapon_definition->weapon.zoom_level_count - 1 ? NONE : 0;
+			zoom_level = 0;
 		}
 	}
 
@@ -1307,10 +1303,7 @@ boolean weapon_must_be_readied(
 boolean weapon_is_flag(
 	long weapon_index)
 {
-	struct weapon_datum *weapon = weapon_get(weapon_index);
-	struct weapon_definition const *weapon_definition = weapon_definition_get(weapon->definition_index);
-
-	return TEST_FLAG(weapon_definition->weapon.flags, _weapon_must_be_readied_bit);
+	return weapon_must_be_readied(weapon_index);
 }
 
 boolean weapon_prevents_melee_attack(
@@ -1405,15 +1398,15 @@ short weapon_get_first_person_animation_time(
 				{
 					struct animation const *enter_animation = TAG_BLOCK_GET_ELEMENT(
 						&animation_graph->animations,
-						_first_person_weapon_animation_shotgun_enter < weapon_animations->animations.count ? animation_graph_animation_index_get(&weapon_animations->animations)[_first_person_weapon_animation_shotgun_enter].animation_index : NONE,
+						_first_person_weapon_animation_shotgun_enter >= 0 && _first_person_weapon_animation_shotgun_enter < weapon_animations->animations.count ? animation_graph_animation_index_get(&weapon_animations->animations)[_first_person_weapon_animation_shotgun_enter].animation_index : NONE,
 						struct animation);
 					struct animation const *exit_empty_animation = TAG_BLOCK_GET_ELEMENT(
 						&animation_graph->animations,
-						_first_person_weapon_animation_shotgun_exit_empty < weapon_animations->animations.count ? animation_graph_animation_index_get(&weapon_animations->animations)[_first_person_weapon_animation_shotgun_exit_empty].animation_index : NONE,
+						_first_person_weapon_animation_shotgun_exit_empty >= 0 && _first_person_weapon_animation_shotgun_exit_empty < weapon_animations->animations.count ? animation_graph_animation_index_get(&weapon_animations->animations)[_first_person_weapon_animation_shotgun_exit_empty].animation_index : NONE,
 						struct animation);
 					struct animation const *exit_full_animation = TAG_BLOCK_GET_ELEMENT(
 						&animation_graph->animations,
-						_first_person_weapon_animation_shotgun_exit_full < weapon_animations->animations.count ? animation_graph_animation_index_get(&weapon_animations->animations)[_first_person_weapon_animation_shotgun_exit_full].animation_index : NONE,
+						_first_person_weapon_animation_shotgun_exit_full >= 0 && _first_person_weapon_animation_shotgun_exit_full < weapon_animations->animations.count ? animation_graph_animation_index_get(&weapon_animations->animations)[_first_person_weapon_animation_shotgun_exit_full].animation_index : NONE,
 						struct animation);
 
 					// the exit animations are looked up but never used (sapien and hcex do the same)
@@ -1509,9 +1502,14 @@ static long weapon_get_owner_object_index(
 	struct weapon_datum *weapon = weapon_get(weapon_index);
 	long owner_object_index = NONE;
 
-	if (weapon->object.parent_object_index != NONE && unit_try_and_get(weapon->object.parent_object_index))
+	if (weapon->object.parent_object_index != NONE)
 	{
-		owner_object_index = weapon->object.parent_object_index;
+		struct unit_datum *unit = unit_try_and_get(weapon->object.parent_object_index);
+
+		if (unit)
+		{
+			owner_object_index = weapon->object.parent_object_index;
+		}
 	}
 
 	return owner_object_index;
@@ -1585,12 +1583,12 @@ static boolean weapon_trigger_can_fire_again(
 		struct weapon_trigger_definition);
 	boolean can_fire_again = FALSE;
 	real rate_of_fire_fraction = TEST_FLAG(trigger_definition->flags, _weapon_trigger_analog_rate_of_fire_bit) ? weapon->weapon.primary_trigger : trigger->rate_of_fire;
-	real rate_of_fire = rate_of_fire_fraction * (trigger_definition->final_rate_of_fire - trigger_definition->initial_rate_of_fire) + trigger_definition->initial_rate_of_fire;
+	real rate_of_fire = (trigger_definition->final_rate_of_fire - trigger_definition->initial_rate_of_fire) * rate_of_fire_fraction + trigger_definition->initial_rate_of_fire;
 	real ticks_between_shots = rate_of_fire > _real_epsilon ? TICKS_PER_SECOND / rate_of_fire : 0.f;
 
 	if (weapon_definition->weapon.age_rate_of_fire_penalty > 0.f)
 	{
-		ticks_between_shots *= weapon->weapon.age * weapon_definition->weapon.age_rate_of_fire_penalty + 1.f;
+		ticks_between_shots += weapon->weapon.age * ticks_between_shots * weapon_definition->weapon.age_rate_of_fire_penalty;
 	}
 
 	if (trigger->idle_ticks + 1.f >= ticks_between_shots)
@@ -1754,7 +1752,6 @@ static void weapon_magazine_finish_reload(
 	long weapon_index,
 	short magazine_index)
 {
-	long rounds_reloaded;
 	short rounds_loaded;
 	struct weapon_datum *weapon = weapon_get(weapon_index);
 	struct weapon_magazine *magazine = weapon_magazine_get(weapon, magazine_index);
@@ -1769,13 +1766,12 @@ static void weapon_magazine_finish_reload(
 		magazine->rounds_loaded = 0;
 	}
 
-	rounds_reloaded = MIN(magazine_definition->rounds_reloaded, magazine->rounds_total);
-	rounds_loaded = magazine->rounds_loaded + rounds_reloaded;
+	rounds_loaded = MIN(magazine_definition->rounds_reloaded, magazine->rounds_total) + magazine->rounds_loaded;
 	rounds_loaded = MIN(rounds_loaded, magazine_definition->rounds_loaded_maximum);
 
 	if (!cheat.infinite_ammo && TEST_FLAG(weapon->item.flags, _item_belongs_to_player_bit))
 	{
-		magazine->rounds_total = magazine->rounds_total - rounds_loaded + magazine->rounds_loaded;
+		magazine->rounds_total -= rounds_loaded - magazine->rounds_loaded;
 	}
 
 	magazine->rounds_loaded = rounds_loaded;
@@ -1785,9 +1781,7 @@ static void weapon_magazine_finish_reload(
 	if (magazine->rounds_total > 0 &&
 		magazine->rounds_loaded < magazine_definition->rounds_loaded_maximum &&
 		!TEST_FLAG(magazine_definition->flags, _weapon_magazine_wastes_rounds_when_reloaded_bit) &&
-		!TEST_FLAG(weapon->weapon.control_flags, _weapon_control_primary_trigger_bit) &&
-		!TEST_FLAG(weapon->weapon.control_flags, _weapon_control_secondary_trigger_bit) &&
-		!TEST_FLAG(weapon->weapon.control_flags, _weapon_control_user_switching_weapons_bit))
+		!(weapon->weapon.control_flags & (FLAG(_weapon_control_primary_trigger_bit) | FLAG(_weapon_control_secondary_trigger_bit) | FLAG(_weapon_control_user_switching_weapons_bit))))
 	{
 		weapon_magazine_start_reload(weapon_index, magazine_index, FALSE);
 	}
@@ -2078,8 +2072,9 @@ static void weapon_trigger_fire(
 
 		if (trigger->firing_effect_shots_remaining <= 0)
 		{
+			struct trigger_firing_effect const *firing_effect;
 			short starting_firing_effect_index = trigger->firing_effect_index;
-			short firing_effect_index = TEST_FLAG(trigger_definition->flags, _weapon_trigger_random_firing_effects_bit) ? random() % trigger_definition->firing_effects.count : starting_firing_effect_index;
+			short firing_effect_index = TEST_FLAG(trigger_definition->flags, _weapon_trigger_random_firing_effects_bit) ? random() % trigger_definition->firing_effects.count : trigger->firing_effect_index;
 
 			do
 			{
@@ -2104,7 +2099,7 @@ static void weapon_trigger_fire(
 					firing_effect_index,
 					struct trigger_firing_effect);
 				trigger->firing_effect_index = firing_effect_index;
-				SET_FLAG(trigger->firing_effects_used_flags, firing_effect_index, TRUE);
+				trigger->firing_effects_used_flags |= FLAG(firing_effect_index);
 				trigger->firing_effect_shots_remaining = random_range(
 					firing_effect->shots_lower_bound,
 					firing_effect->shots_upper_bound);
@@ -2283,25 +2278,10 @@ static long weapon_effect_new(
 	{
 		long effect_object_index = weapon_get_effect_object_index(weapon_index);
 		long owner_object_index = weapon_get_owner_object_index(weapon_index);
-		long group_tag = tag_get_group_tag(effect_index);
 
-		if (group_tag != EFFECT_DEFINITION_TAG)
+		switch (tag_get_group_tag(effect_index))
 		{
-			match_vassert("c:\\halo\\SOURCE\\items\\weapons.c", 2514, group_tag==SOUND_DEFINITION_TAG, NULL);
-
-			if (group_tag == SOUND_DEFINITION_TAG)
-			{
-				object_impulse_sound_new(
-					owner_object_index,
-					effect_index,
-					NONE,
-					global_origin3d,
-					global_forward3d,
-					effect_scale);
-			}
-		}
-		else
-		{
+		case EFFECT_DEFINITION_TAG:
 			new_effect_index = effect_new_from_object(
 				effect_index,
 				owner_object_index,
@@ -2311,6 +2291,21 @@ static long weapon_effect_new(
 				effect_error,
 				NULL,
 				NULL);
+			break;
+
+		case SOUND_DEFINITION_TAG:
+			object_impulse_sound_new(
+				owner_object_index,
+				effect_index,
+				NONE,
+				global_origin3d,
+				global_forward3d,
+				effect_scale);
+			break;
+
+		default:
+			match_halt("c:\\halo\\SOURCE\\items\\weapons.c", 2514);
+			break;
 		}
 	}
 
@@ -2550,16 +2545,16 @@ static void trigger_create_projectiles(
 				&weapon_definition->weapon.triggers,
 				_weapon_trigger_secondary,
 				struct weapon_trigger_definition);
-			short alternate_shots_loaded = weapon->weapon.alternate_shots_loaded;
 
 			projectile_definition_index = secondary_trigger_definition->projectile.index;
+			projectile_count = weapon->weapon.alternate_shots_loaded;
 
 			if (weapon_definition->weapon.secondary_trigger_mode == _weapon_secondary_trigger_loads_multiple_primary_ammunition)
 			{
-				alternate_shots_loaded++;
+				projectile_count++;
 			}
 
-			projectile_count = alternate_shots_loaded * trigger_definition->projectiles_per_shot;
+			projectile_count *= trigger_definition->projectiles_per_shot;
 			weapon->weapon.alternate_shots_loaded = 0;
 		}
 		else
@@ -2672,7 +2667,8 @@ static void projectile_distribute(
 	short count)
 {
 	real offset;
-	real angle;
+	real angle_cosine;
+	real angle_sine;
 
 	if (count & 1)
 	{
@@ -2684,15 +2680,7 @@ static void projectile_distribute(
 		{
 			short side_index = index - 1;
 
-			if (side_index & 1)
-			{
-				side_index >>= 1;
-			}
-			else
-			{
-				side_index = -(side_index >> 1);
-			}
-
+			side_index = side_index & 1 ? side_index >> 1 : -(side_index >> 1);
 			offset = side_index;
 		}
 	}
@@ -2706,12 +2694,14 @@ static void projectile_distribute(
 		}
 	}
 
-	angle = offset * distribution_angle;
+	offset *= distribution_angle;
+	angle_cosine = cosine(offset);
+	angle_sine = sine(offset);
 
 	switch (distribution_function)
 	{
 	case _trigger_distribution_horizontal_fan:
-		rotate_vector_about_axis(forward, up, sine(angle), cosine(angle));
+		rotate_vector_about_axis(forward, up, angle_sine, angle_cosine);
 		break;
 	}
 
@@ -2878,7 +2868,7 @@ static boolean weapon_set_state(
 
 				if (animation_type != NONE)
 				{
-					short animation_index = animation_type < weapon_animations->animations.count ? animation_graph_animation_index_get(&weapon_animations->animations)[animation_type].animation_index : NONE;
+					short animation_index = animation_type >= 0 && animation_type < weapon_animations->animations.count ? animation_graph_animation_index_get(&weapon_animations->animations)[animation_type].animation_index : NONE;
 
 					if (animation_index != NONE || new_state == _weapon_state_idle)
 					{
@@ -2969,15 +2959,13 @@ void weapon_set_current_amount(
 	}
 	else if (weapon_definition->weapon.magazines.count > 0)
 	{
-		short rounds_loaded;
 		struct weapon_magazine_definition const *magazine_definition = TAG_BLOCK_GET_ELEMENT(
 			&weapon_definition->weapon.magazines,
 			0,
 			struct weapon_magazine_definition);
 		struct weapon_magazine *magazine = weapon_magazine_get(weapon, _weapon_magazine_primary);
+		short rounds_loaded = (short)fast_ftol(magazine_definition->rounds_loaded_maximum * current_amount);
 
-		current_amount *= magazine_definition->rounds_loaded_maximum;
-		rounds_loaded = (short)fast_ftol(current_amount);
 		magazine->rounds_total += rounds_loaded - magazine->rounds_loaded;
 		magazine->rounds_loaded = rounds_loaded;
 	}

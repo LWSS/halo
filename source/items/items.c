@@ -346,13 +346,13 @@ boolean item_update(
 		if (TEST_FLAG(item->item.flags, _item_has_nonzero_angular_velocity_bit))
 		{
 			struct object_marker marker;
+			real_matrix4x3 ground_point_matrix;
 			real_vector3d left;
 
 			if (TEST_FLAG(item->object.flags, _object_at_rest_bit) &&
 				object_get_marker_by_name(item_index, "ground point", &marker, 1))
 			{
-				real_matrix4x3 ground_point_matrix = marker.matrix;
-
+				ground_point_matrix = marker.matrix;
 				rotate_vector_about_axis(
 					&ground_point_matrix.forward,
 					&item->item.rotation_axis,
@@ -402,9 +402,7 @@ boolean item_update(
 
 	if (item->item.detonation_ticks > 0)
 	{
-		item->item.detonation_ticks--;
-
-		if (item->item.detonation_ticks == 0)
+		if (--item->item.detonation_ticks == 0)
 		{
 			effect_new_from_object(
 				definition->item.detonation_effect.index,
@@ -484,7 +482,9 @@ void item_get_position_even_if_in_inventory(
 {
 	struct item_datum *item = item_try_and_get(item_index);
 
-	set_real_point3d(position, 0.f, 0.f, 0.f);
+	position->x = 0.f;
+	position->y = 0.f;
+	position->z = 0.f;
 
 	if (item)
 	{
@@ -576,8 +576,8 @@ void item_accelerate(
 				TEST_FLAG(item->item.flags, _item_on_structure_bit) &&
 				magnitude_squared3d(acceleration) < _real_epsilon)
 			{
-				real_vector3d up;
 				real_vector3d angular_acceleration;
+				real_vector3d up;
 
 				if (object_get_marker_by_name(item_index, "ground point", &marker, 1))
 				{
