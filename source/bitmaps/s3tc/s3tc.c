@@ -9,6 +9,11 @@ S3TC.C
 
 /* ---------- constants */
 
+#define NUMBER_OF_S3TC_BLOCK_PIXELS 16 /* fake name */
+#define NUMBER_OF_S3TC_COLOR_CHANNELS 3 /* fake name */
+#define NUMBER_OF_S3TC_COLOR_COMPONENTS 4 /* fake name */
+#define NUMBER_OF_S3TC_ALPHA4_ROWS 4 /* fake name */
+
 /* ---------- macros */
 
 /* ---------- structures */
@@ -35,7 +40,7 @@ static void ColorToFcolor(
 	real value;
 	long i;
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < NUMBER_OF_S3TC_COLOR_CHANNELS; i++)
 	{
 		value = pcolor->rgba[i];
 		pfcolor->rgba[i] = value * wtPrimary[i] * (1.0f / 255.0f);
@@ -144,7 +149,7 @@ static void ClipExtrema(
 	real t;
 	long i;
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < NUMBER_OF_S3TC_COLOR_CHANNELS; i++)
 	{
 		if ((plower->rgba[i] < 0.0f) ^ (pupper->rgba[i] < 0.0f))
 		{
@@ -207,7 +212,7 @@ static void AllSame(
 		bit = 1;
 		mask = 3;
 
-		for (i = 0; i < 16; i++)
+		for (i = 0; i < NUMBER_OF_S3TC_BLOCK_PIXELS; i++)
 		{
 			if ((wAlpha & bit) == 0)
 			{
@@ -275,7 +280,7 @@ void EncodeBlockRGBColorKey(
 
 	cOpaque = 0;
 
-	for (i = 15; i >= 0; i--)
+	for (i = NUMBER_OF_S3TC_BLOCK_PIXELS - 1; i >= 0; i--)
 	{
 		wAlpha <<= 1;
 
@@ -300,7 +305,7 @@ void EncodeBlockRGBColorKey(
 
 	same = TRUE;
 
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < NUMBER_OF_S3TC_BLOCK_PIXELS; i++)
 	{
 		if (same && i > 0 &&
 			(colorSrc[i].rgba[2] != colorSrc[i - 1].rgba[2] ||
@@ -317,19 +322,19 @@ void EncodeBlockRGBColorKey(
 		return;
 	}
 
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < NUMBER_OF_S3TC_BLOCK_PIXELS; i++)
 	{
 		ColorToFcolor(&colorSrc[i], &c[i]);
 	}
 
 	scale = 1.0f / cOpaque;
 
-	for (j = 0; j < 3; j++)
+	for (j = 0; j < NUMBER_OF_S3TC_COLOR_CHANNELS; j++)
 	{
 		mean.rgba[j] = 0.0f;
 		bit = 1;
 
-		for (i = 0; i < 16; i++)
+		for (i = 0; i < NUMBER_OF_S3TC_BLOCK_PIXELS; i++)
 		{
 			if (wAlpha & bit)
 			{
@@ -342,22 +347,22 @@ void EncodeBlockRGBColorKey(
 		mean.rgba[j] *= scale;
 	}
 
-	for (j = 0; j < 3; j++)
+	for (j = 0; j < NUMBER_OF_S3TC_COLOR_CHANNELS; j++)
 	{
-		for (i = 0; i < 16; i++)
+		for (i = 0; i < NUMBER_OF_S3TC_BLOCK_PIXELS; i++)
 		{
 			c[i].rgba[j] -= mean.rgba[j];
 		}
 	}
 
-	for (i = 0; i < 3; i++)
+	for (i = 0; i < NUMBER_OF_S3TC_COLOR_CHANNELS; i++)
 	{
-		for (j = i; j < 3; j++)
+		for (j = i; j < NUMBER_OF_S3TC_COLOR_CHANNELS; j++)
 		{
 			t[i][j] = 0.0f;
 			bit = 1;
 
-			for (k = 0; k < 16; k++)
+			for (k = 0; k < NUMBER_OF_S3TC_BLOCK_PIXELS; k++)
 			{
 				if (wAlpha & bit)
 				{
@@ -385,9 +390,9 @@ void EncodeBlockRGBColorKey(
 
 		scale = 3.0f / trace;
 
-		for (i = 0; i < 3; i++)
+		for (i = 0; i < NUMBER_OF_S3TC_COLOR_CHANNELS; i++)
 		{
-			for (j = i; j < 3; j++)
+			for (j = i; j < NUMBER_OF_S3TC_COLOR_CHANNELS; j++)
 			{
 				t[i][j] *= scale;
 			}
@@ -421,7 +426,7 @@ void EncodeBlockRGBColorKey(
 	inv = 1.0f / square_root(best);
 	len2 = 0.0f;
 
-	for (j = 0; j < 3; j++)
+	for (j = 0; j < NUMBER_OF_S3TC_COLOR_CHANNELS; j++)
 	{
 		axis_vector.rgba[j] = t[j][axis] * inv;
 		len2 += axis_vector.rgba[j] * axis_vector.rgba[j];
@@ -437,13 +442,13 @@ void EncodeBlockRGBColorKey(
 	min = 99999.0f;
 	max = -99999.0f;
 
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < NUMBER_OF_S3TC_BLOCK_PIXELS; i++)
 	{
 		if (wAlpha & bit)
 		{
 			projection = 0.0f;
 
-			for (j = 0; j < 3; j++)
+			for (j = 0; j < NUMBER_OF_S3TC_COLOR_CHANNELS; j++)
 			{
 				projection += axis_vector.rgba[j] * c[i].rgba[j];
 			}
@@ -476,12 +481,12 @@ void EncodeBlockRGBColorKey(
 
 	len2 = 0.0f;
 
-	for (j = 0; j < 3; j++)
+	for (j = 0; j < NUMBER_OF_S3TC_COLOR_CHANNELS; j++)
 	{
 		len2 += (fcolor1.rgba[j] - fcolor0.rgba[j]) * (fcolor1.rgba[j] - fcolor0.rgba[j]);
 	}
 
-	if (len2 == 0.0f && cOpaque == 16)
+	if (len2 == 0.0f && cOpaque == NUMBER_OF_S3TC_BLOCK_PIXELS)
 	{
 		AllSame(colorSrc, pblockDst, wAlpha);
 		return;
@@ -489,13 +494,13 @@ void EncodeBlockRGBColorKey(
 
 	bit = 0x8000;
 
-	for (i = 15; i >= 0; i--)
+	for (i = NUMBER_OF_S3TC_BLOCK_PIXELS - 1; i >= 0; i--)
 	{
 		if (wAlpha & bit)
 		{
 			projection = 0.0f;
 
-			for (j = 0; j < 3; j++)
+			for (j = 0; j < NUMBER_OF_S3TC_COLOR_CHANNELS; j++)
 			{
 				c[i].rgba[j] += mean.rgba[j];
 				projection += (c[i].rgba[j] - fcolor0.rgba[j]) * (fcolor1.rgba[j] - fcolor0.rgba[j]);
@@ -503,7 +508,7 @@ void EncodeBlockRGBColorKey(
 
 			projection /= len2;
 
-			if (cOpaque == 16)
+			if (cOpaque == NUMBER_OF_S3TC_BLOCK_PIXELS)
 			{
 				projection *= 4.0f;
 
@@ -559,7 +564,7 @@ void DecodeBlockRGB(
 
 	if (pblockSrc == NULL)
 	{
-		memset(colorDst, 0, 16 * sizeof(*colorDst));
+		memset(colorDst, 0, NUMBER_OF_S3TC_BLOCK_PIXELS * sizeof(*colorDst));
 	}
 	else
 	{
@@ -590,7 +595,7 @@ void DecodeBlockRGB(
 		}
 		else
 		{
-			for (j = 0; j < 3; j++)
+			for (j = 0; j < NUMBER_OF_S3TC_COLOR_CHANNELS; j++)
 			{
 				clut[2].rgba[j] = (byte)((clut[0].rgba[j] + clut[1].rgba[j]) / 2);
 				clut[3].rgba[j] = 0;
@@ -601,9 +606,9 @@ void DecodeBlockRGB(
 
 		pixbm = pblockSrc->pixbm;
 
-		for (i = 0; i < 16; i++)
+		for (i = 0; i < NUMBER_OF_S3TC_BLOCK_PIXELS; i++)
 		{
-			for (j = 0; j < 4; j++)
+			for (j = 0; j < NUMBER_OF_S3TC_COLOR_COMPONENTS; j++)
 			{
 				colorDst[i].rgba[j] = clut[pixbm & 3].rgba[j];
 			}
@@ -626,7 +631,7 @@ void DecodeBlockRGB__single_pixel(
 
 	if (pblockSrc == NULL)
 	{
-		memset(colorDst, 0, 16 * sizeof(*colorDst));
+		memset(colorDst, 0, NUMBER_OF_S3TC_BLOCK_PIXELS * sizeof(*colorDst));
 	}
 	else
 	{
@@ -657,7 +662,7 @@ void DecodeBlockRGB__single_pixel(
 		}
 		else
 		{
-			for (j = 0; j < 3; j++)
+			for (j = 0; j < NUMBER_OF_S3TC_COLOR_CHANNELS; j++)
 			{
 				clut[2].rgba[j] = (byte)((clut[0].rgba[j] + clut[1].rgba[j]) / 2);
 				clut[3].rgba[j] = 0;
@@ -682,7 +687,7 @@ void EncodeBlockAlpha4(
 	long i;
 	long j;
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < NUMBER_OF_S3TC_ALPHA4_ROWS; i++)
 	{
 		for (j = 3; j >= 0; j--)
 		{
@@ -706,7 +711,7 @@ void DecodeBlockAlpha4(
 
 	DecodeBlockRGB(&pblockSrc->rgb, colorDst);
 
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < NUMBER_OF_S3TC_ALPHA4_ROWS; i++)
 	{
 		alpha = pblockSrc->alphabm[i];
 
@@ -754,7 +759,7 @@ void EncodeBlockAlpha3(
 	alpha1 = colorSrc[0].rgba[3];
 	alpha0 = alpha1;
 
-	for (i = 1; i < 16; i++)
+	for (i = 1; i < NUMBER_OF_S3TC_BLOCK_PIXELS; i++)
 	{
 		alpha = colorSrc[i].rgba[3];
 
@@ -771,7 +776,7 @@ void EncodeBlockAlpha3(
 
 	if (alpha0 == 255 && alpha1 == 0)
 	{
-		for (i = 0; i < 16; i++)
+		for (i = 0; i < NUMBER_OF_S3TC_BLOCK_PIXELS; i++)
 		{
 			alpha = colorSrc[i].rgba[3];
 
@@ -811,7 +816,7 @@ void EncodeBlockAlpha3(
 		bias = range >> 1;
 		steps = six_alpha ? 5 : 7;
 
-		for (i = 15; i >= 0; i--)
+		for (i = NUMBER_OF_S3TC_BLOCK_PIXELS - 1; i >= 0; i--)
 		{
 			alphabm <<= 3;
 
@@ -905,7 +910,7 @@ void DecodeBlockAlpha3(
 		alpha[7] = 255;
 	}
 
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < NUMBER_OF_S3TC_BLOCK_PIXELS; i++)
 	{
 		if ((i & 7) == 0)
 		{

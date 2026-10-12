@@ -76,6 +76,16 @@ vassert(												\
 	)													\
 )
 
+#define assert_valid_real_rgb_color(color)					\
+vassert(													\
+	valid_real_rgb_color(color),							\
+	csprintf(												\
+		temporary,											\
+		"%s: assert_valid_real_rgb_color(%f, %f, %f)",		\
+		#color, (*color).red, (*color).green, (*color).blue	\
+	)														\
+)
+
 #define assert_valid_real_vector3d_axes2(forward, up)						\
 vassert(																	\
 	valid_real_vector3d_axes2(forward, up),									\

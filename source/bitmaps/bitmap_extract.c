@@ -630,12 +630,12 @@ static boolean extract_plateless_cube_map(
 			short face_index;
 			struct cube_map_face_source faces[NUMBER_OF_FACES_PER_CUBE] =
 			{
-				{ 0, 1, 1, 0, 0, 1, -1, 0 }, // middle row, column 0
-				{ 1, 1, 1, 1, -1, 0, 0, -1 }, // middle row, column 1
-				{ 2, 1, 0, 1, 0, -1, 1, 0 }, // middle row, column 2
-				{ 3, 1, 0, 0, 1, 0, 0, 1 }, // middle row, column 3
-				{ 0, 0, 1, 0, 0, 1, -1, 0 }, // top row, column 0
-				{ 0, 2, 1, 0, 0, 1, -1, 0 } // bottom row, column 0
+				{ 0, 1, 1, 0, 0, 1, -1, 0 },
+				{ 1, 1, 1, 1, -1, 0, 0, -1 },
+				{ 2, 1, 0, 1, 0, -1, 1, 0 },
+				{ 3, 1, 0, 0, 1, 0, 0, 1 },
+				{ 0, 0, 1, 0, 0, 1, -1, 0 },
+				{ 0, 2, 1, 0, 0, 1, -1, 0 }
 			};
 
 			for (face_index = 0; face_index < NUMBEROF(faces); face_index++)
@@ -1926,9 +1926,9 @@ static boolean process_sprites(
 	long budget_pixel_count = sprite_budget_count * page_size * page_size;
 	pixel32 sprite_usage_background_colors[NUMBER_OF_BITMAP_GROUP_SPRITE_USAGES] =
 	{
-		PIXEL32_FROM_ARGB(0, 0, 0, 0), // blend_add_sub_max
-		PIXEL32_FROM_ARGB(255, 255, 255, 255), // mul_min
-		PIXEL32_FROM_ARGB(127, 127, 127, 127) // double_multiply
+		PIXEL32_FROM_ARGB(0, 0, 0, 0),			// blend_add_sub_max
+		PIXEL32_FROM_ARGB(255, 255, 255, 255),	// mul_min
+		PIXEL32_FROM_ARGB(127, 127, 127, 127)	// double_multiply
 	};
 	short maximum_sprite_dimension = (short)(page_size - 2 * spacing);
 
