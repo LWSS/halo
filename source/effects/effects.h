@@ -20,6 +20,7 @@ header included in hcex build.
 
 /* ---------- prototypes/EFFECTS.C */
 
+void effect_stop(long effect_index, boolean and_delete);
 void effect_delete(long effect_index);
 void effects_disconnect_from_structure_bsp(void);
 void effects_reconnect_to_structure_bsp(void);

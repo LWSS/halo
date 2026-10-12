@@ -102,19 +102,19 @@ extern boolean render_model_nodes;
 
 /* ---------- public code */
 
-__inline short animation_choose_random_permutation(
-	long animation_graph_index,
-	short animation_index)
-{
-	return animation_choose_random_permutation_internal(animation_update_kind_affects_game_state, animation_graph_index, animation_index);
-}
-
 __inline short animation_update(
 	long animation_graph_index,
 	struct animation_state *state,
 	long *triggered_sound_index)
 {
 	return animation_update_internal(animation_update_kind_affects_game_state, animation_graph_index, state, triggered_sound_index);
+}
+
+__inline short animation_choose_random_permutation(
+	long animation_graph_index,
+	short animation_index)
+{
+	return animation_choose_random_permutation_internal(animation_update_kind_affects_game_state, animation_graph_index, animation_index);
 }
 
 #endif // __MODELS_H

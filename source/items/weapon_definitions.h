@@ -45,18 +45,137 @@ enum
 
 enum
 {
+	_weapon_secondary_trigger_normal = 0,
+	_weapon_secondary_trigger_slaved_to_primary,
+	_weapon_secondary_trigger_inhibits_primary,
+	_weapon_secondary_trigger_loads_alternate_ammunition,
+	_weapon_secondary_trigger_loads_multiple_primary_ammunition,
+	NUMBER_OF_WEAPON_SECONDARY_TRIGGER_MODES,
+};
+
+enum
+{
+	_weapon_function_none = 0,
+	_weapon_function_heat,
+	_weapon_function_primary_ammunition,
+	_weapon_function_secondary_ammunition,
+	_weapon_function_primary_rate_of_fire,
+	_weapon_function_secondary_rate_of_fire,
+	_weapon_function_ready,
+	_weapon_function_primary_ejection_port,
+	_weapon_function_secondary_ejection_port,
+	_weapon_function_overheated,
+	_weapon_function_primary_charged,
+	_weapon_function_secondary_charged,
+	_weapon_function_illumination,
+	_weapon_function_age,
+	_weapon_function_integrated_light,
+	_weapon_function_primary_firing,
+	_weapon_function_secondary_firing,
+	NUMBER_OF_WEAPON_FUNCTION_MODES,
+};
+
+enum
+{
 	_weapon_movement_penalty_always = 0,
 	_weapon_movement_penalty_when_zoomed,
 	_weapon_movement_penalty_when_zoomed_or_reloading,
 	NUMBER_OF_WEAPON_MOVEMENT_PENALTY_MODES,
 };
 
+enum
+{
+	_weapon_type_undefined = 0,
+	_weapon_type_shotgun,
+	_weapon_type_needler,
+	_weapon_type_plasma_pistol,
+	_weapon_type_plasma_rifle,
+	NUMBER_OF_WEAPON_TYPES,
+};
+
+enum
+{
+	_weapon_magazine_primary = 0,
+	_weapon_magazine_secondary,
+	MAXIMUM_NUMBER_OF_MAGAZINES_PER_WEAPON,
+};
+
+enum
+{
+	_weapon_magazine_wastes_rounds_when_reloaded_bit = 0,
+	_weapon_magazine_must_be_chambered_every_shot_bit,
+	NUMBER_OF_WEAPON_MAGAZINE_FLAGS,
+};
+
+enum
+{
+	_weapon_trigger_primary = 0,
+	_weapon_trigger_secondary,
+	MAXIMUM_NUMBER_OF_TRIGGERS_PER_WEAPON,
+};
+
+enum
+{
+	_weapon_trigger_tracks_projectile_bit = 0,
+	_weapon_trigger_random_firing_effects_bit,
+	_weapon_trigger_can_fire_with_partial_ammunition_bit,
+	_weapon_trigger_latched_bit,
+	_weapon_trigger_toggles_bit,
+	_weapon_trigger_uses_weapon_origin_bit,
+	_weapon_trigger_sticks_when_dropped_bit,
+	_weapon_trigger_ejection_port_during_chamber_animation_bit,
+	_weapon_trigger_discharging_spews_bit,
+	_weapon_trigger_analog_rate_of_fire_bit,
+	_weapon_trigger_use_error_when_unzoomed_bit,
+	_weapon_trigger_projectiles_cannot_be_aimed_bit,
+	_weapon_trigger_projectiles_have_identical_error_bit,
+	NUMBER_OF_WEAPON_TRIGGER_FLAGS,
+};
+
+enum
+{
+	_trigger_overcharged_none = 0,
+	_trigger_overcharged_explodes,
+	_trigger_overcharged_fire,
+	NUMBER_OF_TRIGGER_OVERCHARGED_ACTIONS,
+};
+
+enum
+{
+	_trigger_distribution_point = 0,
+	_trigger_distribution_horizontal_fan,
+	NUMBER_OF_TRIGGER_DISTRIBUTION_FUNCTIONS,
+};
+
+enum
+{
+	_trigger_firing_effect = 0,
+	_trigger_overheated_effect,
+	_trigger_empty_effect,
+	NUMBER_OF_TRIGGER_FIRING_EFFECTS,
+};
 
 /* ---------- macros */
 
 #define weapon_definition_get(index) ((struct weapon_definition *)tag_get(WEAPON_DEFINITION_TAG, index))
 
 /* ---------- structures */
+
+struct weapon_ammunition_object
+{
+	short rounds;
+	word unused[5];
+	struct tag_reference object;
+};
+
+struct trigger_firing_effect
+{
+	short shots_lower_bound;
+	short shots_upper_bound;
+	long unused[8];
+	struct tag_reference effects[NUMBER_OF_TRIGGER_FIRING_EFFECTS];
+	struct tag_reference damage_effects[NUMBER_OF_TRIGGER_FIRING_EFFECTS];
+};
 
 struct weapon_magazine_definition
 {
@@ -74,7 +193,7 @@ struct weapon_magazine_definition
 	struct tag_reference reloading_effect;
 	struct tag_reference chambering_effect;
 	long unused[3];
-	struct tag_block ammunition_objects;
+	struct tag_block ammunition_objects;	// weapon_ammunition_object
 };
 
 struct weapon_trigger_definition
@@ -129,7 +248,7 @@ struct weapon_trigger_definition
 	real runtime_rate_of_fire_deceleration_time;
 	real runtime_error_acceleration_time;
 	real runtime_error_deceleration_time;
-	struct tag_block firing_effects;
+	struct tag_block firing_effects;	// trigger_firing_effect
 };
 
 struct _weapon_definition
@@ -201,7 +320,9 @@ struct weapon_definition
 	struct _weapon_definition weapon;
 };
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/WEAPON_DEFINITIONS.C */
+
+real weapon_definition_get_damage_potential(long weapon_definition_index, real *rounds_per_second);
 
 /* ---------- globals */
 

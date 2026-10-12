@@ -12,6 +12,24 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	_material_effect_biped_walk = 0,
+	_material_effect_biped_run,
+	_material_effect_biped_sliding,
+	_material_effect_biped_shuffle,
+	_material_effect_biped_jump,
+	_material_effect_biped_jump_land,
+	_material_effect_biped_unused1,
+	_material_effect_biped_unused2,
+	_material_effect_impact,
+	_material_effect_vehicle_slip_nonmetallic,
+	_material_effect_vehicle_slip_metallic,
+	_material_effect_vehicle_unused1,
+	_material_effect_vehicle_unused2,
+	NUMBER_OF_MATERIAL_EFFECT_TYPES,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */

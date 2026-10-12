@@ -994,6 +994,8 @@ boolean actor_has_unlimited_grenades(long actor_index);
 
 /* ---------- prototypes/ACTOR_COMBAT.C */
 
+boolean actor_firing_blindly(long actor_index);
+long actor_aim_projectile(long actor_index, real_point3d const *origin, real_vector3d *vector, real *error_reference);
 long actor_aim_grenade(long actor_index, real_point3d const *origin, real_vector3d *vector);
 
 /* ---------- prototypes/ACTOR_LOOKING.C */

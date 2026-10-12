@@ -22,6 +22,14 @@ enum
 	ITEM_COLLECTION_DEFINITION_VERSION = 0,
 };
 
+enum
+{
+	_item_always_maintains_z_up_bit = 0,
+	_item_destroyed_by_explosions_bit,
+	_item_antigravity_bit,
+	NUMBER_OF_ITEM_DEFINITION_FLAGS,
+};
+
 /* ---------- macros */
 
 #define item_definition_get(index) ((struct item_definition *)tag_get(ITEM_DEFINITION_TAG, index))

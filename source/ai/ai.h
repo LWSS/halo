@@ -20,6 +20,25 @@ enum
 	NUMBER_OF_AI_LINE_OF_SIGHTS,
 };
 
+enum
+{
+	_ai_unit_effect_bump = 0,
+	_ai_unit_effect_shooting,
+	_ai_unit_effect_death_scream,
+	_ai_unit_effect_magic_sight,
+	NUMBER_OF_AI_UNIT_EFFECTS,
+};
+
+enum
+{
+	_ai_sound_volume_silent = 0,
+	_ai_sound_volume_medium,
+	_ai_sound_volume_loud,
+	_ai_sound_volume_shout,
+	_ai_sound_volume_quiet,
+	NUMBER_OF_AI_SOUND_VOLUMES,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
@@ -92,6 +111,10 @@ void ai_find_inactive_encounters(unsigned char *working_memory, short working_me
 boolean ai_release_inactive_encounters(char *result_description, unsigned char *more_to_release, unsigned char *working_memory, short working_memory_size);
 
 void ai_handle_damage(long unit_index, long shooter_object_index, short damage_category, float fraction, union real_vector3d *damage_velocity, boolean delayed);
+void ai_handle_deleted_object(long deleted_object_index);
+void ai_handle_unit_effect(long owner_unit_index, short effect_type, short volume);
+void ai_handle_enter_vehicle(long unit_index, long vehicle_index);
+void ai_handle_exit_vehicle(long unit_index, long vehicle_index);
 void ai_handle_spatial_effect(long object_index, real_point3d const *position, short effect_type, short volume, short count);
 
 void ai_globals_dialogue_triggers_enabled(boolean enable);

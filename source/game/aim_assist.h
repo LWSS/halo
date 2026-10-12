@@ -24,7 +24,9 @@ struct aim_assist_parameters
 	real unused;
 };
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/AIM_ASSIST.C */
+
+long player_aim_projectile(long player_index, real_point3d const *position, real_vector3d *direction);
 
 /* ---------- globals */
 

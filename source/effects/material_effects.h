@@ -14,7 +14,10 @@ header included in hcex build.
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/MATERIAL_EFFECTS.C */
+
+boolean material_effect_visible(real_point3d const *origin);
+void material_effect_new(long effects_definition_index, short effect_index, short material_index, real_point3d const *origin, real_vector3d const *normal, struct location const *location, real scale);
 
 /* ---------- globals */
 

@@ -18,18 +18,6 @@ header included in hcex build.
 
 enum
 {
-	_weapon_overheated_bit = 0,
-	_weapon_overheated_exit_bit,
-	_weapon_overheat_recoil_bit,
-	_weapon_needs_to_reload_bit,
-	_weapon_integrated_light_on_bit,
-	_weapon_multiplayer_inventory_flag,
-	_weapon_multiplayer_flag,
-	NUMBER_OF_WEAPON_FLAGS,
-};
-
-enum
-{
 	_weapon_state_idle = 0,
 	_weapon_state_primary_recoil,
 	_weapon_state_secondary_recoil,
@@ -65,6 +53,56 @@ enum
 	_magazine_unchambered,
 	_magazine_chambering,
 	NUMBER_OF_WEAPON_MAGAZINE_STATES,
+};
+
+enum
+{
+	_weapon_overheated_bit = 0,
+	_weapon_overheated_exit_bit,
+	_weapon_overheat_recoil_bit,
+	_weapon_needs_to_reload_bit,
+	_weapon_integrated_light_on_bit,
+	_weapon_multiplayer_inventory_flag,
+	_weapon_multiplayer_flag,
+	NUMBER_OF_WEAPON_FLAGS,
+};
+
+enum
+{
+	_weapon_control_integrated_light_bit = 0,
+	_weapon_control_primary_trigger_bit,
+	_weapon_control_secondary_trigger_bit,
+	_weapon_control_reload_bit,
+	_weapon_control_user_busy_bit,
+	_weapon_control_user_switching_weapons_bit,
+	_weapon_control_zoomed_bit,
+	NUMBER_OF_WEAPON_CONTROL_FLAGS,
+};
+
+enum
+{
+	_weapon_trigger_released_since_last_shot_bit = 0,
+	_weapon_trigger_was_down_bit,
+	_weapon_trigger_toggled_bit,
+	_weapon_trigger_useless_bit,
+	_weapon_trigger_blurred_bit,
+	_weapon_trigger_fired_before_charging_bit,
+	NUMBER_OF_WEAPON_TRIGGER_DATUM_FLAGS,
+};
+
+enum
+{
+	_first_person_animation_time_end = 0,
+	_first_person_animation_time_key,
+	NUMBER_OF_FIRST_PERSON_ANIMATION_TIME_MODES,
+};
+
+enum
+{
+	_shotgun_reload_type_first_round = 0,
+	_shotgun_reload_type_last_round,
+	_shotgun_reload_type_first_and_last_round,
+	NUMBER_OF_SHOTGUN_RELOAD_TYPES,
 };
 
 enum
@@ -159,7 +197,7 @@ struct weapon_trigger
 	real rate_of_fire;
 	real ejection_port_position;
 	real illumination;
-	real __noop;
+	real error;
 	long charging_effect_index;
 };
 
@@ -191,8 +229,8 @@ struct _weapon_datum
 	short recoil_recovery_time;
 	short shots_until_demotion;
 	short alternate_shots_loaded;
-	struct weapon_trigger triggers[2];
-	struct weapon_magazine magazines[2];
+	struct weapon_trigger triggers[MAXIMUM_NUMBER_OF_TRIGGERS_PER_WEAPON];
+	struct weapon_magazine magazines[MAXIMUM_NUMBER_OF_MAGAZINES_PER_WEAPON];
 	struct animation_state animation;
 	long overheated_effect_index;
 	long game_time_last_fired;
@@ -206,38 +244,63 @@ struct weapon_datum
 	struct _weapon_datum weapon;
 };
 
+struct weapon_interface_magazine_state
+{
+	boolean reloading;
+	boolean can_fire;
+	short rounds_loaded;
+	short rounds_loaded_maximum;
+	short rounds_remaining;
+	short rounds_remaining_maximum;
+};
+
+struct weapon_interface_state
+{
+	real heat;
+	real age;
+	boolean overheated;
+	short magazine_count;
+	struct weapon_interface_magazine_state magazines[MAXIMUM_NUMBER_OF_MAGAZINES_PER_WEAPON];
+};
+
 /* ---------- prototypes/WEAPONS.C */
 
 void weapons_initialize(void);
 void weapons_initialize_for_new_map(void);
 void weapons_dispose_from_old_map(void);
 void weapons_dispose(void);
-
-void weapon_place(long weapon_index, struct scenario_weapon_datum const *scenario_weapon);
-void weapon_preprocess_node_orientations(long weapon_index, struct real_orientation *node_orientations);
+long weapon_place(long weapon_index, struct scenario_weapon_datum const *scenario_weapon);
+boolean weapon_new(long weapon_index);
+void weapon_delete(long weapon_index);
+boolean weapon_update(long weapon_index);
+void weapon_export_function_values(long weapon_index);
+void weapon_preprocess_node_orientations(long weapon_index, real_orientation *node_orientations);
 char const *weapon_get_label(long weapon_index);
+boolean weapon_handle_potential_inventory_item(long weapon_index, long item_index, short local_player_parent_index, short *rounds_picked_up);
+void weapon_ready(long weapon_index);
+boolean weapon_put_away(long weapon_index, boolean immediate);
+void weapon_owner_update(long weapon_index, unsigned long control_flags, real primary_trigger);
+void weapon_build_weapon_interface_state(long weapon_index, struct weapon_interface_state *state);
+boolean weapon_reloading(long weapon_index);
 void weapon_set_integrated_light_power(long weapon_index, real light_power);
+boolean weapon_aim(long weapon_index, short trigger_index, real_point3d const *origin, real_point3d const *target_point, boolean lob, real_vector3d *result_aim_vector, real *result_ticks, real *result_distance, boolean *result_linear);
 real weapon_estimate_time_to_target(long weapon_index, short trigger_index, real target_distance);
 boolean weapon_can_be_fired(long weapon_index);
 boolean weapon_useful(long weapon_index);
 real weapon_compute_movement_penalty(long weapon_index, boolean forward, boolean zoomed);
+short weapon_rotate_zoom_level(long weapon_index, short zoom_level);
+real weapon_get_zoom_magnification(long weapon_index, short zoom_level);
+real weapon_get_field_of_view(long weapon_index, real default_field_of_view, short zoom_level);
+void weapon_melee_attack(long weapon_index);
 boolean weapon_must_be_readied(long weapon_index);
 boolean weapon_is_flag(long weapon_index);
+boolean weapon_prevents_melee_attack(long weapon_index);
 boolean weapon_prevents_grenade_throwing(long weapon_index);
-
-char const *weapon_get_label(long weapon_index);
-
-void weapon_ready(long weapon_index);
-void weapon_unready(long weapon_index);
-boolean weapon_put_away(long weapon_index, boolean immediate);
-
-void weapon_set_integrated_light_power(long weapon_index, real light_power);
-
-void weapon_owner_update(long weapon_index, word control_flags, real primary_trigger);
-
-boolean weapon_can_be_fired(long weapon_index);
-
+void weapon_stop_reload(long weapon_index);
 short weapon_get_first_person_animation_time(long weapon_index, short mode, short animation_type, short shotgun_reload_type);
+boolean weapon_overcharged(long weapon_index);
+void weapon_set_total_rounds(long weapon_index, short const *rounds_array);
+void weapon_set_current_amount(long weapon_index, real current_amount);
 
 /* ---------- globals */
 

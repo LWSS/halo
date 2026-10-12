@@ -160,7 +160,6 @@ struct scenario_weapon_datum
 	unsigned long unused[3];
 };
 
-
 struct scenario_object_name
 {
 	char name[TAG_STRING_LENGTH+1];

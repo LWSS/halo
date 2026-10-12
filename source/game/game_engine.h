@@ -100,6 +100,7 @@ long game_engine_remap_vehicle(long vehicle_definition_index);
 long game_engine_remap_equipment(long equipment_definition_index);
 long game_engine_remap_weapon(long weapon_definition_index);
 
+void game_engine_weapon_fired(long player_index);
 
 boolean game_engine_allow_integrated_lights(long object_index);
 

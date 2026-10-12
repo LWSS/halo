@@ -554,7 +554,9 @@ void unit_euler_aiming_update(
 	real angular_velocity_limit,
 	real angular_acceleration_limit);
 
+void unit_adjust_projectile_ray(long unit_index, real_point3d *origin, real_vector3d *forward, real *inherited_velocity, boolean offset_origin, boolean offset_aim);
 void unit_unzoom(long unit_index);
+void unit_handle_weapon_state_change(long unit_index, short new_weapon_state);
 
 void unit_destroy(long unit_index);
 void unit_died(long unit_index, boolean feigned);
