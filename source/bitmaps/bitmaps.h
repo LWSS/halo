@@ -145,8 +145,27 @@ void bitmap_cube_map_face_insert(struct bitmap_data const *face_bitmap, struct b
 
 /* ---------- prototypes/BITMAP_UTILITIES.C */
 
+void bitmap_fill(struct bitmap_data *bitmap, pixel32 color);
+void bitmap_alpha_to_rgb(struct bitmap_data *bitmap);
+struct bitmap_data *bitmap_clone(struct bitmap_data const *source_bitmap);
+struct bitmap_data *bitmap_shrink(struct bitmap_data const *source_bitmap, short scale, short alpha_bias, boolean ignore_zero_alpha);
+void bitmap_fade(struct bitmap_data *bitmap, pixel32 fade_color, real fade_amount);
+void bitmap_smooth(struct bitmap_data *bitmap, real filter_size);
+void bitmap_sharpen(struct bitmap_data *bitmap, real sharpen_amount);
+void bitmap_alpha_bleed(struct bitmap_data *bitmap, short passes);
+void bitmap_height_map(struct bitmap_data *bitmap, real bump_height);
+void bitmap_vector_map(struct bitmap_data *bitmap);
+void bitmap_compress_to_mipmap(struct bitmap_data const *source_bitmap, struct bitmap_data *destination_bitmap, short destination_mipmap_index, pixel32 const *transparent_color);
+void bitmap_uncompress_from_mipmap(struct bitmap_data const *source_bitmap, struct bitmap_data *destination_bitmap, short source_mipmap_index);
 real real_rgb_color_brightness(union real_rgb_color const *color);
+union hsv_color *rgb_color_to_hsv_color(union rgb_color const *rgb, union hsv_color *hsv);
+union rgb_color *hsv_color_to_rgb_color(union hsv_color const *hsv, union rgb_color *rgb);
+union real_hsv_color *real_rgb_color_to_real_hsv_color(union real_rgb_color const *rgb, union real_hsv_color *hsv);
+union real_rgb_color *real_hsv_color_to_real_rgb_color(union real_hsv_color const *hsv, union real_rgb_color *rgb);
+union real_argb_color *argb_color_to_real_argb_color(union argb_color const *argb, union real_argb_color *real_argb);
+union real_rgb_color *rgb_color_to_real_rgb_color(union rgb_color const *rgb, union real_rgb_color *real_rgb);
 union real_argb_color *pixel32_to_real_argb_color(pixel32 pixel, union real_argb_color *color);
+union real_rgb_color *pixel32_to_real_rgb_color(pixel32 color, union real_rgb_color *result);
 
 union real_rgb_color *rgb_colors_interpolate(
 	union real_rgb_color *rgb_result,
@@ -161,10 +180,6 @@ union real_rgb_color *rgb_colors_interpolate_and_scale(
 	union real_argb_color const *argb_upper_bound,
 	union real_rgb_color const *rgb_scale,
 	real u);
-
-/* ---------- prototypes/BITMAP_UTILITIES.C */
-
-union real_rgb_color *pixel32_to_real_rgb_color(pixel32 color, union real_rgb_color *result);
 
 /* ---------- prototypes/BITMAPS_QUANTITIZE.C */
 

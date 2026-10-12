@@ -47,6 +47,8 @@ enum
 
 /* ---------- prototypes/PERIODIC_FUNCTIONS.C */
 
+void periodic_functions_initialize(void);
+void periodic_functions_dispose(void);
 real periodic_function_evaluate(short function_type, real time);
 real transition_function_evaluate(short function_type, real value);
 

@@ -193,6 +193,18 @@ match_vassert(													\
 	)															\
 )
 
+#define match_assert_valid_real_rgb_color(file, line, color)	\
+match_vassert(													\
+	file,														\
+	line,														\
+	valid_real_rgb_color(color),								\
+	csprintf(													\
+		temporary,												\
+		"%s: assert_valid_real_rgb_color(%f, %f, %f)",			\
+		#color, (*color).red, (*color).green, (*color).blue		\
+	)															\
+)
+
 #define match_assert_valid_real_vector3d_axes2(file, line, forward, up)		\
 match_vassert(																\
 	file,																\
@@ -404,6 +416,13 @@ union real_argb_color
 };
 typedef union real_argb_color real_argb_color;
 
+union real_hsv_color
+{
+	real n[3];
+	struct { real hue, saturation, value; };
+};
+typedef union real_hsv_color real_hsv_color;
+
 /* ---------- prototypes/REAL_MATH.C */
 
 void real_math_initialize(void);
@@ -415,6 +434,7 @@ real_vector3d *perpendicular3d(real_vector3d const *a, real_vector3d *result);
 real_vector4d *perpendicular4d(real_vector4d const *a, real_vector4d *result);
 
 real_vector3d *rotate_vector_about_axis(real_vector3d *v, real_vector3d const *n, real sine, real cosine);
+boolean pin_normal_to_cone3d(real_vector3d const *normal, real_vector3d const *direction, real sine, real cosine, real_vector3d *result);
 
 void vectors_interpolate(real_vector3d const *a, real_vector3d const *b, real t, real_vector3d *result);
 void points_interpolate(real_point3d const *a, real_point3d const *b, real t, real_point3d *result);
@@ -429,7 +449,10 @@ void quaternions_interpolate(real_quaternion const *q0, real_quaternion const *q
 void quaternion_transform_point(real_quaternion const *q, real_point3d const *p, real_point3d *result);
 
 void vectors3d_from_euler_angles3d(real_vector3d *forward, real_vector3d *up, real_euler_angles3d const *angles);
+real vector_to_line_distance_squared3d(real_point3d const *point, real_vector3d const *vector, real_point3d const *base, real_vector3d const *height);
+boolean pill_test_vector3d(real_point3d const *base, real height, real width, real_point3d const *point, real_vector3d const *vector, real *t_reference, real_vector3d *normal);
 boolean fast_vector_intersects_sphere(real_point3d const *point, real_vector3d const *vector, real_point3d const *center, real radius);
+real fast_vector_intersection_with_sphere(real_point3d const *point, real_vector3d const *vector, real_point3d const *center, real radius);
 
 boolean point_in_rectangle2d(real_point2d const *point, real_rectangle2d const *bounds);
 boolean point_in_rectangle3d(real_point3d const *point, real_rectangle3d const *bounds);
@@ -1523,6 +1546,15 @@ __inline boolean valid_real_matrix4x3(
 		valid_real(matrix->scale) &&
 		valid_real_vector3d_axes3(&matrix->forward, &matrix->left, &matrix->up) &&
 		valid_real_point3d(&matrix->position);
+}
+
+__inline boolean valid_real_rgb_color(
+	real_rgb_color const *color)
+{
+	return valid_real(color->red) && valid_real(color->green) && valid_real(color->blue) &&
+		color->red >= 0.f && color->red <= 1.f &&
+		color->green >= 0.f && color->green <= 1.f &&
+		color->blue >= 0.f && color->blue <= 1.f;
 }
 
 // TODO: depends on byte_rectangle3d, need to include integer_math?

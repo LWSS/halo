@@ -42,43 +42,16 @@ struct S3TCBlockAlpha3
 
 /* ---------- prototypes/S3TC.C */
 
-void EncodeBlockRGBColorKey(
-	struct S3TC_COLOR *colorSrc,
-	struct S3TCBlockRGB *pblockDst,
-	byte alphaKey);
-void DecodeBlockRGB(
-	struct S3TCBlockRGB *pblockSrc,
-	struct S3TC_COLOR *colorDst);
-void DecodeBlockRGB__single_pixel(
-	struct S3TCBlockRGB const *pblockSrc,
-	struct S3TC_COLOR *colorDst,
-	short u,
-	short v);
-void DecodeBlockAlpha4(
-	struct S3TCBlockAlpha4 *pblockSrc,
-	struct S3TC_COLOR *colorDst);
-void DecodeBlockAlpha4__single_pixel(
-	struct S3TCBlockAlpha4 const *pblockSrc,
-	struct S3TC_COLOR *colorDst,
-	short u,
-	short v);
-void DecodeBlockAlpha3(
-	struct S3TCBlockAlpha3 *pblockSrc,
-	struct S3TC_COLOR *colorDst);
-void DecodeBlockAlpha3__single_pixel(
-	struct S3TCBlockAlpha3 const *pblockSrc,
-	struct S3TC_COLOR *colorDst,
-	short u,
-	short v);
-void EncodeBlockRGB(
-	struct S3TC_COLOR *colorSrc,
-	struct S3TCBlockRGB *pblockDst);
-void EncodeBlockAlpha4(
-	struct S3TC_COLOR *colorSrc,
-	struct S3TCBlockAlpha4 *pblockDst);
-void EncodeBlockAlpha3(
-	struct S3TC_COLOR *colorSrc,
-	struct S3TCBlockAlpha3 *pblockDst);
+void EncodeBlockRGB(struct S3TC_COLOR *colorSrc, struct S3TCBlockRGB *pblockDst);
+void EncodeBlockRGBColorKey(struct S3TC_COLOR *colorSrc, struct S3TCBlockRGB *pblockDst, byte alphaKey);
+void DecodeBlockRGB(struct S3TCBlockRGB *pblockSrc, struct S3TC_COLOR *colorDst);
+void DecodeBlockRGB__single_pixel(struct S3TCBlockRGB const *pblockSrc, struct S3TC_COLOR *colorDst, short u, short v);
+void EncodeBlockAlpha4(struct S3TC_COLOR *colorSrc, struct S3TCBlockAlpha4 *pblockDst);
+void DecodeBlockAlpha4(struct S3TCBlockAlpha4 *pblockSrc, struct S3TC_COLOR *colorDst);
+void DecodeBlockAlpha4__single_pixel(struct S3TCBlockAlpha4 const *pblockSrc, struct S3TC_COLOR *colorDst, short u, short v);
+void EncodeBlockAlpha3(struct S3TC_COLOR *colorSrc, struct S3TCBlockAlpha3 *pblockDst);
+void DecodeBlockAlpha3(struct S3TCBlockAlpha3 *pblockSrc, struct S3TC_COLOR *colorDst);
+void DecodeBlockAlpha3__single_pixel(struct S3TCBlockAlpha3 const *pblockSrc, struct S3TC_COLOR *colorDst, short u, short v);
 
 /* ---------- globals */
 

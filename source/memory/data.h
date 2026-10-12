@@ -66,7 +66,7 @@ void data_verify(struct data_array *data);
 
 boolean data_compress(void const *uncompressed_buffer, unsigned long uncompressed_size, void *compressed_buffer, unsigned long *compressed_size, unsigned long maximum_compressed_size);
 unsigned long data_decompressed_size(void const *compressed_buffer, unsigned long compressed_size);
-boolean data_decompress(void const *compressed_buffer, unsigned long compressed_size, void *decompressed_buffer, unsigned long *decompressed_size);
+boolean data_decompress(void const *compressed_buffer, unsigned long compressed_size, void *decompressed_buffer, unsigned long *decompressed_size, unsigned long maximum_decompressed_size);
 
 /* ---------- public code */
 
