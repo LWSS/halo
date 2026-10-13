@@ -624,7 +624,7 @@ void ai_communication_initialize(
 
 	if (!global_dialogue_events)
 	{
-		global_dialogue_events = game_state_malloc(
+		global_dialogue_events = (struct dialogue_event_status *)game_state_malloc(
 			"ai communication dialogue",
 			NULL,
 			NUMBER_OF_AI_COMMUNICATION_TEAMS * global_dialogue_event_count * sizeof(*global_dialogue_events));
@@ -640,7 +640,7 @@ void ai_communication_initialize(
 
 	if (!global_reply_events)
 	{
-		global_reply_events = game_state_malloc(
+		global_reply_events = (struct dialogue_event_status *)game_state_malloc(
 			"ai communication replies",
 			NULL,
 			NUMBER_OF_AI_COMMUNICATION_TEAMS * global_reply_event_count * sizeof(*global_reply_events));
@@ -1560,8 +1560,13 @@ void ai_communication_event(
 				}
 				else
 				{
-					match_assert("c:\\halo\\SOURCE\\ai\\ai_communication.c", 1579, (communication_team >= 0) && (communication_team < NUMBER_OF_AI_COMMUNICATION_TEAMS));
-					match_assert("c:\\halo\\SOURCE\\ai\\ai_communication.c", 1582, (communication_priority > _ai_communication_priority_none) && (communication_priority < NUMBER_OF_AI_COMMUNICATION_PRIORITIES));
+					match_assert("c:\\halo\\SOURCE\\ai\\ai_communication.c", 1579,
+						(communication_team >= 0) &&
+						(communication_team < NUMBER_OF_AI_COMMUNICATION_TEAMS));
+					match_assert("c:\\halo\\SOURCE\\ai\\ai_communication.c", 1582,
+						(communication_priority > _ai_communication_priority_none) &&
+						(communication_priority < NUMBER_OF_AI_COMMUNICATION_PRIORITIES));			
+					
 					sprintf(
 						classificationbuf,
 						"%s-%c%c%c%s",
@@ -2272,6 +2277,9 @@ void ai_communication_notify(
 	return;
 }
 
+
+/* ---------- private code */
+
 static long ai_communication_find_actor_to_reply_to_player(
 	long unit_index,
 	long target_unit_index,
@@ -2473,6 +2481,8 @@ static long ai_communication_find_actor_to_reply_to_player(
 
 	return reply_actor_index;
 }
+
+// NOTE: Bungie didn't follow coding standards here and placed public functions partway through the private section
 
 void ai_communication_finished(
 	long unit_index,
@@ -2697,7 +2707,9 @@ void ai_communication_finished(
 											speech.ai.look_priority = _secondary_look_priority_none;
 											speech.ai.look_type = _ai_information_look_none;
 											speech.ai.information_type = _ai_information_none;
+											
 											memset(&speech.ai.information_data, 0, sizeof(speech.ai.information_data));
+											
 											unit_speak(reply_unit_index, play_type, &speech);
 											ai_communication_update_speech_timers(
 												reply_unit_index,
@@ -2772,7 +2784,7 @@ static void actor_reset_idle_vocalization_timer(
 {
 	real idle_time;
 	struct actor_datum *actor = actor_get(actor_index);
-	struct actor_definition *definition = actor_definition_get(actor->meta.definition_index);
+	struct actor_definition const *definition = actor_definition_get(actor->meta.definition_index);
 	boolean in_combat = actor_in_combat(actor_index);
 	short delay_ticks = 0;
 
@@ -2815,34 +2827,30 @@ void actor_communication_update(
 			actor_reset_idle_vocalization_timer(actor_index);
 		}
 
-		if (actor->control.idle_vocalization_timer > 0)
+		if (actor->control.idle_vocalization_timer > 0 &&
+			--actor->control.idle_vocalization_timer == 0)
 		{
-			actor->control.idle_vocalization_timer--;
+			short vocalization_type = in_combat ? _vocalization_idle_combat : _vocalization_idle_noncombat;
+			long sound_definition_index = NONE;
+			short play_type = unit_test_speech(
+				actor->meta.unit_index,
+				_unit_speech_idle,
+				TRUE,
+				FALSE,
+				NULL,
+				&vocalization_type,
+				&sound_definition_index);
 
-			if (!actor->control.idle_vocalization_timer)
+			if (play_type > _unit_play_speech_none)
 			{
-				short vocalization_type = in_combat ? _vocalization_idle_combat : _vocalization_idle_noncombat;
-				long sound_definition_index = NONE;
-				short play_type = unit_test_speech(
-					actor->meta.unit_index,
-					_unit_speech_idle,
-					TRUE,
-					FALSE,
-					NULL,
-					&vocalization_type,
-					&sound_definition_index);
+				struct unit_speech_item speech;
 
-				if (play_type > _unit_play_speech_none)
-				{
-					struct unit_speech_item speech;
-
-					memset(&speech, 0, sizeof(speech));
-					speech.vocalization_type = vocalization_type;
-					speech.sound_definition_index = sound_definition_index;
-					speech.priority = _unit_speech_idle;
-					ai_communication_packet_new(&speech.ai);
-					unit_speak(actor->meta.unit_index, play_type, &speech);
-				}
+				memset(&speech, 0, sizeof(speech));
+				speech.vocalization_type = vocalization_type;
+				speech.sound_definition_index = sound_definition_index;
+				speech.priority = _unit_speech_idle;
+				ai_communication_packet_new(&speech.ai);
+				unit_speak(actor->meta.unit_index, play_type, &speech);
 			}
 		}
 	}
@@ -2890,7 +2898,8 @@ static boolean reply_filter_not_close(
 		{
 			struct prop_datum *prop = prop_get(prop_index);
 
-			if (prop->distance > 5.f || (prop->line_of_sight != _ai_line_of_sight_clear && prop->line_of_sight != _ai_line_of_sight_occluded))
+			if (prop->distance > 5.f ||
+				(prop->line_of_sight != _ai_line_of_sight_clear && prop->line_of_sight != _ai_line_of_sight_occluded))
 			{
 				result = TRUE;
 			}
@@ -3087,6 +3096,7 @@ static short ai_communication_consider_speech(
 	short play_type;
 
 	match_assert("c:\\halo\\SOURCE\\ai\\ai_communication.c", 3098, vocalization_type && sound_definition_index_reference && weight);
+
 	play_type = unit_test_speech(
 		unit_index,
 		speech_priority,
@@ -3683,7 +3693,7 @@ real ai_communication_get_player_rating(
 	unit_get_head_position(unit_index, &unit_head_position);
 	data_iterator_new(&iterator, player_data);
 
-	while (player = data_iterator_next(&iterator))
+	while (player = (struct player_datum *)data_iterator_next(&iterator))
 	{
 		if (player->unit_index != NONE)
 		{
@@ -3870,7 +3880,7 @@ short ai_conversation_status(
 
 	data_iterator_new(&iterator, conversation_data);
 
-	while (conversation = data_iterator_next(&iterator))
+	while (conversation = (struct conversation_datum *)data_iterator_next(&iterator))
 	{
 		if (conversation->conversation_definition_index == conversation_definition_index)
 		{
@@ -3936,7 +3946,7 @@ short ai_conversation_line(
 
 	data_iterator_new(&iterator, conversation_data);
 
-	while (conversation = data_iterator_next(&iterator))
+	while (conversation = (struct conversation_datum *)data_iterator_next(&iterator))
 	{
 		if (conversation->conversation_definition_index == conversation_definition_index)
 		{
@@ -3956,7 +3966,7 @@ void ai_conversation_stop(
 
 	data_iterator_new(&iterator, conversation_data);
 
-	while (conversation = data_iterator_next(&iterator))
+	while (conversation = (struct conversation_datum *)data_iterator_next(&iterator))
 	{
 		if (conversation->conversation_definition_index == conversation_definition_index)
 		{
@@ -3980,7 +3990,7 @@ void ai_conversation_advance(
 
 	data_iterator_new(&iterator, conversation_data);
 
-	while (conversation = data_iterator_next(&iterator))
+	while (conversation = (struct conversation_datum *)data_iterator_next(&iterator))
 	{
 		if (conversation->conversation_definition_index == conversation_definition_index)
 		{
@@ -4007,7 +4017,7 @@ void ai_conversation_update(
 
 	data_iterator_new(&iterator, conversation_data);
 
-	while (conversation = data_iterator_next(&iterator))
+	while (conversation = (struct conversation_datum *)data_iterator_next(&iterator))
 	{
 		struct ai_conversation *conversation_definition = ai_conversation_definition_get(conversation->conversation_definition_index);
 
@@ -4113,7 +4123,7 @@ void ai_conversation_actor_deleted(
 
 	data_iterator_new(&iterator, conversation_data);
 
-	while (conversation = data_iterator_next(&iterator))
+	while (conversation = (struct conversation_datum *)data_iterator_next(&iterator))
 	{
 		short participant_index;
 		struct ai_conversation *conversation_definition = ai_conversation_definition_get(conversation->conversation_definition_index);
@@ -4151,7 +4161,7 @@ void ai_conversation_unit_died(
 
 	data_iterator_new(&iterator, conversation_data);
 
-	while (conversation = data_iterator_next(&iterator))
+	while (conversation = (struct conversation_datum *)data_iterator_next(&iterator))
 	{
 		struct ai_conversation *conversation_definition = ai_conversation_definition_get(conversation->conversation_definition_index);
 		boolean abort = FALSE;
@@ -4246,6 +4256,7 @@ void ai_conversation_finish(
 
 		finished_conversation = conversation_get(conversation_index);
 		recent_index = ai_globals->recent_conversation_next_index;
+
 		ai_globals->recent_conversation_next_index = recent_index + 1;
 		ai_globals->recent_conversation_next_index %= (short)NUMBEROF(ai_globals->recent_conversations);
 		ai_globals->recent_conversation_count = MAX(ai_globals->recent_conversation_count, recent_index + 1);
@@ -4443,7 +4454,7 @@ static boolean ai_conversation_begin(
 
 			data_iterator_new(&iterator, player_data);
 
-			while (player = data_iterator_next(&iterator))
+			while (player = (struct player_datum *)data_iterator_next(&iterator))
 			{
 				if (player->unit_index != NONE)
 				{
@@ -4501,7 +4512,7 @@ static boolean ai_conversation_begin(
 
 		data_iterator_new(&iterator, player_data);
 
-		while ((player = data_iterator_next(&iterator)) && !looking)
+		while ((player = (struct player_datum *)data_iterator_next(&iterator)) && !looking)
 		{
 			if (player->unit_index != NONE)
 			{
@@ -4577,7 +4588,7 @@ static boolean ai_conversation_begin(
 	}
 	else
 	{
-		*continue_trying = wait && TEST_FLAG(conversation_definition->flags, _ai_conversation_keep_trying_to_play_bit);
+		*continue_trying = wait!=FALSE && TEST_FLAG(conversation_definition->flags, _ai_conversation_keep_trying_to_play_bit);
 	}
 
 	return success;
@@ -4599,7 +4610,7 @@ static long ai_conversation_new(
 
 		data_iterator_new(&iterator, conversation_data);
 
-		while (conversation = data_iterator_next(&iterator))
+		while (conversation = (struct conversation_datum *)data_iterator_next(&iterator))
 		{
 			if (conversation->scripted < oldest_scripted || conversation->creation_time < oldest_time)
 			{
@@ -5264,5 +5275,3 @@ static void ai_conversation_line_end(
 
 	return;
 }
-
-/* ---------- private code */
