@@ -1569,6 +1569,12 @@ __inline boolean valid_real_rgb_color(
 		color->blue >= 0.f && color->blue <= 1.f;
 }
 
+__inline boolean valid_real_argb_color(
+	real_argb_color const *color)
+{
+	return valid_real(color->alpha) && color->alpha >= 0.f && color->alpha <= 1.f && valid_real_rgb_color(&color->rgb);
+}
+
 // TODO: depends on byte_rectangle3d, need to include integer_math?
 /*
 __inline real_rectangle3d *dequantize_byte_to_real_rectangle3d(

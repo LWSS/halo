@@ -176,9 +176,12 @@ boolean game_engine_force_single_screen(void);
 void game_engine_update_non_deterministic(real seconds_elapsed);
 
 boolean game_engine_running(void);
+boolean game_engine_display_team_indicators(void);
+boolean game_engine_get_state_message(long player_index, wchar_t *buffer, long buffer_length);
 boolean game_engine_has_shield(long player_index);
 boolean game_engine_has_teams(void);
 boolean game_engine_hud_draw_motion_sensor(long player_index);
+boolean game_engine_hud_draw_messages(long player_index);
 
 real_point3d game_engine_get_goal_position(short goal_index);
 void game_engine_render_nav_points(short local_player_index);
