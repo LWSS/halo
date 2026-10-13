@@ -36,9 +36,100 @@ enum get_score_type
 	_get_score_team
 };
 
+enum
+{
+	MAXIMUM_GAME_VARIANT_NAME_LENGTH = 12	/* fake name */
+};
+
+enum
+{
+	_variant_is_system_default_bit = 0,
+	NUMBER_OF_GAME_VARIANT_FLAGS,
+
+	_default_variant_index_mask = 0xFFFFFF00
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
+
+struct universal_variant
+{
+	boolean teams;
+	byte pad0;
+	byte pad1;
+	byte pad2;
+	long flags;
+	long goal_radar;
+	boolean odd_man_out;
+	byte pad4;
+	byte pad5;
+	byte pad6;
+	long respawn_time_growth;
+	long respawn_time;
+	long suicide_penalty;
+	long lives;
+	real health;
+	long score_to_win;
+	long weapon_set;
+	long vehicle_set;
+};
+
+struct ctf_variant
+{
+	boolean assault;
+	boolean reset_on_capture;
+	boolean flag_must_reset;
+	boolean flag_at_home_to_score;
+	long single_flag_time;
+};
+
+struct slayer_variant
+{
+	boolean no_death_bonus;
+	boolean no_kill_penalty;
+	boolean kill_in_order;
+};
+
+struct king_variant
+{
+	boolean moving_hill;
+};
+
+struct oddball_variant
+{
+	boolean random_start;
+	boolean ball_spawn_delay;
+	long speed_with_ball;
+	long trait_with_ball;
+	long trait_without_ball;
+	long oddball_ball_type;
+	long ball_spawn_count;
+};
+
+struct race_variant
+{
+	long race_type;
+	long team_scoring;
+};
+
+union game_engine_variant
+{
+	struct ctf_variant ctf;
+	struct slayer_variant slayer;
+	struct king_variant king;
+	struct oddball_variant oddball;
+	struct race_variant race;
+};
+
+struct game_variant
+{
+	wchar_t human_readable_game_description[MAXIMUM_GAME_VARIANT_NAME_LENGTH];
+	long game_engine_index;
+	struct universal_variant universal_variant;
+	union game_engine_variant game_engine_variant;
+	word flags;
+};
 
 struct game_engine
 {
@@ -107,6 +198,35 @@ boolean game_engine_allow_dynamic_lighting(void);
 boolean game_engine_can_score(void);
 void game_engine_player_killed(long killing_player_index, long killing_object_index, long dead_player_index, boolean friendly_fire);
 real game_engine_get_damage_multiplier(long attacker_index, long defender_index);
+
+void game_engine_playlist_next(long, long, long);
+struct game_variant build_game_variant_slayer(void);
+struct game_variant build_game_variant_slayer_pro(void);
+struct game_variant build_game_variant_elimination(void);
+struct game_variant build_game_variant_phantoms(void);
+struct game_variant build_game_variant_endurance(void);
+struct game_variant build_game_variant_rockets(void);
+struct game_variant build_game_variant_snipers(void);
+struct game_variant build_game_variant_oddball(void);
+struct game_variant build_game_variant_reverse_tag(void);
+struct game_variant build_game_variant_accumulation(void);
+struct game_variant build_game_variant_juggernaut(void);
+struct game_variant build_game_variant_stalker(void);
+struct game_variant build_game_variant_king(void);
+struct game_variant build_game_variant_king_pro(void);
+struct game_variant build_game_variant_crazy_king(void);
+struct game_variant build_game_variant_race(void);
+struct game_variant build_game_variant_rally(void);
+struct game_variant build_game_variant_ctf(void);
+struct game_variant build_game_variant_invasion(void);
+struct game_variant build_game_variant_iron_ctf(void);
+struct game_variant build_game_variant_ctf_pro(void);
+struct game_variant build_game_variant_team_race(void);
+struct game_variant build_game_variant_team_rally(void);
+struct game_variant build_game_variant_team_oddball(void);
+struct game_variant build_game_variant_team_king(void);
+struct game_variant build_game_variant_team_slayer(void);
+void game_engine_variant_cleanup(struct game_variant *variant);
 
 /* ---------- prototypes/GAME_ENGINE_MULTIPLAYER_SOUNDS.C */
 

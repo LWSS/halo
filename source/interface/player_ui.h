@@ -19,6 +19,10 @@ header included in hcex build.
 short player_ui_get_single_player_local_player_controller(short local_player_index);
 boolean player_ui_local_player_wants_to_play_multiplayer(short local_player_index);
 boolean player_ui_rumble_disabled(short local_player_index);
+void player_ui_get_active_player_profile(short local_player_index, struct player_profile *profile);
+long player_ui_get_active_player_profile_index(short local_player_index);
+boolean player_ui_get_path_to_local_player_profile_directory(short local_player_index, char *full_path);
+void player_ui_set_active_player_profile(short local_player_index, long profile_index, struct player_profile *profile);
 
 /* ---------- globals */
 
