@@ -108,7 +108,7 @@ boolean file_read_only(struct file_reference *file);
 
 /* ---------- globals */
 
-extern char file_location_volume_names[NUMBER_OF_FILE_REFERENCE_LOCATIONS-1][256];
+extern char file_location_volume_names[NUMBER_OF_FILE_REFERENCE_LOCATIONS-1][MAXIMUM_FILENAME_LENGTH+1];
 
 /* ---------- public code */
 

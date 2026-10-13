@@ -450,6 +450,8 @@ long tag_iterator_next(
 	return tag_index;
 }
 
+// NOTE: Bungie didn't follow coding standards here and placed a private function partway through the public section
+
 static struct cache_file_tag_instance *cache_file_tag_instance_get(
 	long tag_index)
 {

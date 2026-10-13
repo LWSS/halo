@@ -46,19 +46,21 @@ enum
 
 enum
 {
-	LARGE_CACHED_MAP_FILE_SIZE = 0x11600000, /* fake name */
-	MEDIUM_CACHED_MAP_FILE_SIZE = 0x2300000, /* fake name */
-	SMALL_CACHED_MAP_FILE_SIZE = 0x2F00000, /* fake name */
+	LARGE_CACHED_MAP_FILE_SIZE = 0x11600000,	/* fake name */
+	MEDIUM_CACHED_MAP_FILE_SIZE = 0x2300000,	/* fake name */
+	SMALL_CACHED_MAP_FILE_SIZE = 0x2F00000,		/* fake name */
 };
 
 enum
 {
-	CACHE_FILE_READ_ALIGNMENT = 512, /* fake name */
+	CACHE_FILE_READ_ALIGNMENT = 512,				/* fake name */
 	CACHE_FILE_WINDOWS_THREAD_STACK_SIZE = 16*1024, /* fake name */
-	CACHED_MAP_FILE_BLOCK_TIMEOUT = 5000, /* fake name */
+	CACHED_MAP_FILE_BLOCK_TIMEOUT = 5000,			/* fake name */
 };
 
 /* ---------- macros */
+
+#define LAST_LANGUAGE_PATH "z:\\last_language.dat"	/* fake name */
 
 /* ---------- structures */
 
@@ -82,11 +84,11 @@ struct cache_request
 
 /* ---------- prototypes */
 
+static boolean cache_file_read_header_from_dvd(char const *name, struct cache_file_header *header);
 static void cached_map_issue_async_read(HANDLE file, OVERLAPPED *overlapped, void *buffer, long size, long offset, LPOVERLAPPED_COMPLETION_ROUTINE completion_routine, volatile boolean *completion_flag);
 static void cached_map_issue_async_write(HANDLE file, OVERLAPPED *overlapped, void *buffer, long size, long offset, LPOVERLAPPED_COMPLETION_ROUTINE completion_routine, volatile boolean *completion_flag);
-static void cached_map_issue_async_request(BOOL (__stdcall *async_request_function)(HANDLE, void *, unsigned long, OVERLAPPED *, LPOVERLAPPED_COMPLETION_ROUTINE), HANDLE file, OVERLAPPED *overlapped, void *buffer, long size, long offset, LPOVERLAPPED_COMPLETION_ROUTINE completion_routine, volatile boolean *completion_flag);
+static void cached_map_issue_async_request(BOOL(__stdcall *async_request_function)(HANDLE, LPVOID, DWORD, LPOVERLAPPED, LPOVERLAPPED_COMPLETION_ROUTINE), HANDLE file, OVERLAPPED *overlapped, void *buffer, long size, long offset, LPOVERLAPPED_COMPLETION_ROUTINE completion_routine, volatile boolean *completion_flag);
 static boolean cached_map_block_on_async_request(volatile boolean *completion_flag);
-static boolean cache_file_read_header_from_dvd(char const *name, struct cache_file_header *header);
 static struct cache_request *cache_request_get(short request_index);
 static short cache_request_next_free_index(void);
 static void cache_requests_flush(void);
@@ -130,7 +132,7 @@ void cache_files_initialize(
 	void)
 {
 	cache_file_globals.open_map_file_index = NONE;
-	cache_file_globals.requests = match_malloc("c:\\halo\\SOURCE\\cache\\cache_files_windows.c", 187, MAXIMUM_SIMULTANEOUS_CACHE_REQUESTS * sizeof(struct cache_request));
+	cache_file_globals.requests = (struct cache_request *)match_malloc("c:\\halo\\SOURCE\\cache\\cache_files_windows.c", 187, MAXIMUM_SIMULTANEOUS_CACHE_REQUESTS * sizeof(struct cache_request));
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_windows.c", 188, cache_file_globals.requests);
 	cache_file_windows_thread_create();
 	cache_files_zap_if_language_has_changed();
@@ -142,7 +144,10 @@ void cache_files_dispose(
 	void)
 {
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_windows.c", 207, cache_file_globals.open_map_file_index==NONE);
+
 	match_free("c:\\halo\\SOURCE\\cache\\cache_files_windows.c", 209, cache_file_globals.requests);
+
+	return;
 }
 
 boolean cache_file_open(
@@ -170,6 +175,8 @@ void cache_file_close(
 		cache_requests_flush();
 		cache_file_globals.open_map_file_index = NONE;
 	}
+
+	return;
 }
 
 short cache_file_read(
@@ -212,13 +219,17 @@ void cache_file_promote_read(
 	short request_index)
 {
 	cache_request_get(request_index)->blocking = TRUE;
+
+	return;
 }
+
+/* ---------- private code */
 
 static boolean cache_file_read_header_from_dvd(
 	char const *name,
 	struct cache_file_header *header)
 {
-	char path[256];
+	char path[MAXIMUM_FILENAME_LENGTH+1];
 	unsigned long bytes_read;
 	HANDLE file;
 	boolean success = FALSE;
@@ -259,6 +270,8 @@ static void cached_map_issue_async_read(
 		offset,
 		completion_routine,
 		completion_flag);
+
+	return;
 }
 
 static void cached_map_issue_async_write(
@@ -279,10 +292,12 @@ static void cached_map_issue_async_write(
 		offset,
 		completion_routine,
 		completion_flag);
+
+	return;
 }
 
 static void cached_map_issue_async_request(
-	BOOL (__stdcall *async_request_function)(HANDLE, void *, unsigned long, OVERLAPPED *, LPOVERLAPPED_COMPLETION_ROUTINE),
+	BOOL (__stdcall *async_request_function)(HANDLE, LPVOID, DWORD, LPOVERLAPPED, LPOVERLAPPED_COMPLETION_ROUTINE),
 	HANDLE file,
 	OVERLAPPED *overlapped,
 	void *buffer,
@@ -317,6 +332,8 @@ static void cached_map_issue_async_request(
 		SleepEx(0, TRUE);
 		SetLastError(ERROR_SUCCESS);
 	}
+
+	return;
 }
 
 static boolean cached_map_block_on_async_request(
@@ -355,6 +372,8 @@ void cache_file_block_until_not_busy(
 		}
 	}
 	while (busy);
+
+	return;
 }
 
 void tags_header_register_vertex_and_index_buffers(
@@ -377,6 +396,8 @@ void tags_header_register_vertex_and_index_buffers(
 
 		index_buffer->Common = 1 | D3DCOMMON_TYPE_INDEXBUFFER;
 	}
+
+	return;
 }
 
 void tags_header_deregister_vertex_and_index_buffers(
@@ -400,6 +421,8 @@ void tags_header_deregister_vertex_and_index_buffers(
 		IDirect3DIndexBuffer8_BlockUntilNotBusy(index_buffer);
 		match_assert("c:\\halo\\SOURCE\\cache\\cache_files_windows.c", 536, !IDirect3DIndexBuffer8_IsBusy(index_buffer));
 	}
+
+	return;
 }
 
 void structure_bsp_header_register_vertex_buffers(
@@ -422,6 +445,8 @@ void structure_bsp_header_register_vertex_buffers(
 		vertex_buffer->Common = 1 | D3DCOMMON_TYPE_VERTEXBUFFER;
 		IDirect3DVertexBuffer8_Register(vertex_buffer, NULL);
 	}
+
+	return;
 }
 
 void structure_bsp_header_deregister_vertex_buffers(
@@ -442,6 +467,8 @@ void structure_bsp_header_deregister_vertex_buffers(
 	}
 
 	rasterizer_globals.current_lock_operation = _rasterizer_lock_none;
+
+	return;
 }
 
 static struct cache_request *cache_request_get(
@@ -473,6 +500,8 @@ static short cache_request_next_free_index(
 			warned = TRUE;
 		}
 	}
+
+	return;
 }
 
 static void cache_requests_flush(
@@ -488,12 +517,14 @@ static void cache_requests_flush(
 
 		while (request->pending);
 	}
+
+	return;
 }
 
 static void cached_map_files_delete(
 	short map_file_index)
 {
-	char path[256];
+	char path[MAXIMUM_FILENAME_LENGTH+1];
 
 	for (map_file_index++; map_file_index < MAXIMUM_NUMBER_OF_CACHED_MAP_FILES; map_file_index++)
 	{
@@ -502,6 +533,8 @@ static void cached_map_files_delete(
 	}
 
 	SetLastError(ERROR_SUCCESS);
+
+	return;
 }
 
 static void cache_files_zap_if_language_has_changed(
@@ -512,7 +545,7 @@ static void cache_files_zap_if_language_has_changed(
 	unsigned long language = XGetLanguage();
 	unsigned long previous_language = NONE;
 
-	if (file_reference_create_from_path(&file, "z:\\last_language.dat", FALSE) && file_open(&file, FLAG(_permission_read_bit)))
+	if (file_reference_create_from_path(&file, LAST_LANGUAGE_PATH, FALSE) && file_open(&file, FLAG(_permission_read_bit)))
 	{
 		if (file_read(&file, sizeof(last_language), &last_language))
 		{
@@ -532,13 +565,15 @@ static void cache_files_zap_if_language_has_changed(
 		}
 	}
 
-	if (file_reference_create_from_path(&file, "z:\\last_language.dat", FALSE) &&
+	if (file_reference_create_from_path(&file, LAST_LANGUAGE_PATH, FALSE) &&
 		file_create(&file) &&
 		file_open(&file, FLAG(_permission_write_bit)))
 	{
 		file_write(&file, sizeof(language), &language);
 		file_close(&file);
 	}
+
+	return;
 }
 
 static void cached_map_files_open_all(
@@ -546,7 +581,7 @@ static void cached_map_files_open_all(
 {
 	struct cache_file_header new_header;
 	struct cache_file_header dvd_header;
-	char path[256];
+	char path[MAXIMUM_FILENAME_LENGTH+1];
 	OVERLAPPED overlapped;
 	short map_file_index;
 	boolean files_deleted = FALSE;
@@ -643,12 +678,16 @@ static void cached_map_files_open_all(
 			memset(&map_file->header, 0, sizeof(map_file->header));
 		}
 	}
+
+	return;
 }
 
 void cache_files_precache_set_priority(
 	boolean blocking)
 {
 	cache_copy_set_priority(blocking);
+
+	return;
 }
 
 boolean cache_files_precache_in_progress(
@@ -686,7 +725,7 @@ boolean cache_files_precache_map_begin(
 	boolean blocking)
 {
 	struct cache_file_header header;
-	char path[256];
+	char path[MAXIMUM_FILENAME_LENGTH+1];
 	boolean result;
 	char const *stripped_name = tag_name_strip_path(name);
 
@@ -770,6 +809,8 @@ void cache_files_precache_map_queue_end(
 {
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_windows.c", 1022, cache_file_globals.copy_in_progress);
 	cache_copy_queue_end();
+
+	return;
 }
 
 void cache_files_precache_map_end(
@@ -782,6 +823,8 @@ void cache_files_precache_map_end(
 	cached_map_file_read_header(cache_file_globals.copying_to_map_file_index);
 	cache_file_globals.copy_in_progress = FALSE;
 	cache_file_globals.copying_to_map_file_index = NONE;
+
+	return;
 }
 
 static void cached_map_file_set_modification_date(
@@ -793,12 +836,14 @@ static void cached_map_file_set_modification_date(
 	GetSystemTime(&system_time);
 	SystemTimeToFileTime(&system_time, &map_file->last_modification_date);
 	SetFileTime(map_file->handle, &map_file->last_modification_date, NULL, NULL);
+
+	return;
 }
 
 static void cached_map_file_read_header(
 	short map_file_index)
 {
-	char path[256];
+	char path[MAXIMUM_FILENAME_LENGTH+1];
 	OVERLAPPED overlapped;
 	volatile boolean read_complete;
 	struct cached_map_file *map_file = cached_map_file_get(map_file_index);
@@ -832,6 +877,8 @@ static void cached_map_file_read_header(
 			csprintf(temporary, "couldn't read header from cache file (#%d)", GetLastError()));
 		cached_map_file_invalidate(map_file_index);
 	}
+
+	return;
 }
 
 static short cached_map_files_find_map(
@@ -914,6 +961,8 @@ static void cached_map_file_invalidate(
 	short map_file_index)
 {
 	cached_map_file_get(map_file_index)->handle = INVALID_HANDLE_VALUE;
+
+	return;
 }
 
 static HANDLE cached_map_file_get_handle(
@@ -950,6 +999,8 @@ static void cached_map_file_get_path(
 	char *path)
 {
 	sprintf(path, "z:\\cache%03d.map", map_file_index);
+
+	return;
 }
 
 static void cache_file_windows_thread_create(
@@ -971,6 +1022,8 @@ static void cache_file_windows_thread_wake(
 	void)
 {
 	SetEvent(cache_file_globals.sleep_event);
+
+	return;
 }
 
 static unsigned long __stdcall cache_file_windows_thread_proc(
@@ -1017,6 +1070,8 @@ static unsigned long __stdcall cache_file_windows_thread_proc(
 		}
 		while (best_request);
 	}
+
+	return;
 }
 
 static void __stdcall cache_file_read_io_completion_routine(
@@ -1032,6 +1087,8 @@ static void __stdcall cache_file_read_io_completion_routine(
 	*(boolean *)finished_request->overlapped.hEvent = TRUE;
 	finished_request->pending = FALSE;
 	finished_request->running = FALSE;
+
+	return;
 }
 
 static void __stdcall cache_file_blocking_io_completion_routine(
@@ -1042,6 +1099,8 @@ static void __stdcall cache_file_blocking_io_completion_routine(
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_windows.c", 1405, error_code==ERROR_SUCCESS);
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_windows.c", 1406, overlapped->hEvent);
 	*(boolean *)overlapped->hEvent = TRUE;
+
+	return;
 }
 
 static void scenario_name_to_cache_file_path(
@@ -1049,6 +1108,6 @@ static void scenario_name_to_cache_file_path(
 	char *path)
 {
 	sprintf(path, "%s%s.map", cache_files_map_directory(), scenario_name);
-}
 
-/* ---------- private code */
+	return;
+}

@@ -207,7 +207,7 @@ static struct timing_globals timing_globals;	/* fake name */
 static char decompressor_error_string[256];		/* fake name */
 
 static struct simple_decompressor_definition *global_self = &decompress_globals;
-static long timing_frequency = 1; /* fake name */
+static long timing_frequency = 1;				/* fake name */
 
 /* ---------- public code */
 
@@ -409,6 +409,8 @@ void cache_copy_end(
 
 	return;
 }
+
+/* ---------- private code */
 
 static void cache_copy_initialize_zlib(
 	struct simple_decompressor_definition *self)
@@ -1307,5 +1309,3 @@ static void give_up_time_if_necessary(
 
 	return;
 }
-
-/* ---------- private code */

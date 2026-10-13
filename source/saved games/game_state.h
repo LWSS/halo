@@ -21,14 +21,14 @@ header included in hcex build.
 
 struct game_state_header
 {
-	unsigned long allocation_size_checksum; // 0x0
-	char map_name[256]; // 0x4
-	char build_number[32]; // 0x104 TAG_STRING_LENGTH+1
-	short player_count; // 0x124
-	short difficulty; // 0x126
-	unsigned long cache_file_checksum; // 0x128
-	long unused[7]; // 0x12C
-	unsigned long checksum; // 0x148
+	unsigned long allocation_size_checksum;
+	char map_name[MAXIMUM_FILENAME_LENGTH+1];
+	char build_number[TAG_STRING_LENGTH+1];
+	short player_count;
+	short difficulty;
+	unsigned long cache_file_checksum;
+	long unused[7];
+	unsigned long checksum;
 };
 
 /* ---------- prototypes/GAME_STATE.C */
