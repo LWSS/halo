@@ -571,9 +571,9 @@ void physics_update_new(
 
 	SET_FLAG(object->object.flags, _object_at_rest_bit, mass_points_at_rest_count == instance->physics->mass_points.count && mass_points_on_ground_count >= 3 && !mass_points_on_volatile_surface_count &&
 		magnitude_squared3d(&linear_velocity) <= SECONDS_PER_TICK*SECONDS_PER_TICK &&
-		magnitude_squared3d(&angular_velocity) <= (_half_pi*SECONDS_PER_TICK)*(_half_pi*SECONDS_PER_TICK) &&
+		magnitude_squared3d(&angular_velocity) <= (_pi2*SECONDS_PER_TICK)*(_pi2*SECONDS_PER_TICK) &&
 		magnitude_squared3d(&linear_acceleration) <= (0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK)*(0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK) &&
-		magnitude_squared3d(&angular_acceleration) <= (_half_pi*SECONDS_PER_TICK*SECONDS_PER_TICK)*(_half_pi*SECONDS_PER_TICK*SECONDS_PER_TICK));
+		magnitude_squared3d(&angular_acceleration) <= (_pi2*SECONDS_PER_TICK*SECONDS_PER_TICK)*(_pi2*SECONDS_PER_TICK*SECONDS_PER_TICK));
 	SET_FLAG(object->object.flags, _object_on_ground_bit, mass_points_on_ground_count > 0);
 	SET_FLAG(object->object.flags, _object_on_media_bit, mass_points_in_water_count > 0);
 	SET_FLAG(object->object.flags, _object_partially_under_media_bit, mass_points_in_water_count > 0);
@@ -1228,9 +1228,9 @@ static void physics_update_old(
 
 	{
 		real const translational_velocity_threshold = SECONDS_PER_TICK*SECONDS_PER_TICK;
-		real const angular_velocity_threshold = (_half_pi*SECONDS_PER_TICK)*(_half_pi*SECONDS_PER_TICK);
+		real const angular_velocity_threshold = (_pi2*SECONDS_PER_TICK)*(_pi2*SECONDS_PER_TICK);
 		real const translational_acceleration_threshold = (0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK)*(0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK);
-		real const angular_acceleration_threshold = (_half_pi*SECONDS_PER_TICK*SECONDS_PER_TICK)*(_half_pi*SECONDS_PER_TICK*SECONDS_PER_TICK);
+		real const angular_acceleration_threshold = (_pi2*SECONDS_PER_TICK*SECONDS_PER_TICK)*(_pi2*SECONDS_PER_TICK*SECONDS_PER_TICK);
 		real translational_velocity_squared = magnitude_squared3d(&object->object.translational_velocity);
 		real angular_velocity_squared = magnitude_squared3d(&object->object.angular_velocity);
 		real translational_acceleration_squared = magnitude_squared3d(&translational_acceleration);

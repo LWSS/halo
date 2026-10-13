@@ -588,7 +588,7 @@ void item_accelerate(
 					up = *global_up3d;
 				}
 
-				scale_vector3d(&up, real_random_range(-_half_pi, _half_pi), &angular_acceleration);
+				scale_vector3d(&up, real_random_range(-_pi2, _pi2), &angular_acceleration);
 				add_vectors3d(
 					&item->object.angular_velocity,
 					&angular_acceleration,
@@ -615,7 +615,7 @@ void item_accelerate(
 
 				scale_vector3d(
 					&random_angular_velocity,
-					real_random() * _half_pi * magnitude,
+					real_random() * _pi2 * magnitude,
 					&random_angular_velocity);
 				add_vectors3d(
 					&item->object.angular_velocity,

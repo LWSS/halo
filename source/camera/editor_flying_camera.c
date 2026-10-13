@@ -309,7 +309,7 @@ void editor_camera_set_position_and_roll(
 		euler_angles2d_from_vector3d(&editor_camera->orientation, &matrix.forward);
 		vector3d_from_euler_angles2d(&forward, &editor_camera->orientation);
 		hack_angles = editor_camera->orientation;
-		hack_angles.pitch += _half_pi;
+		hack_angles.pitch += _pi2;
 		vector3d_from_euler_angles2d(&up, &hack_angles);
 		normalize3d(&forward);
 		normalize3d(&up);

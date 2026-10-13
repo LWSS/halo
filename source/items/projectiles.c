@@ -353,7 +353,7 @@ boolean projectile_update(
 				&offset_angles,
 				_pi - periodic_function_evaluate(
 					_periodic_function_wander,
-					((game_time_get() + 3 * DATUM_INDEX_TO_IDENTIFIER(projectile_index)) & UNSIGNED_SHORT_MAX) / (3.f * TICKS_PER_SECOND)) * _half_pi,
+					((game_time_get() + 3 * DATUM_INDEX_TO_IDENTIFIER(projectile_index)) & UNSIGNED_SHORT_MAX) / (3.f * TICKS_PER_SECOND)) * _pi2,
 				periodic_function_evaluate(
 					_periodic_function_wander,
 					((game_time_get() + 7 * DATUM_INDEX_TO_IDENTIFIER(projectile_index)) & UNSIGNED_SHORT_MAX) / (3.f * TICKS_PER_SECOND)) * (2.f * _pi));
@@ -956,7 +956,7 @@ void projectile_accelerate(
 			random_direction3d(&random_angular_velocity);
 			scale_vector3d(
 				&random_angular_velocity,
-				real_random() * magnitude3d(acceleration) * _half_pi,
+				real_random() * magnitude3d(acceleration) * _pi2,
 				&random_angular_velocity);
 			add_vectors3d(
 				&projectile->object.angular_velocity,
@@ -1110,7 +1110,7 @@ static void projectile_collision(
 	}
 
 	velocity_into_surface = -dot_product3d(&collision->plane.n, new_velocity) + real_random_range(-material_response->velocity_noise, 0.f);
-	angle_of_incidence = angle_between_vectors3d(new_velocity, &collision->plane.n) - _half_pi + real_random_range(-material_response->angle_noise, material_response->angle_noise);
+	angle_of_incidence = angle_between_vectors3d(new_velocity, &collision->plane.n) - _pi2 + real_random_range(-material_response->angle_noise, material_response->angle_noise);
 
 	if (material_response->possible_response != _projectile_response_disappear &&
 		(material_response->possible_response_maximum_angle == 0.f || (angle_of_incidence >= material_response->possible_response_minimum_angle && angle_of_incidence <= material_response->possible_response_maximum_angle)) &&
@@ -1252,7 +1252,7 @@ static void projectile_collision(
 		effect_scale = velocity_fraction;
 		break;
 	case _projectile_material_response_scale_effects_by_angle:
-		effect_scale = angle_of_incidence * (1.f / _half_pi);
+		effect_scale = angle_of_incidence * (1.f / _pi2);
 		break;
 	}
 

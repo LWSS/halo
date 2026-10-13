@@ -357,7 +357,7 @@ short const communication_repeat_selection_time = 30 * TICKS_PER_SECOND;
 real const communication_player_absolute_range = 30.f;
 real const communication_player_ideal_range_min = 3.f;
 real const communication_player_ideal_range_max = 15.f;
-real const communication_player_ideal_fov = _sqrt_2 / 2.f;
+real const communication_player_ideal_fov = _sqrt2 / 2.f;
 real const communication_player_rating_low_priority = 2.f;
 
 struct dialogue_usage const global_dialogue_table[] =

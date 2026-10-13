@@ -731,7 +731,7 @@ static void observer_postcheck(
 	match_assert("c:\\halo\\SOURCE\\camera\\observer.c", 945, valid_world_real_point3d((real_point3d *) &observer->focus_offset));
 	match_assert("c:\\halo\\SOURCE\\camera\\observer.c", 946, valid_focus_distance(focus_distance));
 
-	observer->field_of_view = PIN(observer->field_of_view, 0.001f, _half_pi);
+	observer->field_of_view = PIN(observer->field_of_view, 0.001f, _pi2);
 	focus_position.x = PIN(focus_position.x, -MAXIMUM_WORLD_COORDINATE, MAXIMUM_WORLD_COORDINATE);
 	focus_position.y = PIN(focus_position.y, -MAXIMUM_WORLD_COORDINATE, MAXIMUM_WORLD_COORDINATE);
 	focus_position.z = PIN(focus_position.z, -MAXIMUM_WORLD_COORDINATE, MAXIMUM_WORLD_COORDINATE);

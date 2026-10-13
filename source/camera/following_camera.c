@@ -136,7 +136,7 @@ void following_camera_update(
 
 		facing = *player_control_get_facing_angles(controls->local_player_index);
 		facing.yaw += camera->facing_offset.yaw;
-		facing.pitch = PIN(facing.pitch + camera->facing_offset.pitch, -_half_pi, _half_pi);
+		facing.pitch = PIN(facing.pitch + camera->facing_offset.pitch, -_pi2, _pi2);
 		vector3d_from_euler_angles2d(&result->forward, &facing);
 		match_assert("c:\\halo\\SOURCE\\camera\\following_camera.c", 212, magnitude3d(&result->forward) > 0.9999f && magnitude3d(&result->forward) < 1.0001f);
 
@@ -199,7 +199,7 @@ static void camera_track_splut(
 	struct unit_camera_track const *unit_camera_track = camera->unit_camera_tracks.count ? TAG_BLOCK_GET_ELEMENT(&camera->unit_camera_tracks, MIN(_unit_camera_track_loose, camera->unit_camera_tracks.count - 1), struct unit_camera_track) : NULL;
 	long camera_track_index = unit_camera_track && unit_camera_track->track.index != NONE ? unit_camera_track->track.index : TAG_BLOCK_GET_ELEMENT(&scenario_get_game_globals()->camera, 0, struct game_globals_camera)->default_unit_camera_track.index;
 	struct camera_track_definition const *camera_track = camera_track_definition_get(camera_track_index);
-	real t = (pitch + _half_pi) / _pi;
+	real t = (pitch + _pi2) / _pi;
 	short start_index = (short)(t * (camera_track->control_points.count - 1));
 	short index = start_index;
 	real h = 1.f / (camera_track->control_points.count - 1);

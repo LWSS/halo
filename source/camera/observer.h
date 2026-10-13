@@ -66,7 +66,7 @@ enum
 #define valid_world_real(n) (valid_real(n) && (n) >= -MAXIMUM_WORLD_COORDINATE && (n) <= MAXIMUM_WORLD_COORDINATE)
 #define valid_world_real_point3d(point) (valid_world_real((point)->x) && valid_world_real((point)->y) && valid_world_real((point)->z))
 #define valid_focus_distance(distance) (valid_real(distance) && (distance) >= 0.f && (distance) <= MAXIMUM_WORLD_COORDINATE)
-#define valid_field_of_view(field_of_view) (valid_real(field_of_view) && (field_of_view) >= 0.001f && (field_of_view) <= _half_pi)
+#define valid_field_of_view(field_of_view) (valid_real(field_of_view) && (field_of_view) >= 0.001f && (field_of_view) <= _pi2)
 #define valid_timer(time) (valid_real(time) && (time) >= 0.f && (time) <= MAXIMUM_OBSERVER_TIMER)
 
 #define observer_valid_camera_command(command)																							\
