@@ -5,8 +5,9 @@ CACHE_FILES_DECOMPRESS_WINDOWS.C
 /* ---------- headers */
 
 #include "cseries.h"
-#include "zlib.h"
 #include "cache_files_decompress_windows.h"
+
+#include "zlib.h"
 
 /* ---------- constants */
 
@@ -71,23 +72,23 @@ enum
 
 enum
 {
-	_timing_file_data = 0, /* fake name */
-	_timing_read_file, /* fake name */
-	_timing_write_file, /* fake name */
-	_timing_zlib, /* fake name */
-	_timing_zlib_during_write_file, /* fake name */
-	_timing_thread_blocked, /* fake name */
-	_timing_thread_blocked_on_read, /* fake name */
-	_timing_thread_blocked_on_write, /* fake name */
-	_timing_copying, /* fake name */
-	NUMBER_OF_TIMINGS, /* fake name */
+	_timing_file_data = 0,				/* fake name */
+	_timing_read_file,					/* fake name */
+	_timing_write_file,					/* fake name */
+	_timing_zlib,						/* fake name */
+	_timing_zlib_during_write_file,		/* fake name */
+	_timing_thread_blocked,				/* fake name */
+	_timing_thread_blocked_on_read,		/* fake name */
+	_timing_thread_blocked_on_write,	/* fake name */
+	_timing_copying,					/* fake name */
+	NUMBER_OF_TIMINGS,					/* fake name */
 };
 
 enum
 {
-	COPY_THREAD_STACK_SIZE = 16*1024, /* fake name */
-	GARBAGE_BUFFER_FILL = 0xFD, /* fake name */
-	GARBAGE_DYNAMIC_DATA_FILL = 0xFA, /* fake name */
+	COPY_THREAD_STACK_SIZE = 16*1024,	/* fake name */
+	GARBAGE_BUFFER_FILL = 0xFD,			/* fake name */
+	GARBAGE_DYNAMIC_DATA_FILL = 0xFA,	/* fake name */
 };
 
 /* ---------- macros */
@@ -106,8 +107,8 @@ struct cache_copy_write_request
 
 struct timing_globals /* fake name */
 {
-	long totals[NUMBER_OF_TIMINGS]; /* fake name */
-	LARGE_INTEGER start_times[NUMBER_OF_TIMINGS]; /* fake name */
+	long totals[NUMBER_OF_TIMINGS];					/* fake name */
+	LARGE_INTEGER start_times[NUMBER_OF_TIMINGS];	/* fake name */
 };
 
 struct simple_decompressor_definition
@@ -202,8 +203,8 @@ static void give_up_time_if_necessary(void);
 boolean decompressor_print_timing = FALSE;
 
 static struct simple_decompressor_definition decompress_globals;
-static struct timing_globals timing_globals; /* fake name */
-static char decompressor_error_string[256]; /* fake name */
+static struct timing_globals timing_globals;	/* fake name */
+static char decompressor_error_string[256];		/* fake name */
 
 static struct simple_decompressor_definition *global_self = &decompress_globals;
 static long timing_frequency = 1; /* fake name */
@@ -246,6 +247,8 @@ void cache_copy_set_priority(
 	{
 		SetThreadPriority(global_self->copy_thread, THREAD_PRIORITY_NORMAL);
 	}
+
+	return;
 }
 
 void cache_copy_initialize(
@@ -270,6 +273,8 @@ void cache_copy_initialize(
 		NULL,
 		0,
 		NULL);
+
+	return;
 }
 
 boolean cache_copy_compressed_file_complete(
@@ -318,6 +323,8 @@ void cache_copy_begin(
 	{
 		match_vhalt("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 564, "previous copy session did not complete");
 	}
+
+	return;
 }
 
 short cache_copy_get_status(
@@ -382,6 +389,8 @@ void cache_copy_queue_end(
 	{
 		SetEvent(global_self->copy_stop_event);
 	}
+
+	return;
 }
 
 void cache_copy_end(
@@ -397,6 +406,8 @@ void cache_copy_end(
 	{
 		print_timing();
 	}
+
+	return;
 }
 
 static void cache_copy_initialize_zlib(
@@ -407,6 +418,8 @@ static void cache_copy_initialize_zlib(
 	self->zlib_stream.next_out = NULL;
 	self->zlib_stream.avail_out = 0;
 	inflateInit(&self->zlib_stream);
+
+	return;
 }
 
 static void cache_copy_dispose_zlib(
@@ -417,6 +430,8 @@ static void cache_copy_dispose_zlib(
 	self->zlib_stream.avail_in = 0;
 	self->zlib_stream.next_out = NULL;
 	self->zlib_stream.avail_out = 0;
+
+	return;
 }
 
 static void *cache_copy_compressed_alloc(
@@ -437,7 +452,9 @@ static void cache_copy_compressed_free(
 	void *address)
 {
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 710, (byte*)address<=global_self->next_allocation);
-	global_self->next_allocation = address;
+	global_self->next_allocation = (byte *)address;
+
+	return;
 }
 
 static unsigned long __stdcall simple_cache_copy_thread(
@@ -554,6 +571,8 @@ static unsigned long __stdcall simple_cache_copy_thread(
 		self->write_file_handle = NULL;
 		SetEvent(self->copy_complete_event);
 	}
+
+	return;
 }
 
 static void cache_copy_initialize_and_fill_with_garbage(
@@ -561,7 +580,7 @@ static void cache_copy_initialize_and_fill_with_garbage(
 {
 	short read_buffer_index;
 	short write_buffer_index;
-	byte *buffer = self->allocated_buffer;
+	byte *buffer = (byte *)self->allocated_buffer;
 
 	for (read_buffer_index = 0; read_buffer_index < NUMBER_OF_READ_BUFFERS; read_buffer_index++)
 	{
@@ -587,6 +606,8 @@ static void cache_copy_initialize_and_fill_with_garbage(
 		(byte *)self + _start_dynamic_data_offset,
 		GARBAGE_DYNAMIC_DATA_FILL,
 		_end_dynamic_data_offset - _start_dynamic_data_offset);
+
+	return;
 }
 
 static void cache_copy_initialize_read_data(
@@ -628,6 +649,8 @@ static void cache_copy_initialize_read_data(
 	self->next_write_sequence_index = 0;
 	self->write_requests_pending = 0;
 	self->current_write_buffer_index = NONE;
+
+	return;
 }
 
 static void cache_copy_initialize_file_data(
@@ -650,6 +673,8 @@ static void cache_copy_initialize_file_data(
 	self->current_request = NULL;
 	self->current_read_sequence_count = 0;
 	self->current_write_request = NULL;
+
+	return;
 }
 
 static void cache_copy_initialize_read_buffers(
@@ -665,6 +690,8 @@ static void cache_copy_initialize_read_buffers(
 		cache_copy_issue_read(self, read_buffer_index);
 		BIT_VECTOR_SET_FLAG(self->overlapped_in_use_flags, overlapped_index, TRUE);
 	}
+
+	return;
 }
 
 static void cache_copy_update_write_buffers(
@@ -719,6 +746,8 @@ static void cache_copy_update_write_buffers(
 		match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 1125, self->write_requests_pending<=NUMBER_OF_WRITE_BUFFERS);
 		match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 1126, self->write_requests[self->current_write_buffer_index].write_sequence_index+1==self->next_write_sequence_index);
 	}
+
+	return;
 }
 
 static void cache_copy_run_decompression(
@@ -743,7 +772,7 @@ static void cache_copy_run_decompression(
 			}
 
 			zlib_stream->avail_in = get_read_request_size(self, self->current_request);
-			zlib_stream->next_in = get_read_request_buffer(self, self->current_request);
+			zlib_stream->next_in = (Bytef *)get_read_request_buffer(self, self->current_request);
 			self->current_read_sequence_count = 1;
 			match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 1163, zlib_stream->avail_in==FILE_BLOCK_SIZE);
 		}
@@ -757,7 +786,7 @@ static void cache_copy_run_decompression(
 
 		if (!zlib_stream->avail_out)
 		{
-			zlib_stream->next_out = get_write_buffer(self, self->current_write_buffer_index);
+			zlib_stream->next_out = (Bytef *)get_write_buffer(self, self->current_write_buffer_index);
 			zlib_stream->avail_out = get_write_buffer_size(self, self->current_write_buffer_index);
 		}
 
@@ -815,6 +844,8 @@ static void cache_copy_run_decompression(
 			}
 		}
 	}
+
+	return;
 }
 
 void __stdcall cache_copy_FileIOCompletionRoutine(
@@ -870,6 +901,8 @@ void __stdcall cache_copy_FileIOCompletionRoutine(
 			set_copy_error(_copy_read_failed_bit);
 		}
 	}
+
+	return;
 }
 
 static void cache_copy_issue_read_internal(
@@ -914,6 +947,8 @@ static void cache_copy_issue_read_internal(
 	}
 
 	end_timing(_timing_read_file);
+
+	return;
 }
 
 static void cache_copy_issue_write_internal(
@@ -958,6 +993,8 @@ static void cache_copy_issue_write_internal(
 	}
 
 	end_timing(_timing_write_file);
+
+	return;
 }
 
 static void cache_copy_issue_read_raw(
@@ -967,6 +1004,8 @@ static void cache_copy_issue_read_raw(
 	long offset)
 {
 	cache_copy_issue_read_internal(self, buffer, size, offset, _raw_read_index);
+
+	return;
 }
 
 static void cache_copy_issue_write_raw(
@@ -976,6 +1015,8 @@ static void cache_copy_issue_write_raw(
 	long offset)
 {
 	cache_copy_issue_write_internal(self, buffer, size, offset, _raw_write_index);
+
+	return;
 }
 
 static void wait_for_raw_read(
@@ -986,6 +1027,8 @@ static void wait_for_raw_read(
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 1482, !BIT_VECTOR_TEST_FLAG(self->overlapped_in_use_flags, _raw_read_offset));
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 1483, wait_result==WAIT_IO_COMPLETION);
 	BIT_VECTOR_SET_FLAG(self->overlapped_in_use_flags, _raw_read_offset, FALSE);
+
+	return;
 }
 
 static void wait_for_raw_write(
@@ -998,6 +1041,8 @@ static void wait_for_raw_write(
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 1498, !BIT_VECTOR_TEST_FLAG(self->overlapped_in_use_flags, _raw_write_offset));
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 1499, wait_result==WAIT_IO_COMPLETION);
 	BIT_VECTOR_SET_FLAG(self->overlapped_in_use_flags, _raw_write_offset, FALSE);
+
+	return;
 }
 
 static void cache_copy_issue_read_request_internal(
@@ -1018,6 +1063,8 @@ static void cache_copy_issue_read_request_internal(
 	self->read_bytes_left -= size;
 	self->current_read_offset += size;
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 1537, self->current_read_offset<=self->read_file_size);
+
+	return;
 }
 
 static void cache_copy_issue_read_request(
@@ -1027,6 +1074,8 @@ static void cache_copy_issue_read_request(
 	short read_buffer_index = request - self->read_requests;
 
 	cache_copy_issue_read_request_internal(self, request, read_buffer_index);
+
+	return;
 }
 
 static void cache_copy_issue_read(
@@ -1037,6 +1086,8 @@ static void cache_copy_issue_read(
 
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 1561, read_buffer_index>=0 && read_buffer_index<NUMBER_OF_READ_BUFFERS);
 	cache_copy_issue_read_request_internal(self, request, read_buffer_index);
+
+	return;
 }
 
 struct cache_copy_read_request *acquire_read_request(
@@ -1089,6 +1140,8 @@ static void release_read_request(
 	BIT_VECTOR_SET_FLAG(self->overlapped_completed_flags, _read_buffer_base + read_buffer_index, FALSE);
 	request->read_sequence_index = NONE;
 	cache_copy_issue_read_request(self, request);
+
+	return;
 }
 
 static void *get_write_buffer(
@@ -1128,6 +1181,8 @@ static void cache_copy_issue_write(
 	self->current_write_offset += size;
 	self->write_bytes_left -= size;
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 1666, self->current_write_offset<=self->header.size);
+
+	return;
 }
 
 static boolean any_bit_vector_flag_set(
@@ -1139,7 +1194,7 @@ static boolean any_bit_vector_flag_set(
 
 	for (index = 0; index < size; index++)
 	{
-		result = result || bit_vector[index];
+		result = result!=FALSE || bit_vector[index];
 	}
 
 	return result;
@@ -1159,6 +1214,8 @@ static void wait_for_io_to_complete(
 
 	match_assert("c:\\halo\\SOURCE\\cache\\cache_files_decompress_windows.c", 1699, !any_bit_vector_flag_set(self->overlapped_in_use_flags, BIT_VECTOR_SIZE_IN_LONGS(NUMBER_OF_OVERLAPPED_STRUCTURES)));
 	memset(self->overlapped_completed_flags, 0, BIT_VECTOR_SIZE_IN_BYTES(NUMBER_OF_OVERLAPPED_STRUCTURES));
+
+	return;
 }
 
 static void set_copy_error(
@@ -1177,12 +1234,16 @@ static void initialize_timing(
 	void)
 {
 	memset(timing_globals.totals, 0, sizeof(timing_globals.totals));
+	
+	return;
 }
 
 static void begin_timing(
 	long timing_index)
 {
 	QueryPerformanceCounter(&timing_globals.start_times[timing_index]);
+
+	return;
 }
 
 static void end_timing(
@@ -1192,6 +1253,8 @@ static void end_timing(
 
 	QueryPerformanceCounter(&end_time);
 	timing_globals.totals[timing_index] += end_time.u.LowPart - timing_globals.start_times[timing_index].u.LowPart;
+
+	return;
 }
 
 static void print_timing(
@@ -1230,6 +1293,8 @@ static void print_timing(
 		_error_silent,
 		"    Total copying time: %.3f",
 		(real)timing_globals.totals[_timing_copying] / timing_frequency);
+
+	return;
 }
 
 static void give_up_time_if_necessary(
@@ -1239,6 +1304,8 @@ static void give_up_time_if_necessary(
 	{
 		SwitchToThread();
 	}
+
+	return;
 }
 
 /* ---------- private code */
