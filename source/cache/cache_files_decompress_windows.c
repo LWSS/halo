@@ -211,6 +211,8 @@ static long timing_frequency = 1;				/* fake name */
 
 /* ---------- public code */
 
+// NOTE: Bungie didn't follow coding standards here and placed private functions partway through the public section
+
 static boolean copy_should_stop(
 	void)
 {

@@ -94,8 +94,10 @@ void sound_cache_new(
 		sound_cache_locked_block_proc);
 	match_assert("c:\\halo\\SOURCE\\cache\\xbox_sound_cache.c", 73, xbox_sound_cache_globals.cache);
 
-	xbox_sound_cache_globals.base_address = physical_memory_get_sound_cache_base_address();
+	xbox_sound_cache_globals.base_address = (byte *)physical_memory_get_sound_cache_base_address();
 	match_assert("c:\\halo\\SOURCE\\cache\\xbox_sound_cache.c", 76, xbox_sound_cache_globals.base_address);
+
+	return;
 }
 
 void sound_cache_delete(
@@ -104,12 +106,16 @@ void sound_cache_delete(
 	data_dispose(xbox_sound_cache_globals.cache_sounds);
 	lruv_delete(xbox_sound_cache_globals.cache);
 	xbox_sound_cache_globals.base_address = NULL;
+
+	return;
 }
 
 void sound_cache_open(
 	void)
 {
 	data_make_valid(xbox_sound_cache_globals.cache_sounds);
+
+	return;
 }
 
 void sound_cache_flush(
@@ -120,13 +126,15 @@ void sound_cache_flush(
 
 	data_iterator_new(&iterator, xbox_sound_cache_globals.cache_sounds);
 
-	while (cache_sound = data_iterator_next(&iterator))
+	while (cache_sound = (struct cache_sound_datum *)data_iterator_next(&iterator))
 	{
 		if (!cache_sound->software_reference_count && !cache_sound->hardware_reference_count)
 		{
 			sound_cache_sound_delete(cache_sound->sound);
 		}
 	}
+
+	return;
 }
 
 void sound_cache_close(
@@ -137,12 +145,14 @@ void sound_cache_close(
 
 	data_iterator_new(&iterator, xbox_sound_cache_globals.cache_sounds);
 
-	while (cache_sound = data_iterator_next(&iterator))
+	while (cache_sound = (struct cache_sound_datum *)data_iterator_next(&iterator))
 	{
 		sound_cache_sound_delete(cache_sound->sound);
 	}
 
 	data_make_invalid(xbox_sound_cache_globals.cache_sounds);
+
+	return;
 }
 
 void sound_cache_idle(
@@ -150,6 +160,8 @@ void sound_cache_idle(
 {
 	lruv_idle(xbox_sound_cache_globals.cache);
 	match_vassert("c:\\halo\\SOURCE\\cache\\xbox_sound_cache.c", 148, !assertion_count, "hardware sound reference count failure.");
+
+	return;
 }
 
 void sound_cache_sound_new(
@@ -161,6 +173,8 @@ void sound_cache_sound_new(
 	sound->cache_block_index = NONE;
 	sound->cache_base_address = NULL;
 	sound->cache_tag_index = tag_index;
+
+	return;
 }
 
 void sound_cache_sound_delete(
@@ -192,6 +206,8 @@ void sound_cache_sound_delete(
 
 	sound->cache_block_index = NONE;
 	sound->cache_base_address = NULL;
+
+	return;
 }
 
 boolean _sound_cache_sound_request(
@@ -289,6 +305,8 @@ void sound_cache_sound_hardware_lock(
 	{
 		assertion_count++;
 	}
+
+	return;
 }
 
 void sound_cache_sound_hardware_unlock(
@@ -304,7 +322,11 @@ void sound_cache_sound_hardware_unlock(
 	{
 		assertion_count++;
 	}
+
+	return;
 }
+
+// NOTE: Bungie didn't follow coding standards here and placed private functions partway through the public section
 
 static boolean sound_cache_locked_block_proc(
 	long block_index)
@@ -333,6 +355,8 @@ static void sound_cache_delete_block_proc(
 	cache_sound->sound->cache_block_index = NONE;
 	cache_sound->sound->cache_base_address = NULL;
 	datum_delete(xbox_sound_cache_globals.cache_sounds, block_index);
+
+	return;
 }
 
 static char const *cache_block_get_sound_permutation_name(
@@ -388,6 +412,8 @@ static void sound_cache_start_loading_sound(
 			cache_block_get_sound_permutation_name);
 		sound_cache_last_blown_time = system_milliseconds();
 	}
+
+	return;
 }
 
 void sound_cache_debug_render(
@@ -445,6 +471,8 @@ void sound_cache_debug_render(
 			}
 		}
 	}
+
+	return;
 }
 
 /* ---------- private code */
@@ -462,6 +490,7 @@ static void render_inverse_transform_screen_point(
 		_lower_right,
 		_camera_position
 	};
+
 	real_vector3d across;
 	real_vector3d down;
 	real_point3d point;
@@ -483,4 +512,6 @@ static void render_inverse_transform_screen_point(
 	point_from_line3d(&render.frustum.world_vertices[_upper_left], &across, u, &point);
 	point_from_line3d(&point, &down, v, &point);
 	vector_from_points3d(world_pos, &point, world_vec);
+
+	return;
 }

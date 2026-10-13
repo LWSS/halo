@@ -351,6 +351,8 @@ static boolean cached_map_block_on_async_request(
 	return result;
 }
 
+// NOTE: Bungie didn't follow coding standards here and placed public functions partway through the private section
+
 void cache_file_block_until_not_busy(
 	void)
 {

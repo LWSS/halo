@@ -24,6 +24,8 @@ XBOX_TEXTURE_CACHE.C
 #include "terminal.h"
 #include "rasterizer_swizzle.h"
 #include "rasterizer/xbox/rasterizer_xbox.h"
+#include "render_debug.h"
+#include "draw_string.h"
 
 /* ---------- constants */
 
@@ -88,23 +90,17 @@ static unsigned long last_stabbed_time = 0; /* fake name */
 void texture_cache_new(
 	void)
 {
-	xbox_texture_cache_globals.textures = data_new(
-		"xbox texture",
-		MAXIMUM_CACHE_TEXTURES,
-		sizeof(struct texture_datum));
+	xbox_texture_cache_globals.textures = data_new("xbox texture", MAXIMUM_CACHE_TEXTURES, sizeof(struct texture_datum));
 	match_assert("c:\\halo\\SOURCE\\cache\\xbox_texture_cache.c", 98, xbox_texture_cache_globals.textures);
 
-	xbox_texture_cache_globals.cache = lruv_new(
-		"xbox texture cache",
-		TEXTURE_CACHE_PAGE_COUNT,
-		TEXTURE_CACHE_PAGE_SIZE_BITS,
-		MAXIMUM_CACHE_TEXTURES,
-		texture_cache_delete_block_proc,
-		texture_cache_locked_block_proc);
+	xbox_texture_cache_globals.cache = lruv_new("xbox texture cache", TEXTURE_CACHE_PAGE_COUNT, TEXTURE_CACHE_PAGE_SIZE_BITS,
+		MAXIMUM_CACHE_TEXTURES, texture_cache_delete_block_proc, texture_cache_locked_block_proc);
 	match_assert("c:\\halo\\SOURCE\\cache\\xbox_texture_cache.c", 102, xbox_texture_cache_globals.cache);
 
 	xbox_texture_cache_globals.base_address = physical_memory_get_texture_cache_base_address();
 	match_assert("c:\\halo\\SOURCE\\cache\\xbox_texture_cache.c", 105, xbox_texture_cache_globals.base_address);
+
+	return;
 }
 
 void texture_cache_delete(
@@ -112,12 +108,16 @@ void texture_cache_delete(
 {
 	data_dispose(xbox_texture_cache_globals.textures);
 	lruv_delete(xbox_texture_cache_globals.cache);
+
+	return;
 }
 
 void texture_cache_open(
 	void)
 {
 	data_make_valid(xbox_texture_cache_globals.textures);
+
+	return;
 }
 
 void texture_cache_close(
@@ -127,12 +127,16 @@ void texture_cache_close(
 
 	texture_cache_flush();
 	data_make_invalid(xbox_texture_cache_globals.textures);
+
+	return;
 }
 
 void texture_cache_idle(
 	void)
 {
 	lruv_idle(xbox_texture_cache_globals.cache);
+
+	return;
 }
 
 void texture_cache_bitmap_new(
@@ -152,6 +156,8 @@ void texture_cache_bitmap_new(
 	bitmap->cache_block_index = NONE;
 	bitmap->base_address = NULL;
 	bitmap->hardware_format = NULL;
+
+	return;
 }
 
 void texture_cache_bitmap_delete(
@@ -168,6 +174,8 @@ void texture_cache_bitmap_delete(
 		bitmap->cache_block_index = NONE;
 		bitmap->base_address = NULL;
 	}
+
+	return;
 }
 
 void *_texture_cache_bitmap_get_hardware_format(
@@ -175,7 +183,7 @@ void *_texture_cache_bitmap_get_hardware_format(
 	boolean block,
 	boolean load)
 {
-	IDirect3DBaseTexture8 *hardware_format = NULL;
+	void *hardware_format = NULL;
 
 	match_assert("c:\\halo\\SOURCE\\cache\\xbox_texture_cache.c", 210, load || !block);
 
@@ -288,6 +296,8 @@ void texture_cache_return_memory(
 		TEXTURE_CACHE_PAGE_COUNT << TEXTURE_CACHE_PAGE_SIZE_BITS,
 		PAGE_READWRITE | PAGE_WRITECOMBINE);
 	xbox_texture_cache_globals.stolen_memory = FALSE;
+
+	return;
 }
 
 void texture_cache_flush(
@@ -296,6 +306,8 @@ void texture_cache_flush(
 	IDirect3DDevice8_KickPushBuffer(global_d3d_device);
 	IDirect3DDevice8_IsBusy(global_d3d_device);
 	lruv_flush(xbox_texture_cache_globals.cache);
+
+	return;
 }
 
 static boolean texture_cache_locked_block_proc(
@@ -317,6 +329,8 @@ static void texture_cache_delete_block_proc(
 	texture->bitmap->cache_block_index = NONE;
 	texture->bitmap->base_address = NULL;
 	datum_delete(xbox_texture_cache_globals.textures, block_index);
+
+	return;
 }
 
 static char const *texture_cache_name_block_proc(
@@ -377,21 +391,22 @@ D3DFORMAT bitmap_format_to_d3d_format(
 		D3DFMT_L8,
 		D3DFMT_AL8,
 		D3DFMT_A8L8,
-		NONE,
-		NONE,
+		(D3DFORMAT)NONE,
+		(D3DFORMAT)NONE,
 		D3DFMT_R5G6B5,
-		NONE,
+		(D3DFORMAT)NONE,
 		D3DFMT_A1R5G5B5,
 		D3DFMT_A4R4G4B4,
 		D3DFMT_X8R8G8B8,
 		D3DFMT_A8R8G8B8,
-		NONE,
-		NONE,
+		(D3DFORMAT)NONE,
+		(D3DFORMAT)NONE,
 		D3DFMT_DXT1,
 		D3DFMT_DXT3,
 		D3DFMT_DXT5,
 		D3DFMT_P8
 	};
+
 	D3DFORMAT d3d_format;
 
 	match_assert("c:\\halo\\SOURCE\\cache\\xbox_texture_cache.c", 481, format>=0 && format<NUMBER_OF_BITMAP_FORMATS);
@@ -419,21 +434,22 @@ D3DFORMAT bitmap_format_to_d3d_linear_format(
 		D3DFMT_LIN_L8,
 		D3DFMT_LIN_AL8,
 		D3DFMT_LIN_A8L8,
-		NONE,
-		NONE,
+		(D3DFORMAT)NONE,
+		(D3DFORMAT)NONE,
 		D3DFMT_LIN_R5G6B5,
-		NONE,
+		(D3DFORMAT)NONE,
 		D3DFMT_LIN_A1R5G5B5,
 		D3DFMT_LIN_A4R4G4B4,
 		D3DFMT_LIN_X8R8G8B8,
 		D3DFMT_LIN_A8R8G8B8,
-		NONE,
-		NONE,
-		NONE,
-		NONE,
-		NONE,
-		NONE
+		(D3DFORMAT)NONE,
+		(D3DFORMAT)NONE,
+		(D3DFORMAT)NONE,
+		(D3DFORMAT)NONE,
+		(D3DFORMAT)NONE,
+		(D3DFORMAT)NONE
 	};
+
 	D3DFORMAT d3d_format;
 
 	match_assert("c:\\halo\\SOURCE\\cache\\xbox_texture_cache.c", 518, format>=0 && format<NUMBER_OF_BITMAP_FORMATS);
@@ -488,6 +504,8 @@ static void texture_cache_initialize_hardware_format(
 	}
 
 	IDirect3DBaseTexture8_Register(texture, bitmap->base_address);
+
+	return;
 }
 
 void texture_cache_debug_render(
@@ -556,7 +574,7 @@ void texture_cache_debug_render(
 
 		data_iterator_new(&iterator, xbox_texture_cache_globals.textures);
 
-		while (texture = data_iterator_next(&iterator))
+		while (texture = (struct texture_datum *)data_iterator_next(&iterator))
 		{
 			if (texture->bitmap->tag_index != NONE)
 			{
@@ -595,6 +613,8 @@ void texture_cache_debug_render(
 			rasterizer_draw_string(&bounds, NULL, NULL, 0, string);
 		}
 	}
+
+	return;
 }
 
 /* ---------- private code */
@@ -640,4 +660,6 @@ static void render_inverse_transform_screen_point(
 	point_from_line3d(&render.frustum.world_vertices[_upper_left], &across, u, &point);
 	point_from_line3d(&point, &down, v, &point);
 	vector_from_points3d(world_pos, &point, world_vec);
+
+	return;
 }
