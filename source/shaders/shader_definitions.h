@@ -15,6 +15,7 @@ header included in hcex build.
 enum
 {
 	SHADER_DEFINITION_TAG = 'shdr',
+	SHADER_DEFINITION_VERSION = 1,
 };
 
 enum

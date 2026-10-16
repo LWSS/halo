@@ -44,12 +44,12 @@ DAMAGE.C
 
 enum
 {
-	_damage_effect_marker_normal = 0, /* fake name */
-	_damage_effect_marker_incident, /* fake name */
-	_damage_effect_marker_negative_incident, /* fake name */
-	_damage_effect_marker_reflection, /* fake name */
-	_damage_effect_marker_gravity, /* fake name */
-	NUMBER_OF_DAMAGE_EFFECT_MARKERS, /* fake name */
+	_damage_effect_marker_normal = 0,			/* fake name */
+	_damage_effect_marker_incident,				/* fake name */
+	_damage_effect_marker_negative_incident,	/* fake name */
+	_damage_effect_marker_reflection,			/* fake name */
+	_damage_effect_marker_gravity,				/* fake name */
+	NUMBER_OF_DAMAGE_EFFECT_MARKERS,			/* fake name */
 };
 
 enum
@@ -59,12 +59,17 @@ enum
 		FLAG(_collision_test_front_facing_surfaces_bit) | FLAG(_collision_test_structure_bit) | _collision_test_objects_sight_blocking_flags,
 };
 
-#define MAXIMUM_SHIELD_OVERCHARGE 3.f /* fake name */
-#define SHIELD_OVERCHARGE_RATE (1.f / TICKS_PER_SECOND) /* fake name */
-#define SHIELD_OVERCHARGE_DECAY_RATE ((MAXIMUM_SHIELD_OVERCHARGE - 1.f) / (90 * TICKS_PER_SECOND)) /* fake name */
-#define DAMAGE_DECAY_RATE (0.5f / TICKS_PER_SECOND) /* fake name */
-#define RECENT_DAMAGE_DECAY_DELAY (2 * TICKS_PER_SECOND) /* fake name */
-#define DAMAGE_ACCELERATION_UPWARD_BIAS 0.45f /* fake name */
+enum
+{
+	NUMBER_OF_AREA_OF_EFFECT_CORE_RAYS = 4	/* fake name */
+};
+
+#define MAXIMUM_SHIELD_OVERCHARGE 3.f																/* fake name */
+#define SHIELD_OVERCHARGE_RATE (1.f / TICKS_PER_SECOND)												/* fake name */
+#define SHIELD_OVERCHARGE_DECAY_RATE ((MAXIMUM_SHIELD_OVERCHARGE - 1.f) / (90 * TICKS_PER_SECOND))	/* fake name */
+#define DAMAGE_DECAY_RATE (0.5f / TICKS_PER_SECOND)													/* fake name */
+#define RECENT_DAMAGE_DECAY_DELAY (2 * TICKS_PER_SECOND)											/* fake name */
+#define DAMAGE_ACCELERATION_UPWARD_BIAS 0.45f														/* fake name */
 
 /* ---------- prototypes */
 
@@ -162,50 +167,54 @@ real object_get_actual_body_vitality(
 	long object_index,
 	boolean ignore_difficulty)
 {
-	real body_vitality = object_get(object_index)->object.body_vitality;
-	real result = object_get_maximum_body_vitality(object_index, ignore_difficulty) * body_vitality;
+	struct object_datum const *object = object_get(object_index);
+	real vitality = object->object.body_vitality;
 
-	return result;
+	vitality *= object_get_maximum_body_vitality(object_index, ignore_difficulty);
+
+	return vitality;
 }
 
 real object_get_actual_shield_vitality(
 	long object_index,
 	boolean ignore_difficulty)
 {
-	real shield_vitality = object_get(object_index)->object.shield_vitality;
-	real result = object_get_maximum_shield_vitality(object_index, ignore_difficulty) * shield_vitality;
+	struct object_datum const *object = object_get(object_index);
+	real vitality = object->object.shield_vitality;
 
-	return result;
+	vitality *= object_get_maximum_shield_vitality(object_index, ignore_difficulty);
+
+	return vitality;
 }
 
 real object_get_maximum_body_vitality(
 	long object_index,
 	boolean ignore_difficulty)
 {
-	struct object_datum *object = object_get(object_index);
-	real result = object->object.maximum_body_vitality;
+	struct object_datum const *object = object_get(object_index);
+	real vitality = object->object.maximum_body_vitality;
 
 	if (!ignore_difficulty)
 	{
-		result *= game_difficulty_get_team_value(_game_difficulty_enemy_vitality_scale, object->object.owner_team_index);
+		vitality *= game_difficulty_get_team_value(_game_difficulty_enemy_vitality_scale, object->object.owner_team_index);
 	}
 
-	return result;
+	return vitality;
 }
 
 real object_get_maximum_shield_vitality(
 	long object_index,
 	boolean ignore_difficulty)
 {
-	struct object_datum *object = object_get(object_index);
-	real result = object->object.maximum_shield_vitality;
+	struct object_datum const *object = object_get(object_index);
+	real vitality = object->object.maximum_shield_vitality;
 
 	if (!ignore_difficulty)
 	{
-		result *= game_difficulty_get_team_value(_game_difficulty_enemy_shield_scale, object->object.owner_team_index);
+		vitality *= game_difficulty_get_team_value(_game_difficulty_enemy_shield_scale, object->object.owner_team_index);
 	}
 
-	return result;
+	return vitality;
 }
 
 void object_damage_update(
@@ -328,9 +337,7 @@ void object_damage_update(
 
 			if (object->object.body_damage_decay_timer != NONE)
 			{
-				object->object.body_damage_decay_timer++;
-
-				if (object->object.body_damage_decay_timer >= 0)
+				if (++object->object.body_damage_decay_timer >= 0)
 				{
 					object->object.current_body_damage -= DAMAGE_DECAY_RATE;
 				}
@@ -351,9 +358,7 @@ void object_damage_update(
 
 			if (object->object.shield_damage_decay_timer != NONE)
 			{
-				object->object.shield_damage_decay_timer++;
-
-				if (object->object.shield_damage_decay_timer >= 0)
+				if (++object->object.shield_damage_decay_timer >= 0)
 				{
 					object->object.current_shield_damage -= DAMAGE_DECAY_RATE;
 				}
@@ -598,7 +603,7 @@ static void area_of_effect_cause_damage_to_object(
 		normalize3d(perpendicular3d(&axis, &x_axis));
 		normalize3d(cross_product3d(&axis, &x_axis, &y_axis));
 
-		for (ray_index = 0; ray_index < 4; ray_index++)
+		for (ray_index = 0; ray_index < NUMBER_OF_AREA_OF_EFFECT_CORE_RAYS; ray_index++)
 		{
 			real_vector3d offset;
 			real_point3d offset_point;
@@ -1841,7 +1846,7 @@ void render_debug_object_damage(
 		char textstring[2048];
 		rectangle2d bounds = render.camera.window_bounds;
 
-		bounds.x0 += 320;
+		bounds.x0 += RASTERIZER_TARGET_RENDER_PRIMARY_WIDTH / 2;
 
 		if (damage_debug_object_index == NONE)
 		{

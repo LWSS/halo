@@ -42,7 +42,6 @@ enum
 	NUMBER_OF_LIGHTMAP_SAMPLE_RAYCASTS_SIDEWAYS = 4, /* fake name */
 };
 
-#define SQUARE_ROOT_ONE_HALF 0.70710678f /* fake name */
 #define MAXIMUM_SHADOW_VECTOR_COMPONENT 0.707f /* fake name */
 
 /* ---------- macros */
@@ -308,12 +307,9 @@ void sample_diffuse_texture(
 static boolean should_render_lights(
 	void)
 {
-	if (lights_game_globals->render_lights && game_engine_allow_dynamic_lighting())
-	{
-		return TRUE;
-	}
+	boolean result = lights_game_globals->render_lights && game_engine_allow_dynamic_lighting();
 
-	return FALSE;
+	return result;
 }
 
 void lights_initialize(
@@ -876,23 +872,17 @@ real object_get_self_illumination(
 	struct object_datum *object = object_get(object_index);
 	struct object_definition *definition = object_definition_get(object->definition_index);
 	real illumination = 0.f;
-	short attachment_index = 0;
+	short attachment_index;
 
-	if (definition->object.attachments.count > 0)
+	for (attachment_index = 0; attachment_index < definition->object.attachments.count; attachment_index++)
 	{
-		do
+		if (object->object.attachment_types[attachment_index] == _object_attachment_type_light &&
+			object->object.attachment_indices[attachment_index] != NONE)
 		{
-			if (object->object.attachment_types[attachment_index] == _object_attachment_type_light &&
-				object->object.attachment_indices[attachment_index] != NONE)
-			{
-				struct point_light *light = light_get(object->object.attachment_indices[attachment_index]);
+			struct point_light *light = light_get(object->object.attachment_indices[attachment_index]);
 
-				illumination += real_rgb_color_brightness(&light->color);
-			}
-
-			attachment_index++;
+			illumination += real_rgb_color_brightness(&light->color);
 		}
-		while (attachment_index < definition->object.attachments.count);
 	}
 
 	if (object->object.first_child_object_index != NONE)
@@ -1134,10 +1124,10 @@ void lights_prepare_for_object_static(
 			real_point3d sample_point;
 
 			sample_point.x =
-				(TEST_FLAG(sample_index, 0) ? SQUARE_ROOT_ONE_HALF : -SQUARE_ROOT_ONE_HALF) * object->object.bounding_sphere_radius +
+				(TEST_FLAG(sample_index, 0) ? _sqrt2 / 2.f : -_sqrt2 / 2.f) * object->object.bounding_sphere_radius +
 				object->object.bounding_sphere_center.x;
 			sample_point.y =
-				(TEST_FLAG(sample_index, 1) ? SQUARE_ROOT_ONE_HALF : -SQUARE_ROOT_ONE_HALF) * object->object.bounding_sphere_radius +
+				(TEST_FLAG(sample_index, 1) ? _sqrt2 / 2.f : -_sqrt2 / 2.f) * object->object.bounding_sphere_radius +
 				object->object.bounding_sphere_center.y;
 			sample_point.z = object->object.bounding_sphere_center.z;
 
