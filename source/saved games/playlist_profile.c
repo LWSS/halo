@@ -524,7 +524,7 @@ static unsigned long __stdcall playlist_profile_write_thread_proc(
 	if (saved_game_files_take_mutex())
 	{
 		boolean failed = FALSE;
-		struct playlist_profile_write_internal_input *thread_input = input;
+		struct playlist_profile_write_internal_input *thread_input = (struct playlist_profile_write_internal_input *)input;
 		long index = thread_input->index;
 		struct game_variant *variant = &thread_input->variant;
 

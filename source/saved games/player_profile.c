@@ -74,24 +74,24 @@ static unsigned long __stdcall player_profile_write_thread_proc(void *input);
 
 static pixel32 profile_color_table[NUMBER_OF_PRIMARY_COLORS] =
 {
-	PIXEL32_FROM_ARGB(0x00, 0xFF, 0xFF, 0xFF),
-	PIXEL32_FROM_ARGB(0x00, 0x00, 0x00, 0x00),
-	PIXEL32_FROM_ARGB(0x00, 0xFE, 0x00, 0x00),
-	PIXEL32_FROM_ARGB(0x00, 0x02, 0x01, 0xE3),
-	PIXEL32_FROM_ARGB(0x00, 0x70, 0x7E, 0x71),
-	PIXEL32_FROM_ARGB(0x00, 0xFF, 0xFF, 0x01),
-	PIXEL32_FROM_ARGB(0x00, 0x00, 0xFF, 0x01),
-	PIXEL32_FROM_ARGB(0x00, 0xFF, 0x56, 0xB9),
-	PIXEL32_FROM_ARGB(0x00, 0xAB, 0x10, 0xF4),
-	PIXEL32_FROM_ARGB(0x00, 0x01, 0xFF, 0xFF),
-	PIXEL32_FROM_ARGB(0x00, 0x64, 0x93, 0xED),
-	PIXEL32_FROM_ARGB(0x00, 0xFF, 0x7F, 0x00),
-	PIXEL32_FROM_ARGB(0x00, 0x1E, 0xCC, 0x91),
-	PIXEL32_FROM_ARGB(0x00, 0x00, 0x64, 0x01),
-	PIXEL32_FROM_ARGB(0x00, 0x60, 0x38, 0x14),
-	PIXEL32_FROM_ARGB(0x00, 0xC6, 0x9C, 0x6C),
-	PIXEL32_FROM_ARGB(0x00, 0x9D, 0x0B, 0x0E),
-	PIXEL32_FROM_ARGB(0x00, 0xF5, 0x99, 0x9E)
+	PIXEL32_FROM_ARGB(0, 255, 255, 255),
+	PIXEL32_FROM_ARGB(0, 0, 0, 0),
+	PIXEL32_FROM_ARGB(0, 254, 0, 0),
+	PIXEL32_FROM_ARGB(0, 2, 1, 227),
+	PIXEL32_FROM_ARGB(0, 112, 126, 113),
+	PIXEL32_FROM_ARGB(0, 255, 255, 1),
+	PIXEL32_FROM_ARGB(0, 0, 255, 1),
+	PIXEL32_FROM_ARGB(0, 255, 86, 185),
+	PIXEL32_FROM_ARGB(0, 171, 16, 244),
+	PIXEL32_FROM_ARGB(0, 1, 255, 255),
+	PIXEL32_FROM_ARGB(0, 100, 147, 237),
+	PIXEL32_FROM_ARGB(0, 255, 127, 0),
+	PIXEL32_FROM_ARGB(0, 30, 204, 145),
+	PIXEL32_FROM_ARGB(0, 0, 100, 1),
+	PIXEL32_FROM_ARGB(0, 96, 56, 20),
+	PIXEL32_FROM_ARGB(0, 198, 156, 108),
+	PIXEL32_FROM_ARGB(0, 157, 11, 14),
+	PIXEL32_FROM_ARGB(0, 245, 153, 158)
 };
 
 struct player_profile_globals player_profile_globals = {0};
@@ -641,7 +641,7 @@ static void player_profile_write(
 static unsigned long __stdcall player_profile_write_thread_proc(
 	void *input)
 {
-	struct player_profile_write_internal_input *thread_input = input;
+	struct player_profile_write_internal_input *thread_input = (struct player_profile_write_internal_input *)input;
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\player_profile.c", 727, input);
 

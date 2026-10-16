@@ -29,8 +29,8 @@ enum
 
 /* ---------- macros */
 
-#define GAME_STATE_FILE_NAME "savegame.bin"					/* fake name */
-#define GAME_STATE_FILE_PATH "z:\\" GAME_STATE_FILE_NAME	/* fake name */
+#define GAME_STATE_FILE_NAME "savegame.bin"						/* fake name */
+#define GAME_STATE_FILE_PATH "z:\\" GAME_STATE_FILE_NAME		/* fake name */
 #define CORE_DIRECTORY "d:\\core"								/* fake name */
 #define CORE_PATH_FORMAT CORE_DIRECTORY "\\%s"					/* fake name */
 
@@ -62,14 +62,17 @@ void *game_state_allocate_buffer(
 	void *result;
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 46, !xbox_game_state_globals.buffer_allocated);
+
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 48, address);
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 49, cpu_size>0);
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 50, gpu_size>0);
+
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 53, !(cpu_size&(CPU_PAGE_SIZE-1)));
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 54, !(gpu_size&(CPU_PAGE_SIZE-1)));
 
 	result = physical_memory_get_game_state_base_address();
+
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 58, result);
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 59, (unsigned long)result==address);
 
