@@ -37,6 +37,22 @@ enum
 	_error_controller_coop_controller_conflict,
 	_error_controller_coop_requires_two_controllers,
 	_error_controller_unused10,
+	_error_insert_quarter,
+	_error_warning_revert_to_saved_progress_will_be_lost,
+	_error_warning_restart_level_progress_will_be_lost,
+	_error_warning_delete_player_profile,
+	_error_warning_delete_multiplayer_profile,
+	_error_cannot_delete_default_game_settings,
+	_error_already_a_saved_game_file_with_that_name,
+	_error_warning_are_you_sure_you_want_to_discard_changes,
+	_error_cannot_create_saved_game_file_with_empty_name,
+	_error_warning_saving_checkpoint,
+	_error_warning_saved_game_file_damaged,
+	_error_warning_unused10,
+	_error_hard_drive_not_enough_free_space,
+	_error_hard_drive_maximum_saved_game_files,
+	_error_media_damaged,
+	_error_maximum_game_files_created,
 };
 
 /* ---------- macros */
