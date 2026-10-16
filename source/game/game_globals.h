@@ -344,6 +344,7 @@ struct game_globals
 
 /* ---------- prototypes/EXAMPLE.C */
 
+real game_difficulty_get_team_value(short value_type, short team_index);
 char const *material_get_name(short material_type);
 real game_difficulty_get_value(short value_type);
 

@@ -34,6 +34,21 @@ enum
 
 enum
 {
+	_damage_effect_dont_scale_damage_by_distance_bit = 0,
+	NUMBER_OF_DAMAGE_EFFECT_DEFINITION_FLAGS,
+};
+
+enum
+{
+	_damage_side_effect_none = 0,
+	_damage_side_effect_harmless,
+	_damage_side_effect_lethal_to_the_unsuspecting,
+	_damage_side_effect_emp,
+	NUMBER_OF_DAMAGE_SIDE_EFFECTS,
+};
+
+enum
+{
 	_damage_category_none = 0,
 	_damage_category_falling,
 	_damage_category_bullet,
@@ -48,6 +63,24 @@ enum
 	_damage_category_needle,
 	_damage_category_shotgun,
 	NUMBER_OF_DAMAGE_CATEGORIES,
+};
+
+enum
+{
+	_damage_does_not_hurt_owner_bit = 0,
+	_damage_can_cause_headshots_bit,
+	_damage_pings_resistant_units_bit,
+	_damage_does_not_hurt_friends_bit,
+	_damage_does_not_ping_units_bit,
+	_damage_detonates_explosives_bit,
+	_damage_only_hurts_shields_bit,
+	_damage_causes_flaming_death_bit,
+	_damage_draw_indicators_down_bit,
+	_damage_skips_shields_bit,
+	_damage_does_not_hurt_infection_forms_bit,
+	_damage_can_cause_multiplayer_headshots_bit,
+	_damage_infection_form_pop_bit,
+	NUMBER_OF_DAMAGE_DEFINITION_FLAGS,
 };
 
 /* ---------- macros */

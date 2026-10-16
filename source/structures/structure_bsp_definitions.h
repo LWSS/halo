@@ -76,6 +76,20 @@ struct structure_lens_flare_marker
 	byte lens_flare_index;
 };
 
+struct structure_subcluster
+{
+	real_rectangle3d world_bounds;
+	struct tag_block surface_indices;	// long
+};
+
+struct structure_mirror
+{
+	real_plane3d plane;
+	long unused[5];
+	struct tag_reference shader;	// _shader
+	struct tag_block points;		// real_point3d
+};
+
 struct structure_cluster
 {
 	short sky_index;
@@ -138,6 +152,14 @@ struct structure_weather_palette_entry
 	long wind_unused[11];
 };
 
+struct structure_weather_polyhedron
+{
+	real_point3d bounding_sphere_center;
+	real bounding_sphere_radius;
+	long unused;
+	struct tag_block planes;	// real_plane3d
+};
+
 struct structure_background_sound_palette_entry
 {
 	char name[TAG_STRING_LENGTH+1];
@@ -162,6 +184,11 @@ struct structure_leaf
 	short cluster_index;
 	short surface_reference_count;
 	long first_surface_reference_index;
+};
+
+struct structure_surface
+{
+	word vertex_indices[3];
 };
 
 struct structure_material
@@ -200,11 +227,11 @@ struct structure_bsp
 	long lonely_unused;
 	struct tag_block collision_materials;
 	struct tag_block collision_bsp;			// collision_bsp
-	struct tag_block nodes;
+	struct tag_block nodes;					// structure_node
 	real_rectangle3d world_bounds;
 	struct tag_block leaves;				// structure_leaf
-	struct tag_block surface_references;
-	struct tag_block surfaces;
+	struct tag_block surface_references;	// structure_surface_reference
+	struct tag_block surfaces;				// structure_surface
 	struct tag_block lightmaps;				// structure_lightmap
 	long render_unused[3];
 	struct tag_block lens_flares;
@@ -219,7 +246,7 @@ struct structure_bsp
 	struct tag_block fog_palette;
 	long fog_unused[6];
 	struct tag_block weather_palette;
-	struct tag_block weather_polyhedra;
+	struct tag_block weather_polyhedra;		// structure_weather_polyhedron
 	long weather_unused[6];
 	struct tag_block pathfinding_surfaces;
 	struct tag_block pathfinding_edges;
@@ -229,7 +256,7 @@ struct structure_bsp
 	long sound_unused[6];
 	struct tag_block markers;
 	struct tag_block detail_object_data;
-	struct tag_block runtime_decals;
+	struct tag_block runtime_decals;		// structure_runtime_decal
 	long diminishing_misc_unused[2];
 	struct leaf_map leaf_map;
 };

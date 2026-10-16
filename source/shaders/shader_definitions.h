@@ -14,6 +14,12 @@ header included in hcex build.
 
 enum
 {
+	SHADER_DEFINITION_TAG = 'shdr',
+	SHADER_DEFINITION_VERSION = 1,
+};
+
+enum
+{
 	_shader_type_screen = 0,
 	_shader_type_effect,
 	_shader_type_decal,
@@ -154,6 +160,8 @@ enum
 };
 
 /* ---------- macros */
+
+#define shader_definition_get(index) ((struct shader *)tag_get(SHADER_DEFINITION_TAG, (index))) /* fake name */
 
 /* ---------- structures */
 
