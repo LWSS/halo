@@ -23,6 +23,7 @@ PLAYER_PROFILE.C
 #include "shell.h"
 #include "bungie_net/common/thread.h"
 #include "input_device_defaults.h"
+#include "bitmap_macros.h"
 
 /* ---------- constants */
 
@@ -71,26 +72,26 @@ static unsigned long __stdcall player_profile_write_thread_proc(void *input);
 
 /* ---------- globals */
 
-static long profile_color_table[NUMBER_OF_PRIMARY_COLORS] =
+static pixel32 profile_color_table[NUMBER_OF_PRIMARY_COLORS] =
 {
-	0x00FFFFFF,
-	0x00000000,
-	0x00FE0000,
-	0x000201E3,
-	0x00707E71,
-	0x00FFFF01,
-	0x0000FF01,
-	0x00FF56B9,
-	0x00AB10F4,
-	0x0001FFFF,
-	0x006493ED,
-	0x00FF7F00,
-	0x001ECC91,
-	0x00006401,
-	0x00603814,
-	0x00C69C6C,
-	0x009D0B0E,
-	0x00F5999E
+	PIXEL32_FROM_ARGB(0x00, 0xFF, 0xFF, 0xFF),
+	PIXEL32_FROM_ARGB(0x00, 0x00, 0x00, 0x00),
+	PIXEL32_FROM_ARGB(0x00, 0xFE, 0x00, 0x00),
+	PIXEL32_FROM_ARGB(0x00, 0x02, 0x01, 0xE3),
+	PIXEL32_FROM_ARGB(0x00, 0x70, 0x7E, 0x71),
+	PIXEL32_FROM_ARGB(0x00, 0xFF, 0xFF, 0x01),
+	PIXEL32_FROM_ARGB(0x00, 0x00, 0xFF, 0x01),
+	PIXEL32_FROM_ARGB(0x00, 0xFF, 0x56, 0xB9),
+	PIXEL32_FROM_ARGB(0x00, 0xAB, 0x10, 0xF4),
+	PIXEL32_FROM_ARGB(0x00, 0x01, 0xFF, 0xFF),
+	PIXEL32_FROM_ARGB(0x00, 0x64, 0x93, 0xED),
+	PIXEL32_FROM_ARGB(0x00, 0xFF, 0x7F, 0x00),
+	PIXEL32_FROM_ARGB(0x00, 0x1E, 0xCC, 0x91),
+	PIXEL32_FROM_ARGB(0x00, 0x00, 0x64, 0x01),
+	PIXEL32_FROM_ARGB(0x00, 0x60, 0x38, 0x14),
+	PIXEL32_FROM_ARGB(0x00, 0xC6, 0x9C, 0x6C),
+	PIXEL32_FROM_ARGB(0x00, 0x9D, 0x0B, 0x0E),
+	PIXEL32_FROM_ARGB(0x00, 0xF5, 0x99, 0x9E)
 };
 
 struct player_profile_globals player_profile_globals = {0};
@@ -265,9 +266,9 @@ real_rgb_color player_profile_get_rgb_color(
 	index = MAX(0, index);
 	color_value = profile_color_table[index];
 
-	color.red = ((color_value >> 16) & 0xFF) / 255.f;
-	color.green = ((color_value >> 8) & 0xFF) / 255.f;
-	color.blue = (color_value & 0xFF) / 255.f;
+	color.red = PIXEL32_RED(color_value) / 255.f;
+	color.green = PIXEL32_GREEN(color_value) / 255.f;
+	color.blue = PIXEL32_BLUE(color_value) / 255.f;
 
 	return color;
 }
@@ -336,7 +337,7 @@ void player_profile_save_level_completed(
 	if (player_profile_index != NONE)
 	{
 		player_ui_get_active_player_profile(local_player_index, &profile);
-		profile.single_player_map_flags[level] |= FLAG(difficulty);
+		SET_FLAG(profile.single_player_map_flags[level], difficulty, TRUE);
 		player_profile_write(player_profile_index, &profile);
 		player_ui_set_active_player_profile(local_player_index, player_profile_index, &profile);
 	}
@@ -413,7 +414,7 @@ static void player_profile_create_default_profiles_on_disk(
 		_snprintf(
 			full_path,
 			MAXIMUM_FILENAME_LENGTH,
-			"z:\\saved\\player_profiles\\default_profile\\%02d.sav",
+			DEFAULT_PLAYER_PROFILE_PATH_FORMAT,
 			i);
 
 		if (file_reference_create_from_path(&file, full_path, FALSE))
@@ -464,7 +465,7 @@ static void build_default_profile(
 	profile->controller_settings.flight_stick_aircraft_controls = FALSE;
 	profile->controller_settings.ingame_help_disabled = FALSE;
 	SET_FLAG(profile->flags, _profile_is_default_bit, TRUE);
-	profile->flags |= i << 8;
+	profile->flags |= i << CHAR_BITS;
 	profile->controller_settings.vibration_disabled = FALSE;
 	profile->last_single_player_map_played = 0;
 
@@ -553,7 +554,7 @@ static boolean player_profile_read(
 							sanitized_profile.player_name,
 							saved_game_file_get_display_name(index),
 							MAXIMUM_PLAYER_PROFILE_NAME_LENGTH);
-						sanitized_profile.player_name[MAXIMUM_PLAYER_PROFILE_NAME_LENGTH] = 0;
+						sanitized_profile.player_name[MAXIMUM_PLAYER_PROFILE_NAME_LENGTH] = '\0';
 						memcpy(profile, &sanitized_profile, sizeof(*profile));
 					}
 
@@ -599,7 +600,7 @@ static boolean player_profile_read(
 			sanitized_profile.player_name,
 			saved_game_file_get_display_name(index),
 			MAXIMUM_PLAYER_PROFILE_NAME_LENGTH);
-		sanitized_profile.player_name[MAXIMUM_PLAYER_PROFILE_NAME_LENGTH] = 0;
+		sanitized_profile.player_name[MAXIMUM_PLAYER_PROFILE_NAME_LENGTH] = '\0';
 		memcpy(profile, &sanitized_profile, sizeof(*profile));
 
 		success = TRUE;
@@ -727,7 +728,7 @@ long player_profile_new(
 			profile->controller_settings.joystick_preset = _joystick_preset_standard;
 			profile->flags = 0;
 			ustrncpy(profile->player_name, name, MAXIMUM_PLAYER_PROFILE_NAME_LENGTH);
-			profile->player_name[MAXIMUM_PLAYER_PROFILE_NAME_LENGTH] = 0;
+			profile->player_name[MAXIMUM_PLAYER_PROFILE_NAME_LENGTH] = '\0';
 
 			error(_error_silent, "### DEBUG unlocking all solo levels for newly created profile");
 
@@ -737,7 +738,7 @@ long player_profile_new(
 
 				do
 				{
-					profile->single_player_map_flags[level] |= FLAG(difficulty);
+					SET_FLAG(profile->single_player_map_flags[level], difficulty, TRUE);
 					difficulty++;
 				}
 				while (difficulty < NUMBER_OF_GAME_DIFFICULTY_LEVELS);

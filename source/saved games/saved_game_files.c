@@ -43,6 +43,12 @@ enum
 
 /* ---------- macros */
 
+#define LAST_PLAYER1_PROFILE_PATH "z:\\lastprof.txt"												/* fake name */
+#define LAST_MULTIPLAYER_VARIANT_PATH "z:\\lastmpvr.txt"											/* fake name */
+#define LAST_MULTIPLAYER_MAP_PATH "z:\\lastmpmp.txt"												/* fake name */
+#define SAVED_GAME_FILE_STRINGS_TAG_NAME "ui\\saved_game_file_strings"								/* fake name */
+#define DEFAULT_PLAYER_PROFILE_NAMES_TAG_NAME "ui\\shell\\strings\\default_player_profile_names"	/* fake name */
+
 /* ---------- structures */
 
 struct enumerated_saved_game_file
@@ -107,45 +113,39 @@ struct _saved_game_files_globals saved_game_files_globals = {0};
 void saved_game_files_initialize(
 	void)
 {
-	if (!find_and_create_directory_if_necessary("z:\\saved"))
+	if (!find_and_create_directory_if_necessary(SAVED_GAMES_DIRECTORY))
 	{
-		error(_error_silent, "failed to find/create '%s' directory", "z:\\saved");
+		error(_error_silent, "failed to find/create '%s' directory", SAVED_GAMES_DIRECTORY);
 	}
 
-	if (!find_and_create_directory_if_necessary("z:\\saved\\player_profiles"))
+	if (!find_and_create_directory_if_necessary(PLAYER_PROFILES_DIRECTORY))
 	{
-		error(_error_silent, "failed to find/create '%s' directory", "z:\\saved\\player_profiles");
+		error(_error_silent, "failed to find/create '%s' directory", PLAYER_PROFILES_DIRECTORY);
 	}
 
-	if (!find_and_create_directory_if_necessary("z:\\saved\\player_profiles\\default_profile"))
+	if (!find_and_create_directory_if_necessary(DEFAULT_PLAYER_PROFILES_DIRECTORY))
 	{
-		error(
-			_error_silent,
-			"failed to find/create '%s' directory",
-			"z:\\saved\\player_profiles\\default_profile");
+		error(_error_silent, "failed to find/create '%s' directory", DEFAULT_PLAYER_PROFILES_DIRECTORY);
 	}
 
-	if (!find_and_create_directory_if_necessary("z:\\saved\\playlists"))
+	if (!find_and_create_directory_if_necessary(PLAYLISTS_DIRECTORY))
 	{
-		error(_error_silent, "failed to find/create '%s' directory", "z:\\saved\\playlists");
+		error(_error_silent, "failed to find/create '%s' directory", PLAYLISTS_DIRECTORY);
 	}
 
-	if (!find_and_create_directory_if_necessary("z:\\saved\\playlists\\default_playlist"))
+	if (!find_and_create_directory_if_necessary(DEFAULT_PLAYLISTS_DIRECTORY))
 	{
-		error(
-			_error_silent,
-			"failed to find/create '%s' directory",
-			"z:\\saved\\playlists\\default_playlist");
+		error(_error_silent, "failed to find/create '%s' directory", DEFAULT_PLAYLISTS_DIRECTORY);
 	}
 
-	if (!find_and_create_directory_if_necessary("z:\\saved\\recordings"))
+	if (!find_and_create_directory_if_necessary(RECORDINGS_DIRECTORY))
 	{
-		error(_error_silent, "failed to find/create '%s' directory", "z:\\saved\\recordings");
+		error(_error_silent, "failed to find/create '%s' directory", RECORDINGS_DIRECTORY);
 	}
 
-	if (!find_and_create_directory_if_necessary("z:\\saved\\recordings\\last_recording"))
+	if (!find_and_create_directory_if_necessary(LAST_RECORDING_DIRECTORY))
 	{
-		error(_error_silent, "failed to find/create '%s' directory", "z:\\saved\\recordings\\last_recording");
+		error(_error_silent, "failed to find/create '%s' directory", LAST_RECORDING_DIRECTORY);
 	}
 
 	memset(&saved_game_files_globals, 0, sizeof(saved_game_files_globals));
@@ -269,7 +269,7 @@ wchar_t *saved_game_file_get_display_name(
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\saved_game_files.c", 299, memory_unit==_memory_unit_hard_drive);
 
-	display_name[0] = 0;
+	display_name[0] = '\0';
 
 	if (memory_unit >= 0 &&
 		memory_unit < NUMBER_OF_MEMORY_UNITS &&
@@ -279,7 +279,7 @@ wchar_t *saved_game_file_get_display_name(
 		if (get_nth_entry_in_mapfile(memory_unit, n,&file))
 		{
 			ustrncpy(display_name, file.display_name, MAXIMUM_SAVED_GAME_NAME_LENGTH - 1);
-			display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = 0;
+			display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = '\0';
 		}
 	}
 	else
@@ -342,7 +342,7 @@ long create_enumerated_saved_game_file(
 
 				ustrncpy(file.display_name, display_name, MAXIMUM_SAVED_GAME_NAME_LENGTH - 1);
 				file.type = saved_game_file_type;
-				file.display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = 0;
+				file.display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = '\0';
 				file.index = number_of_entries;
 				file.default_file = FALSE;
 				file.checksum_valid = FALSE;
@@ -350,12 +350,12 @@ long create_enumerated_saved_game_file(
 				switch (saved_game_file_type)
 				{
 				case _saved_game_file_type_player_profile:
-					_snprintf(file.full_path, MAXIMUM_FILENAME_LENGTH, "%s%s", save_game_directory, "blam.sav");
+					_snprintf(file.full_path, MAXIMUM_FILENAME_LENGTH, "%s%s", save_game_directory, PLAYER_PROFILE_FILE_NAME);
 					checksum_data_size = sizeof(struct player_profile);
 					game_state_create_persistent_storage(save_game_directory);
 					break;
 				case _saved_game_file_type_play_list:
-					_snprintf(file.full_path, MAXIMUM_FILENAME_LENGTH, "%s%s", save_game_directory, "blam.lst");
+					_snprintf(file.full_path, MAXIMUM_FILENAME_LENGTH, "%s%s", save_game_directory, PLAYLIST_PROFILE_FILE_NAME);
 					checksum_data_size = sizeof(struct game_variant);
 					break;
 				default:
@@ -584,8 +584,8 @@ void saved_game_file_get_useable_untitled_profile_name(
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\saved_game_files.c", 705, display_name);
 
-	display_name[0] = 0;
-	string_list_index = tag_loaded(UNICODE_STRING_LISTS_GROUP_TAG, "ui\\saved_game_file_strings");
+	display_name[0] = '\0';
+	string_list_index = tag_loaded(UNICODE_STRING_LISTS_GROUP_TAG, SAVED_GAME_FILE_STRINGS_TAG_NAME);
 
 	if (string_list_index != NONE)
 	{
@@ -602,7 +602,7 @@ void saved_game_file_get_useable_untitled_profile_name(
 				MAXIMUM_SAVED_GAME_NAME_LENGTH - 1,
 				unicode_string_list_get_string(string_list_index, _saved_game_file_string_untitled_profile_name_format),
 				untitled_index + 1);
-			display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = 0;
+			display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = '\0';
 
 			if (XCreateSaveGame(
 				root_path,
@@ -619,12 +619,12 @@ void saved_game_file_get_useable_untitled_profile_name(
 		if (untitled_index == MAXIMUM_UNTITLED_SAVED_GAMES)
 		{
 			error(_error_silent, "%d untitled saved games! clean up your hard drive!!", MAXIMUM_UNTITLED_SAVED_GAMES);
-			display_name[0] = 0;
+			display_name[0] = '\0';
 		}
 	}
 	else
 	{
-		error(_error_silent, "unicode string lis tag '%s' not loaded", "ui\\saved_game_file_strings");
+		error(_error_silent, "unicode string lis tag '%s' not loaded", SAVED_GAME_FILE_STRINGS_TAG_NAME);
 	}
 
 	return;
@@ -673,15 +673,15 @@ boolean synchronize_metadata_display_name_with_profile_name(
 						char new_persistent_storage_path[MAXIMUM_FILENAME_LENGTH+1];
 						char *filename;
 
-						_snprintf(new_path, MAXIMUM_FILENAME_LENGTH, "%s%s", save_game_directory, "blam.sav");
-						new_path[MAXIMUM_FILENAME_LENGTH] = 0;
+						_snprintf(new_path, MAXIMUM_FILENAME_LENGTH, "%s%s", save_game_directory, PLAYER_PROFILE_FILE_NAME);
+						new_path[MAXIMUM_FILENAME_LENGTH] = '\0';
 						success = CopyFileA(file.full_path, new_path, TRUE);
 
 						if (success == TRUE)
 						{
 							strncpy(old_persistent_storage_path, file.full_path, MAXIMUM_FILENAME_LENGTH);
-							old_persistent_storage_path[MAXIMUM_FILENAME_LENGTH] = 0;
-							filename = strstr(old_persistent_storage_path, "blam.sav");
+							old_persistent_storage_path[MAXIMUM_FILENAME_LENGTH] = '\0';
+							filename = strstr(old_persistent_storage_path, PLAYER_PROFILE_FILE_NAME);
 
 							if (filename)
 							{
@@ -690,7 +690,7 @@ boolean synchronize_metadata_display_name_with_profile_name(
 									old_persistent_storage_path,
 									game_state_get_persistent_storage_filename(),
 									MAXIMUM_FILENAME_LENGTH);
-								old_persistent_storage_path[MAXIMUM_FILENAME_LENGTH] = 0;
+								old_persistent_storage_path[MAXIMUM_FILENAME_LENGTH] = '\0';
 								_snprintf(
 									new_persistent_storage_path,
 									MAXIMUM_FILENAME_LENGTH,
@@ -710,8 +710,8 @@ boolean synchronize_metadata_display_name_with_profile_name(
 						break;
 					}
 					case _saved_game_file_type_play_list:
-						_snprintf(new_path, MAXIMUM_FILENAME_LENGTH, "%s%s", save_game_directory, "blam.lst");
-						new_path[MAXIMUM_FILENAME_LENGTH] = 0;
+						_snprintf(new_path, MAXIMUM_FILENAME_LENGTH, "%s%s", save_game_directory, PLAYLIST_PROFILE_FILE_NAME);
+						new_path[MAXIMUM_FILENAME_LENGTH] = '\0';
 						success = CopyFileA(file.full_path, new_path, TRUE);
 						break;
 					default:
@@ -730,9 +730,9 @@ boolean synchronize_metadata_display_name_with_profile_name(
 						}
 
 						strncpy(file.full_path, new_path, MAXIMUM_FILENAME_LENGTH);
-						file.full_path[MAXIMUM_FILENAME_LENGTH] = 0;
+						file.full_path[MAXIMUM_FILENAME_LENGTH] = '\0';
 						ustrncpy(file.display_name, game_display_name, MAXIMUM_SAVED_GAME_NAME_LENGTH - 1);
-						file.display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = 0;
+						file.display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = '\0';
 
 						if (!set_nth_entry_in_mapfile(memory_unit, n,&file))
 						{
@@ -793,7 +793,7 @@ boolean saved_game_file_get_path_to_enclosing_directory(
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\saved_game_files.c", 909, full_path);
 
-	full_path[0] = 0;
+	full_path[0] = '\0';
 
 	if (index != NONE)
 	{
@@ -813,11 +813,11 @@ boolean saved_game_file_get_path_to_enclosing_directory(
 
 				if (file.type == _saved_game_file_type_player_profile)
 				{
-					filename = "blam.sav";
+					filename = PLAYER_PROFILE_FILE_NAME;
 				}
 				else if (file.type == _saved_game_file_type_play_list)
 				{
-					filename = "blam.lst";
+					filename = PLAYLIST_PROFILE_FILE_NAME;
 				}
 				else
 				{
@@ -829,7 +829,7 @@ boolean saved_game_file_get_path_to_enclosing_directory(
 					char *directory_end;
 
 					strncpy(full_path, file.full_path, MAXIMUM_FILENAME_LENGTH);
-					full_path[MAXIMUM_FILENAME_LENGTH] = 0;
+					full_path[MAXIMUM_FILENAME_LENGTH] = '\0';
 					directory_end = strstr(full_path, filename);
 
 					if (directory_end)
@@ -840,7 +840,7 @@ boolean saved_game_file_get_path_to_enclosing_directory(
 					else
 					{
 						error(_error_silent, "player profile pathname doesn't appear to be valid");
-						full_path[0] = 0;
+						full_path[0] = '\0';
 					}
 				}
 			}
@@ -941,20 +941,20 @@ void saved_game_file_remember_player1_last_used_profile_directory(
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\saved_game_files.c", 1050, directory_path);
 
-	if (file_reference_create_from_path(&file, "z:\\lastprof.txt", FALSE) &&
+	if (file_reference_create_from_path(&file, LAST_PLAYER1_PROFILE_PATH, FALSE) &&
 		file_create(&file) &&
 		file_open(&file, FLAG(_permission_write_bit)))
 	{
 		if (!file_write(&file, MAXIMUM_FILENAME_LENGTH + 1,directory_path))
 		{
-			error(_error_silent, "failed to write to '%s'", "z:\\lastprof.txt");
+			error(_error_silent, "failed to write to '%s'", LAST_PLAYER1_PROFILE_PATH);
 		}
 
 		file_close(&file);
 	}
 	else
 	{
-		error(_error_silent, "failed to open '%s'", "z:\\lastprof.txt");
+		error(_error_silent, "failed to open '%s'", LAST_PLAYER1_PROFILE_PATH);
 	}
 
 	return;
@@ -968,24 +968,24 @@ boolean saved_game_file_retrieve_player1_last_used_profile_directory(
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\saved_game_files.c", 1076, directory_path);
 
-	if (file_reference_create_from_path(&file, "z:\\lastprof.txt", FALSE) &&
+	if (file_reference_create_from_path(&file, LAST_PLAYER1_PROFILE_PATH, FALSE) &&
 		file_open(&file, FLAG(_permission_read_bit)))
 	{
 		success = file_read(&file, MAXIMUM_FILENAME_LENGTH + 1,directory_path);
 
 		if (!success)
 		{
-			error(_error_silent, "failed to read from '%s'", "z:\\lastprof.txt");
+			error(_error_silent, "failed to read from '%s'", LAST_PLAYER1_PROFILE_PATH);
 		}
 
 		file_close(&file);
 	}
 	else
 	{
-		error(_error_silent, "failed to open '%s'", "z:\\lastprof.txt");
+		error(_error_silent, "failed to open '%s'", LAST_PLAYER1_PROFILE_PATH);
 	}
 
-	directory_path[MAXIMUM_FILENAME_LENGTH] = 0;
+	directory_path[MAXIMUM_FILENAME_LENGTH] = '\0';
 
 	return success;
 }
@@ -997,20 +997,20 @@ void saved_game_file_remember_last_used_multiplayer_variant_directory(
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\saved_game_files.c", 1102, directory_path);
 
-	if (file_reference_create_from_path(&file, "z:\\lastmpvr.txt", FALSE) &&
+	if (file_reference_create_from_path(&file, LAST_MULTIPLAYER_VARIANT_PATH, FALSE) &&
 		file_create(&file) &&
 		file_open(&file, FLAG(_permission_write_bit)))
 	{
 		if (!file_write(&file, MAXIMUM_FILENAME_LENGTH + 1,directory_path))
 		{
-			error(_error_silent, "failed to write to '%s'", "z:\\lastmpvr.txt");
+			error(_error_silent, "failed to write to '%s'", LAST_MULTIPLAYER_VARIANT_PATH);
 		}
 
 		file_close(&file);
 	}
 	else
 	{
-		error(_error_silent, "failed to open '%s'", "z:\\lastmpvr.txt");
+		error(_error_silent, "failed to open '%s'", LAST_MULTIPLAYER_VARIANT_PATH);
 	}
 
 	return;
@@ -1024,24 +1024,24 @@ boolean saved_game_file_retrieve_last_used_multiplayer_variant_directory(
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\saved_game_files.c", 1128, directory_path);
 
-	if (file_reference_create_from_path(&file, "z:\\lastmpvr.txt", FALSE) &&
+	if (file_reference_create_from_path(&file, LAST_MULTIPLAYER_VARIANT_PATH, FALSE) &&
 		file_open(&file, FLAG(_permission_read_bit)))
 	{
 		success = file_read(&file, MAXIMUM_FILENAME_LENGTH + 1,directory_path);
 
 		if (!success)
 		{
-			error(_error_silent, "failed to read from '%s'", "z:\\lastmpvr.txt");
+			error(_error_silent, "failed to read from '%s'", LAST_MULTIPLAYER_VARIANT_PATH);
 		}
 
 		file_close(&file);
 	}
 	else
 	{
-		error(_error_silent, "failed to open '%s'", "z:\\lastmpvr.txt");
+		error(_error_silent, "failed to open '%s'", LAST_MULTIPLAYER_VARIANT_PATH);
 	}
 
-	directory_path[MAXIMUM_FILENAME_LENGTH] = 0;
+	directory_path[MAXIMUM_FILENAME_LENGTH] = '\0';
 
 	return success;
 }
@@ -1116,20 +1116,20 @@ void saved_game_file_remember_last_used_multiplayer_map(
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\saved_game_files.c", 1207, map_name);
 
-	if (file_reference_create_from_path(&file, "z:\\lastmpmp.txt", FALSE) &&
+	if (file_reference_create_from_path(&file, LAST_MULTIPLAYER_MAP_PATH, FALSE) &&
 		file_create(&file) &&
 		file_open(&file, FLAG(_permission_write_bit)))
 	{
 		if (!file_write(&file, MAXIMUM_FILENAME_LENGTH + 1,map_name))
 		{
-			error(_error_silent, "failed to write to '%s'", "z:\\lastmpmp.txt");
+			error(_error_silent, "failed to write to '%s'", LAST_MULTIPLAYER_MAP_PATH);
 		}
 
 		file_close(&file);
 	}
 	else
 	{
-		error(_error_silent, "failed to open '%s'", "z:\\lastmpmp.txt");
+		error(_error_silent, "failed to open '%s'", LAST_MULTIPLAYER_MAP_PATH);
 	}
 
 	return;
@@ -1143,24 +1143,24 @@ boolean saved_game_file_retrieve_last_used_multiplayer_map(
 
 	match_assert("c:\\halo\\SOURCE\\saved games\\saved_game_files.c", 1233, map_name);
 
-	if (file_reference_create_from_path(&file, "z:\\lastmpmp.txt", FALSE) &&
+	if (file_reference_create_from_path(&file, LAST_MULTIPLAYER_MAP_PATH, FALSE) &&
 		file_open(&file, FLAG(_permission_read_bit)))
 	{
 		success = file_read(&file, MAXIMUM_FILENAME_LENGTH + 1,map_name);
 
 		if (!success)
 		{
-			error(_error_silent, "failed to read from '%s'", "z:\\lastmpmp.txt");
+			error(_error_silent, "failed to read from '%s'", LAST_MULTIPLAYER_MAP_PATH);
 		}
 
 		file_close(&file);
 	}
 	else
 	{
-		error(_error_silent, "failed to open '%s'", "z:\\lastmpmp.txt");
+		error(_error_silent, "failed to open '%s'", LAST_MULTIPLAYER_MAP_PATH);
 	}
 
-	map_name[MAXIMUM_FILENAME_LENGTH] = 0;
+	map_name[MAXIMUM_FILENAME_LENGTH] = '\0';
 
 	return success;
 }
@@ -1289,7 +1289,7 @@ static short enumerate_default_playlist_profiles(
 	struct file_reference file;
 	XCALCSIG_SIGNATURE checksum;
 	short number_of_profiles = playlist_profile_number_of_default_profiles_on_disk();
-	long string_list_index = tag_loaded(UNICODE_STRING_LISTS_GROUP_TAG, "ui\\default_multiplayer_game_setting_names");
+	long string_list_index = tag_loaded(UNICODE_STRING_LISTS_GROUP_TAG, DEFAULT_MULTIPLAYER_GAME_SETTING_NAMES_TAG_NAME);
 	short profile_index = 0;
 
 	if (string_list_index != NONE)
@@ -1301,7 +1301,7 @@ static short enumerate_default_playlist_profiles(
 			_snprintf(
 				path,
 				MAXIMUM_FILENAME_LENGTH,
-				"z:\\saved\\playlists\\default_playlist\\%02d\\blam.lst",
+				DEFAULT_PLAYLIST_PATH_FORMAT,
 				profile_index);
 
 			if (file_reference_create_from_path(&file, path, FALSE) && file_exists(&file))
@@ -1309,9 +1309,9 @@ static short enumerate_default_playlist_profiles(
 				struct enumerated_saved_game_file entry = {0};
 
 				strncpy(entry.full_path, path, MAXIMUM_FILENAME_LENGTH);
-				entry.full_path[MAXIMUM_FILENAME_LENGTH] = 0;
+				entry.full_path[MAXIMUM_FILENAME_LENGTH] = '\0';
 				ustrncpy(entry.display_name, display_name, MAXIMUM_SAVED_GAME_NAME_LENGTH - 1);
-				entry.display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = 0;
+				entry.display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = '\0';
 				entry.type = _saved_game_file_type_play_list;
 				entry.default_file = TRUE;
 
@@ -1372,7 +1372,7 @@ static short enumerate_default_player_profiles(
 	char path[MAXIMUM_FILENAME_LENGTH+1];
 	struct file_reference file;
 	XCALCSIG_SIGNATURE checksum;
-	long string_list_index = tag_loaded(UNICODE_STRING_LISTS_GROUP_TAG, "ui\\shell\\strings\\default_player_profile_names");
+	long string_list_index = tag_loaded(UNICODE_STRING_LISTS_GROUP_TAG, DEFAULT_PLAYER_PROFILE_NAMES_TAG_NAME);
 	short profile_index = 0;
 
 	if (string_list_index != NONE)
@@ -1384,7 +1384,7 @@ static short enumerate_default_player_profiles(
 			_snprintf(
 				path,
 				MAXIMUM_FILENAME_LENGTH,
-				"z:\\saved\\player_profiles\\default_profile\\%02d.sav",
+				DEFAULT_PLAYER_PROFILE_PATH_FORMAT,
 				profile_index);
 
 			if (file_reference_create_from_path(&file, path, FALSE) && file_exists(&file))
@@ -1392,9 +1392,9 @@ static short enumerate_default_player_profiles(
 				struct enumerated_saved_game_file entry = {0};
 
 				strncpy(entry.full_path, path, MAXIMUM_FILENAME_LENGTH);
-				entry.full_path[MAXIMUM_FILENAME_LENGTH] = 0;
+				entry.full_path[MAXIMUM_FILENAME_LENGTH] = '\0';
 				ustrncpy(entry.display_name, display_name, MAXIMUM_SAVED_GAME_NAME_LENGTH - 1);
-				entry.display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = 0;
+				entry.display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = '\0';
 				entry.type = _saved_game_file_type_player_profile;
 				entry.default_file = TRUE;
 
@@ -1493,7 +1493,7 @@ static void enumerate_memory_units(
 									MAXIMUM_FILENAME_LENGTH,
 									"%s%s",
 									find_data.szSaveGameDirectory,
-									"blam.sav") > 0 &&
+									PLAYER_PROFILE_FILE_NAME) > 0 &&
 									file_reference_create_from_path(&saved_game_file, file.full_path, FALSE) &&
 									file_exists(&saved_game_file))
 								{
@@ -1505,7 +1505,7 @@ static void enumerate_memory_units(
 									MAXIMUM_FILENAME_LENGTH,
 									"%s%s",
 									find_data.szSaveGameDirectory,
-									"blam.lst") > 0 &&
+									PLAYLIST_PROFILE_FILE_NAME) > 0 &&
 									file_reference_create_from_path(&saved_game_file, file.full_path, FALSE) &&
 									file_exists(&saved_game_file))
 								{
@@ -1520,7 +1520,7 @@ static void enumerate_memory_units(
 										L"random crap found by XFindNextSaveGame(): display name= '%s' path= '%hs'",
 										find_data.szSaveGameName,
 										find_data.wfd.cFileName);
-									message[MAXIMUM_FILENAME_LENGTH] = 0;
+									message[MAXIMUM_FILENAME_LENGTH] = '\0';
 									error(_error_silent, wide_to_ascii(message, (char *)message, sizeof(message)));
 									file.type = NONE;
 								}
@@ -1528,7 +1528,7 @@ static void enumerate_memory_units(
 								if (file.type != NONE)
 								{
 									ustrncpy(file.display_name, find_data.szSaveGameName, MAXIMUM_SAVED_GAME_NAME_LENGTH - 1);
-									file.display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = 0;
+									file.display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = '\0';
 
 									if (file_open(&saved_game_file, FLAG(_permission_read_bit) | FLAG(_permission_write_bit)))
 									{

@@ -38,6 +38,10 @@ enum
 	GAME_STATE_SIZE = GAME_STATE_CPU_SIZE + GAME_STATE_GPU_SIZE,	/* fake name */
 };
 
+/* ---------- macros */
+
+#define GAME_STATE_ALLOCATION_FILE_PATH "d:\\gamestate.txt"	/* fake name */
+
 /* ---------- prototypes */
 
 static void game_state_call_before_save_procs(void);
@@ -501,7 +505,7 @@ static void game_state_allocation_record(
 {
 	if (!game_state_allocation_file)
 	{
-		game_state_allocation_file = fopen("d:\\gamestate.txt", "w");
+		game_state_allocation_file = fopen(GAME_STATE_ALLOCATION_FILE_PATH, "w");
 	}
 
 	if (game_state_allocation_file)

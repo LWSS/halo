@@ -48,7 +48,7 @@ enum
 	_profile_finished_game_bit,
 	NUMBER_OF_PROFILE_FLAGS,
 
-	_default_profile_index_mask = 0xFFFFFF00,
+	_default_profile_index_mask = ~MASK(CHAR_BITS),
 };
 
 /* ---------- macros */

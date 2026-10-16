@@ -29,7 +29,7 @@ enum
 	_saved_game_file_type_bit1,
 	_saved_game_file_type_bit2,
 	_saved_game_file_type_bit3,
-	SAVED_GAME_FILE_TYPE_MASK = 0xF,
+	SAVED_GAME_FILE_TYPE_MASK = MASK(_saved_game_file_type_bit3 + 1),
 	SAVED_GAME_FILE_TYPE_SHIFT = 0,
 
 	_unused_bit4 = 4,
@@ -44,7 +44,7 @@ enum
 	_memory_unit_index_bit13,
 	_memory_unit_index_bit14,
 	_memory_unit_index_bit15,
-	MEMORY_UNIT_INDEX_MASK = 0xFF,
+	MEMORY_UNIT_INDEX_MASK = MASK(_memory_unit_index_bit15 - _memory_unit_index_bit8 + 1),
 	MEMORY_UNIT_INDEX_SHIFT = 8,
 
 	_enumerated_index_bit16 = 16,
@@ -59,7 +59,7 @@ enum
 	_enumerated_index_bit25,
 	_enumerated_index_bit26,
 	_enumerated_index_bit27,
-	ENUMERATED_INDEX_MASK = 0xFFF,
+	ENUMERATED_INDEX_MASK = MASK(_enumerated_index_bit27 - _enumerated_index_bit16 + 1),
 	ENUMERATED_INDEX_SHIFT = 16,
 
 	_unused_bit28 = 28,
@@ -75,6 +75,20 @@ enum
 };
 
 /* ---------- macros */
+
+#define SAVED_GAMES_DIRECTORY "z:\\saved"																/* fake name */
+#define PLAYER_PROFILES_DIRECTORY SAVED_GAMES_DIRECTORY "\\player_profiles"								/* fake name */
+#define DEFAULT_PLAYER_PROFILES_DIRECTORY PLAYER_PROFILES_DIRECTORY "\\default_profile"					/* fake name */
+#define DEFAULT_PLAYER_PROFILE_PATH_FORMAT DEFAULT_PLAYER_PROFILES_DIRECTORY "\\%02d.sav"				/* fake name */
+#define PLAYLISTS_DIRECTORY SAVED_GAMES_DIRECTORY "\\playlists"											/* fake name */
+#define DEFAULT_PLAYLISTS_DIRECTORY PLAYLISTS_DIRECTORY "\\default_playlist"							/* fake name */
+#define DEFAULT_PLAYLIST_DIRECTORY_FORMAT DEFAULT_PLAYLISTS_DIRECTORY "\\%02d"							/* fake name */
+#define DEFAULT_PLAYLIST_PATH_FORMAT DEFAULT_PLAYLIST_DIRECTORY_FORMAT "\\" PLAYLIST_PROFILE_FILE_NAME	/* fake name */
+#define RECORDINGS_DIRECTORY SAVED_GAMES_DIRECTORY "\\recordings"										/* fake name */
+#define LAST_RECORDING_DIRECTORY RECORDINGS_DIRECTORY "\\last_recording"								/* fake name */
+#define PLAYER_PROFILE_FILE_NAME "blam.sav"																/* fake name */
+#define PLAYLIST_PROFILE_FILE_NAME "blam.lst"															/* fake name */
+#define DEFAULT_MULTIPLAYER_GAME_SETTING_NAMES_TAG_NAME "ui\\default_multiplayer_game_setting_names"	/* fake name */
 
 /* ---------- structures */
 

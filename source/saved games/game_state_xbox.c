@@ -27,6 +27,13 @@ enum
 	GAME_STATE_FILE_SIZE = 0x380000,	/* fake name */
 };
 
+/* ---------- macros */
+
+#define GAME_STATE_FILE_NAME "savegame.bin"					/* fake name */
+#define GAME_STATE_FILE_PATH "z:\\" GAME_STATE_FILE_NAME	/* fake name */
+#define CORE_DIRECTORY "d:\\core"								/* fake name */
+#define CORE_PATH_FORMAT CORE_DIRECTORY "\\%s"					/* fake name */
+
 /* ---------- prototypes */
 
 static boolean game_state_get_persistent_storage_path(char *path);
@@ -58,6 +65,7 @@ void *game_state_allocate_buffer(
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 48, address);
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 49, cpu_size>0);
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 50, gpu_size>0);
+
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 53, !(cpu_size&(CPU_PAGE_SIZE-1)));
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 54, !(gpu_size&(CPU_PAGE_SIZE-1)));
 
@@ -92,7 +100,7 @@ void game_state_create_or_open_file(
 	match_assert("c:\\halo\\SOURCE\\saved games\\game_state_xbox.c", 87, !xbox_game_state_globals.file_open);
 
 	xbox_game_state_globals.handle = CreateFile(
-		"z:\\savegame.bin",
+		GAME_STATE_FILE_PATH,
 		GENERIC_READ | GENERIC_WRITE,
 		0,
 		NULL,
@@ -201,8 +209,8 @@ boolean game_state_write_core(
 	HANDLE file;
 	boolean success = FALSE;
 
-	CreateDirectory("d:\\core", NULL);
-	sprintf(filename, "d:\\core\\%s", name);
+	CreateDirectory(CORE_DIRECTORY, NULL);
+	sprintf(filename, CORE_PATH_FORMAT, name);
 	file = CreateFile(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (file != INVALID_HANDLE_VALUE)
@@ -229,7 +237,7 @@ boolean game_state_read_core_header(
 	HANDLE file;
 	boolean success = FALSE;
 
-	sprintf(filename, "d:\\core\\%s", name);
+	sprintf(filename, CORE_PATH_FORMAT, name);
 	file = CreateFile(filename, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (file != INVALID_HANDLE_VALUE)
@@ -255,7 +263,7 @@ void game_state_read_core(
 	unsigned long bytes_read;
 	HANDLE file;
 
-	sprintf(filename, "d:\\core\\%s", name);
+	sprintf(filename, CORE_PATH_FORMAT, name);
 	file = CreateFile(filename, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (file == INVALID_HANDLE_VALUE ||
@@ -429,7 +437,7 @@ void game_state_read_from_persistent_storage(
 char const *game_state_get_persistent_storage_filename(
 	void)
 {
-	return "savegame.bin";
+	return GAME_STATE_FILE_NAME;
 }
 
 void game_state_create_persistent_storage(
@@ -458,7 +466,7 @@ static boolean game_state_get_persistent_storage_path(
 static void delete_persistent_storage(
 	void)
 {
-	char path[256];
+	char path[MAXIMUM_FILENAME_LENGTH+1];
 
 	if (game_state_get_persistent_storage_path(path))
 	{
@@ -471,7 +479,7 @@ static void delete_persistent_storage(
 static HANDLE game_state_open_persistent_storage(
 	char const *directory)
 {
-	char path[256];
+	char path[MAXIMUM_FILENAME_LENGTH+1];
 	byte empty_header[0x4000];
 	unsigned long bytes_written;
 	HANDLE file = INVALID_HANDLE_VALUE;

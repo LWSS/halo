@@ -172,7 +172,7 @@ long playlist_profile_new(
 				block.profile_block.variant.human_readable_game_description,
 				name,
 				MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1);
-			block.profile_block.variant.human_readable_game_description[MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1] = 0;
+			block.profile_block.variant.human_readable_game_description[MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1] = '\0';
 			saved_game_file_generate_checksum(
 				&block.profile_block.variant,
 				sizeof(block.profile_block.variant),
@@ -192,8 +192,7 @@ long playlist_profile_new(
 		{
 			error(_error_silent, "failed to open newly created playlist profile");
 			delete_enumerated_saved_game_file(playlist_profile_index);
-
-			return NONE;
+			playlist_profile_index = NONE;
 		}
 	}
 
@@ -288,7 +287,7 @@ boolean playlist_profile_get_display_name(
 	if (saved_game_display_name)
 	{
 		ustrncpy(display_name, saved_game_display_name, MAXIMUM_SAVED_GAME_NAME_LENGTH - 1);
-		display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = 0;
+		display_name[MAXIMUM_SAVED_GAME_NAME_LENGTH - 1] = '\0';
 		success = TRUE;
 	}
 	else
@@ -329,7 +328,7 @@ static void playlist_profile_create_default_profiles_on_disk(
 	union playlist_profile_block block;
 	struct game_variant game_variant;
 	struct file_reference file;
-	long string_list_index = tag_loaded(UNICODE_STRING_LISTS_GROUP_TAG, "ui\\default_multiplayer_game_setting_names");
+	long string_list_index = tag_loaded(UNICODE_STRING_LISTS_GROUP_TAG, DEFAULT_MULTIPLAYER_GAME_SETTING_NAMES_TAG_NAME);
 
 	if (string_list_index != NONE)
 	{
@@ -341,19 +340,19 @@ static void playlist_profile_create_default_profiles_on_disk(
 			boolean written = FALSE;
 
 			game_variant = default_variant_building_functions[variant_index]();
-			_snprintf(full_path, MAXIMUM_FILENAME_LENGTH, "z:\\saved\\playlists\\default_playlist\\%02d", variant_index);
-			full_path[MAXIMUM_FILENAME_LENGTH] = 0;
+			_snprintf(full_path, MAXIMUM_FILENAME_LENGTH, DEFAULT_PLAYLIST_DIRECTORY_FORMAT, variant_index);
+			full_path[MAXIMUM_FILENAME_LENGTH] = '\0';
 			directory_create_or_delete_contents(full_path);
-			strncat(full_path, "\\blam.lst", MAXIMUM_FILENAME_LENGTH);
-			full_path[MAXIMUM_FILENAME_LENGTH] = 0;
+			strncat(full_path, "\\" PLAYLIST_PROFILE_FILE_NAME, MAXIMUM_FILENAME_LENGTH);
+			full_path[MAXIMUM_FILENAME_LENGTH] = '\0';
 			display_name = unicode_string_list_get_string(string_list_index, variant_index);
 			memcpy(&block.profile_block.variant, &game_variant, sizeof(game_variant));
 			ustrncpy(
 				block.profile_block.variant.human_readable_game_description,
 				display_name,
 				MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1);
-			block.profile_block.variant.human_readable_game_description[MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1] = 0;
-			block.profile_block.variant.flags |= variant_index << 8;
+			block.profile_block.variant.human_readable_game_description[MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1] = '\0';
+			block.profile_block.variant.flags |= variant_index << CHAR_BITS;
 			saved_game_file_generate_checksum(
 				&block.profile_block.variant,
 				sizeof(block.profile_block.variant),
@@ -440,7 +439,7 @@ static boolean playlist_profile_read(
 							sanitized_variant.human_readable_game_description,
 							saved_game_file_get_display_name(index),
 							MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1);
-						sanitized_variant.human_readable_game_description[MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1] = 0;
+						sanitized_variant.human_readable_game_description[MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1] = '\0';
 						memcpy(variant, &sanitized_variant, sizeof(*variant));
 					}
 
@@ -475,7 +474,7 @@ static boolean playlist_profile_read(
 			sanitized_variant.human_readable_game_description,
 			saved_game_file_get_display_name(index),
 			MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1);
-		sanitized_variant.human_readable_game_description[MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1] = 0;
+		sanitized_variant.human_readable_game_description[MAXIMUM_GAME_VARIANT_NAME_LENGTH - 1] = '\0';
 		memcpy(variant, &sanitized_variant, sizeof(*variant));
 		success = TRUE;
 	}

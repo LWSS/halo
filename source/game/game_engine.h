@@ -46,7 +46,7 @@ enum
 	_variant_is_system_default_bit = 0,
 	NUMBER_OF_GAME_VARIANT_FLAGS,
 
-	_default_variant_index_mask = 0xFFFFFF00
+	_default_variant_index_mask = ~MASK(CHAR_BITS)
 };
 
 /* ---------- macros */
@@ -199,7 +199,7 @@ boolean game_engine_can_score(void);
 void game_engine_player_killed(long killing_player_index, long killing_object_index, long dead_player_index, boolean friendly_fire);
 real game_engine_get_damage_multiplier(long attacker_index, long defender_index);
 
-void game_engine_playlist_next(long, long, long);
+void game_engine_playlist_next(long unused1, long unused2, long unused3);
 struct game_variant build_game_variant_slayer(void);
 struct game_variant build_game_variant_slayer_pro(void);
 struct game_variant build_game_variant_elimination(void);
