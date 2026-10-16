@@ -90,14 +90,14 @@ __inline pixel32 real_argb_color_to_pixel32(
 			fmul st(2), st
 			fmulp st(1), st
 			fistp verify				// blue
-			and verify, 0xFF
+			and verify, UNSIGNED_CHAR_MAX
 			mov edx, verify
 			fistp verify				// green
-			and verify, 0xFF
+			and verify, UNSIGNED_CHAR_MAX
 			shl verify, 8
 			or edx, verify
 			fistp verify				// red
-			and verify, 0xFF
+			and verify, UNSIGNED_CHAR_MAX
 			shl verify, 16
 			or edx, verify
 			fistp verify				// alpha
@@ -131,14 +131,14 @@ __inline pixel32 real_rgb_color_to_pixel32(
 		fmul st(2), st
 		fmulp st(1), st
 		fistp result				// blue
-		and result, 0xFF
+		and result, UNSIGNED_CHAR_MAX
 		mov edx, result
 		fistp result				// green
-		and result, 0xFF
+		and result, UNSIGNED_CHAR_MAX
 		shl result, 8
 		or edx, result
 		fistp result				// red
-		and result, 0xFF
+		and result, UNSIGNED_CHAR_MAX
 		shl result, 16
 		or edx, result				// 0x00RRGGBB, no alpha
 		mov result, edx

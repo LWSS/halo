@@ -23,6 +23,14 @@ enum
 
 /* ---------- macros */
 
+#define hud_verify_stack()																	\
+vassert(return_eip == get_return_eip(), "corrupt return address!");							\
+vassert(corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+
+#define match_hud_verify_stack(file, line)																		\
+match_vassert(file, line, return_eip == get_return_eip(), "corrupt return address!");							\
+match_vassert(file, line, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+
 /* ---------- structures */
 
 struct hud_scripted_globals_definition
@@ -51,8 +59,6 @@ void hud_picked_up_weapon(short local_player_index, long weapon_definition_index
 void hud_picked_up_powerup(short local_player_index, long powerup_definition_index);
 
 /* ---------- prototypes/HUD_UNIT.C */
-
-struct player_datum;
 
 void unit_hud_shield_meter_mapper_init(void);
 void hud_initialize_unit_interface(void);

@@ -559,13 +559,13 @@ static void temporary_hud_draw_reticle(
 {
 	real_point3d points[NUMBER_OF_TEMPORARY_HUD_RETICLE_POINTS];
 	short point_index;
-	real radius = tangent(angle * 0.5f) * 0.0625f;
+	real radius = tangent(angle * 0.5f) / 16.f;
 	real delta = 2.f * _pi / NUMBER_OF_TEMPORARY_HUD_RETICLE_POINTS;
 	real theta = 0.f;
 
 	for (point_index = 0; point_index < NUMBER_OF_TEMPORARY_HUD_RETICLE_POINTS; point_index++)
 	{
-		set_real_point3d(&points[point_index], cosine(theta) * radius, sine(theta) * radius, -0.0625f);
+		set_real_point3d(&points[point_index], cosine(theta) * radius, sine(theta) * radius, -1.f/16.f);
 		matrix4x3_transform_point(&render.frustum.view_to_world, &points[point_index], &points[point_index]);
 		theta += delta;
 	}
@@ -673,7 +673,7 @@ static void hud_draw_players(
 
 		data_iterator_new(&target_player_iterator, player_data);
 
-		while ((target_player = data_iterator_next(&target_player_iterator)) != NULL)
+		while ((target_player = (struct player_datum *)data_iterator_next(&target_player_iterator)) != NULL)
 		{
 			if (player_index != target_player_iterator.index && team_index == target_player->team_index && target_player->unit_index != NONE)
 			{

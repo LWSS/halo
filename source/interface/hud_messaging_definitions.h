@@ -13,6 +13,7 @@ header included in hcex build.
 enum
 {
 	HUD_STATE_MESSAGES_TAG = 'hmt ', /* fake name */
+	// TODO: identify version
 };
 
 enum

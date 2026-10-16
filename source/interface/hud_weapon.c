@@ -43,8 +43,6 @@ enum
 	NO_TARGET_NUMBER_BITS = 0xFFC00000,
 };
 
-/* ---------- macros */
-
 /* ---------- structures */
 
 union weapon_hud_number /* fake name */
@@ -84,7 +82,14 @@ struct weapon_hud_globals_definition
 static void hud_update_weapon_local_player(short local_player_index, long weapon_index, long hud_index, struct weapon_interface_state *weapon_state);
 static struct weapon_hud_state *get_hud_state(short local_player_index);
 static struct crosshair_hud_state *get_crosshair_state(short local_player_index);
-static void render_weapon_hud(long hud_index, short local_player_index, struct weapon_definition const *weapon_definition, struct weapon_interface_state const *weapon_state, short const *new_state_flags, short const *new_overlay_flags, short const *new_numbers);
+static void render_weapon_hud(
+	long hud_index,
+	short local_player_index,
+	struct weapon_definition const *weapon_definition,
+	struct weapon_interface_state const *weapon_state,
+	short const *new_state_flags,
+	short const *new_overlay_flags,
+	short const *new_numbers);
 static void play_weapon_hud_sounds(short local_player_index, long hud_index, struct weapon_interface_state const *weapon_state);
 static void render_grenade_hud(short local_player_index, long unit_index);
 static void crosshairs_draw(struct player_datum *player, long weapon_index, long hud_index, struct weapon_interface_state *weapon_state);
@@ -98,7 +103,7 @@ static struct weapon_hud_globals_definition *weapon_hud_globals = NULL;
 void hud_initialize_weapon_interface(
 	void)
 {
-	weapon_hud_globals = game_state_malloc("hud weapon interface", NULL, sizeof(*weapon_hud_globals));
+	weapon_hud_globals = (struct weapon_hud_globals_definition *)game_state_malloc("hud weapon interface", NULL, sizeof(*weapon_hud_globals));
 	match_assert("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 107, weapon_hud_globals);
 
 	return;
@@ -208,8 +213,7 @@ void hud_update_weapon(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 212, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 212, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 212);
 	}
 
 	return;
@@ -401,8 +405,7 @@ static void hud_update_weapon_local_player(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 414, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 414, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 414);
 	}
 
 	return;
@@ -893,8 +896,7 @@ static void render_weapon_hud(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 776, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 776, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 776);
 	}
 
 	return;
@@ -1027,8 +1029,7 @@ static void render_grenade_hud(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 930, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 930, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 930);
 	}
 
 	return;
@@ -1306,8 +1307,7 @@ static void crosshairs_draw(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 1250, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 1250, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_weapon.c", 1250);
 	}
 
 	return;

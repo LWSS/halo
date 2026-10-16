@@ -76,8 +76,7 @@ static real_rectangle2d const *get_sprite_clip_rect(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 100, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 100, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 100);
 	}
 
 	return result;
@@ -169,8 +168,7 @@ void hud_calculate_point(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 181, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 181, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 181);
 	}
 
 	return;
@@ -226,8 +224,7 @@ void hud_retrieve_bitmap_and_bounding_rect(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 228, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 228, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 228);
 	}
 
 	return;
@@ -326,8 +323,7 @@ unsigned long get_flash_color(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 311, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 311, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 311);
 	}
 
 	return real_argb_color_to_pixel32(&out_color);
@@ -443,8 +439,7 @@ void hud_draw_meter(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 428, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 428, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 428);
 	}
 
 	return;
@@ -720,8 +715,7 @@ void hud_draw_numbers(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 602, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 602, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 602);
 	}
 
 	return;
@@ -821,8 +815,7 @@ void hud_draw_static_element(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 685, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 685, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 685);
 	}
 
 	return;
@@ -907,8 +900,7 @@ void hud_draw_weapon_overlays(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 748, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 748, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 748);
 	}
 
 	return;
@@ -995,8 +987,7 @@ static void hud_draw_bitmap_with_meter(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 814, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 814, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 814);
 	}
 
 	return;
@@ -1044,8 +1035,7 @@ void hud_draw_bitmap_direct(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 856, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 856, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 856);
 	}
 
 	return;
@@ -1110,8 +1100,7 @@ static void hud_calculate_bitmap_bounds(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 907, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 907, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 907);
 	}
 
 	return;
@@ -1168,8 +1157,7 @@ static void hud_draw_bitmap_internal(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 985, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 985, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 985);
 	}
 
 	return;
@@ -1216,8 +1204,7 @@ static boolean hud_draw_multitexture_overlay_get_current_weapon_definition(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 1032, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 1032, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 1032);
 	}
 
 	return result;
@@ -1505,8 +1492,7 @@ static void hud_draw_multitexture_overlay(
 	{
 		short corrupt_index = check_stack_buffer(stack_buffer);
 
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 1372, return_eip == get_return_eip(), "corrupt return address!");
-		match_vassert("c:\\halo\\SOURCE\\interface\\hud_draw.c", 1372, corrupt_index == NONE, csprintf(temporary, "corrupt stack at %d!", corrupt_index));
+		match_hud_verify_stack("c:\\halo\\SOURCE\\interface\\hud_draw.c", 1372);
 	}
 
 	return;

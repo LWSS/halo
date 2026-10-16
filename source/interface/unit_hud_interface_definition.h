@@ -48,6 +48,10 @@ enum
 	NUMBER_OF_UNIT_AUXILARY_OVERLAY_FLAGS,
 };
 
+/* ---------- macros */
+
+#define unit_hud_interface_definition_get(index) ((struct unit_hud_interface_definition *)tag_get(UNIT_HUD_INTERFACE_TAG, index))	/* fake name */
+
 /* ---------- structures */
 
 struct metered_panel_definition
@@ -98,7 +102,7 @@ struct auxilary_overlay_definition
 {
 	struct static_hud_element_definition static_element;
 	short type;
-	unsigned short flags;
+	word flags;
 	long unused0[6];
 };
 

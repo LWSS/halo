@@ -180,7 +180,7 @@ struct weapon_hud_number_element
 {
 	struct weapon_hud_element_header header;
 	struct number_hud_element_definition number_element;
-	unsigned short weapon_flags;
+	word weapon_flags;
 	short pad;
 	long unused[9];
 };
@@ -244,22 +244,22 @@ struct weapon_hud_overlays_element
 struct hud_screen_effect_definition
 {
 	long unused1[1];
-	unsigned short mask_flags;
-	unsigned short mask_pad;
+	word mask_flags;
+	word mask_pad;
 	long mask_unused[4];
 	struct tag_reference mask_fullscreen;
 	struct tag_reference mask_splitscreen;
 	long unused2[2];
-	unsigned short convolution_flags;
-	unsigned short convolution_pad;
+	word convolution_flags;
+	word convolution_pad;
 	real convolution_radius_in_bounds[2];
 	real convolution_radius_out_bounds[2];
 	long unused3[6];
-	unsigned short light_enhancement_flags;
+	word light_enhancement_flags;
 	short light_enhancement_script_source;
 	real light_enhancement_intensity;
 	long unused4[6];
-	unsigned short desaturation_flags;
+	word desaturation_flags;
 	short desaturation_script_source;
 	real desaturation_intensity;
 	union real_rgb_color desaturation_tint;

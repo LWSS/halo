@@ -153,12 +153,12 @@ struct game_engine
 	void (*update)(void);
 	long (*get_score)(long, enum get_score_type);
 	long (*get_team_score)(long);
-	unsigned short *(*get_score_string)(long, unsigned short *);
-	unsigned short *(*get_team_score_string)(long, unsigned short *);
+	word *(*get_score_string)(long, word *);
+	word *(*get_team_score_string)(long, word *);
 	boolean (*allow_pick_up)(long, long);
 	void (*player_damaged_player)(long, long, boolean);
 	void (*player_killed_player)(long, long, long, boolean);
-	boolean (*rasterize_score)(long, long, long, unsigned short *, long);
+	boolean (*rasterize_score)(long, long, long, word *, long);
 	real (*starting_location_rating)(long, struct scenario_player *);
 	void (*prespawn_player_update)(long);
 	boolean (*postspawn_player_update)(long);

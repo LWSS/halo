@@ -200,7 +200,7 @@ struct hud_color_definition
 	real flash_period;
 	real flash_delay;
 	short number_of_flashes;
-	unsigned short flash_flags;
+	word flash_flags;
 	real flash_length;
 	unsigned long disabled_color;
 	union
