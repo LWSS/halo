@@ -18,7 +18,16 @@ header included in hcex build.
 
 /* ---------- structures */
 
-/* ---------- prototypes/EXAMPLE.C */
+/* ---------- prototypes/LIGHTNING.C */
+
+void lightnings_initialize(void);
+void lightnings_dispose(void);
+void lightnings_initialize_for_new_map(void);
+void lightnings_dispose_from_old_map(void);
+long lightning_new(long definition_index);
+void lightning_delete(long lightning_index);
+void lightning_submit(long object_index, long widget_index, struct render_lighting const *lighting, struct render_animation const *animation);
+void lightning_render(long object_index, long widget_index);
 
 /* ---------- globals */
 

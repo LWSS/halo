@@ -75,6 +75,16 @@ enum
 
 enum
 {
+	_object_function_scale_by_none = 0,
+	_object_function_scale_by_first_incoming_function,
+	_object_function_scale_by_last_incoming_function = _object_function_scale_by_first_incoming_function + NUMBER_OF_INCOMING_OBJECT_FUNCTIONS - 1,
+	_object_function_scale_by_first_outgoing_function,
+	_object_function_scale_by_last_outgoing_function = _object_function_scale_by_first_outgoing_function + NUMBER_OF_OUTGOING_OBJECT_FUNCTIONS - 1,
+	NUMBER_OF_OBJECT_FUNCTION_SCALE_BYS,
+};
+
+enum
+{
 	_object_type_biped = 0,
 	_object_type_vehicle,
 	_object_type_weapon,
@@ -121,6 +131,16 @@ enum
 	NUMBER_OF_OBJECT_CHANGE_COLORS,
 };
 
+enum
+{
+	_change_color_reference_none = 0,
+	_change_color_reference_a,
+	_change_color_reference_b,
+	_change_color_reference_c,
+	_change_color_reference_d,
+	NUMBER_OF_CHANGE_COLOR_REFERENCES,
+};
+
 /* ---------- macros */
 
 #define object_definition_get(index) ((struct object_definition *)tag_get(OBJECT_DEFINITION_TAG, (index)))
@@ -135,6 +155,12 @@ struct object_attachment_definition
 	short secondary_scale_function_reference;
 	short change_color_reference;
 	word pad;
+	long unused[4];
+};
+
+struct object_definition_widget
+{
+	struct tag_reference type;
 	long unused[4];
 };
 
@@ -209,7 +235,7 @@ struct _object_definition
 	short icon_text_index;
 	short forced_shader_permutation_index;
 	struct tag_block attachments;			// object_attachment_definition
-	struct tag_block widgets;
+	struct tag_block widgets;				// object_definition_widget
 	struct tag_block functions;				// object_function_definition
 	struct tag_block change_colors;			// object_change_color_definition
 	struct tag_block predicted_resources;

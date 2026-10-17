@@ -38,6 +38,13 @@ enum
 
 enum
 {
+	_encounter_version_0 = 0,
+	_encounter_version_1,
+	_encounter_version_current = _encounter_version_1,
+};
+
+enum
+{
 	_firing_position_group_attacking = 0,
 	_firing_position_group_attacking_search,
 	_firing_position_group_attacking_guard,

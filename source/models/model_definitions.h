@@ -38,6 +38,14 @@ enum
 
 enum
 {
+	_model_definition_blend_shared_normals_bit = 0,
+	_model_definition_parts_have_local_nodes_bit,
+	_model_definition_ignore_skinning,
+	NUMBER_OF_MODEL_DEFINITION_FLAGS,
+};
+
+enum
+{
 	_model_part_stripped_bit = 0,
 	_model_part_local_nodes,
 	NUMBER_OF_MODEL_GEOMETRY_PART_FLAGS,
