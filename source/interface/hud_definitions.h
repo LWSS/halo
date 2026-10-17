@@ -217,7 +217,7 @@ struct static_hud_element_definition
 	struct hud_color_definition colors;
 	short sequence_index;
 	short pad;
-	struct tag_block multitexture_overlays;
+	struct tag_block multitexture_overlays;		// multitexture_overlay_hud_element_definition
 	long unused0[1];
 };
 
@@ -238,7 +238,7 @@ struct meter_hud_element_definition
 	real opacity;
 	real fade;
 	unsigned long disabled_color;
-	struct tag_block multitexture_overlays;
+	struct tag_block multitexture_overlays;		// multitexture_overlay_hud_element_definition
 	long unused0[1];
 };
 
@@ -344,7 +344,7 @@ struct hud_waypoint_definition
 	real right_offset;
 	long unused0[8];
 	struct tag_reference arrow_bitmap;
-	struct tag_block arrows;
+	struct tag_block arrows;		// hud_waypoint_arrow
 	long unused1[20];
 };
 
@@ -379,7 +379,7 @@ struct hud_messaging_parameters_definition
 	struct tag_reference hud_item_messages;
 	struct tag_reference messaging_icons;
 	struct tag_reference alternate_icon_text;
-	struct tag_block button_icons;
+	struct tag_block button_icons;		// icon_hud_element_definition
 	struct hud_color_definition color;
 	struct tag_reference hud_messages;
 	struct hud_color_definition objective_color;

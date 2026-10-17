@@ -198,7 +198,7 @@ struct weapon_hud_crosshair_item
 struct weapon_hud_crosshair_definition
 {
 	struct tag_reference bitmap;
-	struct tag_block items;
+	struct tag_block items;		// weapon_hud_crosshair_item
 };
 
 struct weapon_hud_crosshairs_element
@@ -227,7 +227,7 @@ struct weapon_hud_overlay_item
 struct weapon_hud_overlay_definition
 {
 	struct tag_reference bitmap;
-	struct tag_block items;
+	struct tag_block items;		// weapon_hud_overlay_item
 };
 
 struct weapon_hud_overlays_element
@@ -271,14 +271,14 @@ struct weapon_hud_interface_definition
 	struct tag_reference parent_hud;
 	struct weapon_flash_state_definition flash_cutoffs;
 	struct hud_absolute_placement_definition absolute_placement;
-	struct tag_block statics;
-	struct tag_block meters;
-	struct tag_block numbers;
-	struct tag_block crosshairs;
-	struct tag_block overlays;
+	struct tag_block statics;			// weapon_hud_static_element
+	struct tag_block meters;			// weapon_hud_meter_element
+	struct tag_block numbers;			// weapon_hud_number_element
+	struct tag_block crosshairs;		// weapon_hud_crosshairs_element
+	struct tag_block overlays;			// weapon_hud_overlays_element
 	unsigned long valid_crosshair_types_flags;
-	struct tag_block warning_sounds;
-	struct tag_block screen_effects;
+	struct tag_block warning_sounds;	// sound_hud_element_definition
+	struct tag_block screen_effects;	// hud_screen_effect_definition
 	long unused1[33];
 	struct icon_hud_element_definition messaging_icon;
 	long unused2[12];
@@ -298,7 +298,7 @@ struct grenade_hud_interface_definition
 	struct static_hud_element_definition background;
 	struct grenade_count_panel_definition grenade_count_panel;
 	struct weapon_hud_overlay_definition overlays;
-	struct tag_block warning_sounds;
+	struct tag_block warning_sounds;		// sound_hud_element_definition
 	long unused0[17];
 	struct tag_reference messaging_icon_bitmap;
 	long unused2[12];
