@@ -421,6 +421,11 @@ struct rasterizer_lens_flare_submit_parameters
 	long internal__occlusion_pixels;
 };
 
+struct rasterizer_triangle
+{
+	word vertex_indices[3];
+};
+
 /* ---------- prototypes/RASTERIZER.C */
 
 boolean rasterizer_initialize(void);
@@ -644,9 +649,9 @@ struct rasterizer_globals_struct
 	void *default_white_hardware_format;
 	void *default_2d_hardware_format;
 	void *default_3d_hardware_format;
-	void *default_cm_hardware_format;
 	short lightmap_mode;
 	short maximum_nodes_per_model;
+	short max_simultaneous_textures;
 };
 
 extern struct rasterizer_globals_struct rasterizer_globals;
