@@ -29,6 +29,11 @@ enum
 	_plane_intersection_all, /* fake name */
 };
 
+#define LEAF_FACE_CLIP_EPSILON (1.0f / 4096.0f)				/* fake name */
+#define LEAF_PORTAL_INTERSECTION_EPSILON (1.0f / 2048.0f)	/* fake name */
+#define MINIMUM_LEAF_PORTAL_AREA 0.0025f					/* fake name */
+#define MINIMUM_LEAF_PORTAL_COMPACTNESS 0.01f				/* fake name */
+
 /* ---------- macros */
 
 #define index_from_node(node) ((node)&LONG_MAX)
@@ -290,7 +295,7 @@ static void leaf_map_build_leaf_face_for_leaf_on_node(
 					result.vertices,
 					NULL,
 					NULL,
-					0.000244140625f);
+					LEAF_FACE_CLIP_EPSILON);
 				match_assert("c:\\halo\\SOURCE\\structures\\leaf_map.c", 227, result.vertex_count!=NONE);
 			}
 			else if (intersection == _plane_intersection_none)
@@ -537,7 +542,7 @@ static void leaf_map_build_portal_from_leaves(
 			face1->vertices.address,
 			MAXIMUM_VERTICES_PER_LEAF_PORTAL,
 			vertices,
-			0.00048828125f);
+			LEAF_PORTAL_INTERSECTION_EPSILON);
 
 		if (vertex_count > 0)
 		{
@@ -579,7 +584,8 @@ static void leaf_map_build_portal_from_leaves(
 
 				area = convex_hull2d_area(vertex_count, vertices);
 
-				if (area < 0.0025f || square_root(area) / convex_hull2d_perimeter(vertex_count, vertices) < 0.01f)
+				if (area < MINIMUM_LEAF_PORTAL_AREA ||
+					square_root(area) / convex_hull2d_perimeter(vertex_count, vertices) < MINIMUM_LEAF_PORTAL_COMPACTNESS)
 				{
 					leaf_map_close_portal(leaf_map, portal_index);
 				}
