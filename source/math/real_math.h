@@ -543,9 +543,6 @@ extern real_matrix4x3 const *global_negative_identity4x3;
 extern real_rectangle2d const *global_null_rectangle2d;
 extern real_rectangle3d const *global_null_rectangle3d;
 
-extern const real_rectangle2d *const global_null_rectangle2d;
-extern const real_rectangle3d *const global_null_rectangle3d;
-
 /* ---------- public code */
 
 __inline long fast_ftol(
