@@ -1346,7 +1346,10 @@ __inline short local_random_range(
 __inline real real_local_random(
 	void)
 {
-	return real_seed_random(get_global_local_random_seed_address());
+	// This temporary exists in sapien /Od
+	real result = real_seed_random(get_global_local_random_seed_address());
+
+	return result;
 }
 
 __inline real real_local_random_range(

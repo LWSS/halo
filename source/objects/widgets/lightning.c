@@ -26,7 +26,7 @@ enum
 /* ---------- macros */
 
 #define lightning_get(index) ((struct lightning_datum *)datum_get(lightning_globals.lightning_data, (index)))	/* fake name */
-#define DYNAMIC_TRIANGLE_STRIP_INDEX(vertex_count) (-(vertex_count))											/* fake name */
+#define lightning_try_and_get(index) ((struct lightning_datum *)datum_try_and_get(lightning_globals.lightning_data, (index)))	/* fake name */
 
 /* ---------- structures */
 
@@ -107,7 +107,9 @@ long lightning_new(
 
 	if (lightning_index != NONE)
 	{
-		lightning_get(lightning_index)->definition_index = definition_index;
+		struct lightning_datum *lightning = lightning_get(lightning_index);
+
+		lightning->definition_index = definition_index;
 	}
 
 	return lightning_index;
@@ -130,22 +132,16 @@ static void lightning_offset_marker_position(
 	real_vector3d const *random_position_bounds)
 {
 	real_vector3d offset;
-	real random_k;
-	real random_j;
-	real random_i;
 
 	match_assert("c:\\halo\\SOURCE\\objects\\widgets\\lightning.c", 116, position);
 	match_assert("c:\\halo\\SOURCE\\objects\\widgets\\lightning.c", 117, matrix);
 	match_assert("c:\\halo\\SOURCE\\objects\\widgets\\lightning.c", 118, random_position_bounds);
 
-	random_k = real_local_random();
-	random_j = real_local_random();
-	random_i = real_local_random();
 	set_real_vector3d(
 		&offset,
-		(random_i * 2.f - 1.f) * random_position_bounds->i,
-		(random_j * 2.f - 1.f) * random_position_bounds->j,
-		(random_k * 2.f - 1.f) * random_position_bounds->k);
+		(real_local_random() * 2.f - 1.f) * random_position_bounds->i,
+		(real_local_random() * 2.f - 1.f) * random_position_bounds->j,
+		(real_local_random() * 2.f - 1.f) * random_position_bounds->k);
 	matrix4x3_transform_vector(matrix, &offset, &offset);
 	position->x += offset.i;
 	position->y += offset.j;
@@ -162,9 +158,9 @@ void lightning_submit(
 {
 	if (object_index != NONE && widget_index != NONE)
 	{
-		struct object_marker marker;
 		struct lightning_datum *lightning = lightning_get(widget_index);
 		struct lightning_definition *definition = lightning_definition_get(lightning->definition_index);
+		struct object_marker marker;
 
 		if (definition->markers.count > 0 &&
 			object_get_marker_by_name(
@@ -184,11 +180,11 @@ void lightning_submit(
 
 				for (lightning_index = 0; lightning_index < definition->count; lightning_index++)
 				{
-					short marker_index;
 					struct intermediate_lightning_point points[MAXIMUM_POINTS_PER_LIGHTNING];
 					short point_count = 0;
 					real jitter_scale = 1.f;
 					boolean new_segment = TRUE;
+					short marker_index;
 
 					if (animation &&
 						animation->values &&
@@ -210,9 +206,7 @@ void lightning_submit(
 							point_count = 0;
 							memset(points, 0, sizeof(points));
 							object_get_marker_by_name(object_index, marker_definition->attachment_marker, &marker, 1);
-							points[0].position.x = marker.matrix.position.x;
-							points[0].position.y = marker.matrix.position.y;
-							points[0].position.z = marker.matrix.position.z;
+							points[0].position = marker.matrix.position;
 							lightning_offset_marker_position(
 								&points[0].position,
 								&marker.matrix,
@@ -239,16 +233,16 @@ void lightning_submit(
 
 								if (dynamic_vertex_buffer_index != NONE)
 								{
-									short vertex_index;
+									struct dynamic_unlit_vertex *vertices = rasterizer_dynamic_vertices_lock(dynamic_vertex_buffer_index);
 									real_rectangle3d bounds;
 									real_point3d centroid;
 									struct shader_effect *effect;
-									struct dynamic_unlit_vertex *vertices = rasterizer_dynamic_vertices_lock(dynamic_vertex_buffer_index);
 									real one_over_point_count = 1.f / point_count;
 									real texture_offset = real_local_random();
 									real thickness_scale = 1.f;
 									real_rgb_color const *tint = global_real_rgb_white;
 									real brightness_scale = 1.f;
+									short vertex_index;
 
 									match_assert("c:\\halo\\SOURCE\\objects\\widgets\\lightning.c", 239, vertices);
 
@@ -285,11 +279,11 @@ void lightning_submit(
 										struct intermediate_lightning_point *next_point = vertex_index < point_count - 1 ?
 											&points[vertex_index + 1] :
 											point;
-										real width = points[vertex_index].width * thickness_scale;
-										real u = vertex_index * one_over_point_count;
 										real_vector3d up;
+										real width = points[vertex_index].width * thickness_scale;
 										real_argb_color adjusted_color;
 										pixel32 pixel;
+										real u = vertex_index * one_over_point_count;
 
 										match_assert("c:\\halo\\SOURCE\\objects\\widgets\\lightning.c", 280, points[vertex_index].valid);
 										vector_from_points3d(&previous_point->position, &next_point->position, &up);
@@ -344,7 +338,7 @@ void lightning_submit(
 										(struct shader const *)effect,
 										bitmap,
 										animation,
-										DYNAMIC_TRIANGLE_STRIP_INDEX(2 * point_count),
+										-point_count * 2,
 										dynamic_vertex_buffer_index,
 										2 * point_count - 2,
 										&centroid,
@@ -363,11 +357,12 @@ void lightning_submit(
 								&definition->markers,
 								marker_index + 1,
 								struct lightning_marker_definition);
-							short segment_point_count = FLAG(marker_definition->octaves_to_next_marker);
+							short segment_point_count = 1 << marker_definition->octaves_to_next_marker;
 							short octave_count = marker_definition->octaves_to_next_marker;
+							short octave;
+							real const jitter_falloff_scale = 0.5f;
 							real jitter_falloff = 1.f;
 							real_vector3d up;
-							short octave;
 
 							match_assert("c:\\halo\\SOURCE\\objects\\widgets\\lightning.c", 383, !points[point_count+segment_point_count].valid);
 							object_get_marker_by_name(object_index, next_marker_definition->attachment_marker, &marker, 1);
@@ -392,9 +387,9 @@ void lightning_submit(
 
 							for (octave = 1; octave <= octave_count; octave++)
 							{
-								short segment_point_index;
-								short segment_point_start_index = FLAG(octave_count - octave);
+								short segment_point_start_index = 1 << (octave_count - octave);
 								short segment_point_step = 2 * segment_point_start_index;
+								short segment_point_index;
 
 								match_assert("c:\\halo\\SOURCE\\objects\\widgets\\lightning.c", 408, segment_point_start_index>0);
 
@@ -405,12 +400,12 @@ void lightning_submit(
 									struct intermediate_lightning_point *previous_point = &points[point_count + segment_point_index - segment_point_start_index];
 									struct intermediate_lightning_point *next_point = &points[point_count + segment_point_index + segment_point_start_index];
 									struct intermediate_lightning_point *point = &points[point_count + segment_point_index];
-									real jitter = ((next_marker_definition->random_jitter_offset - marker_definition->random_jitter_offset) *
-										((real)segment_point_index / (real)segment_point_count) +
+									real_vector3d displacement;
+									real t = (real)segment_point_index / (real)segment_point_count;
+									real jitter = ((next_marker_definition->random_jitter_offset - marker_definition->random_jitter_offset) * t +
 										marker_definition->random_jitter_offset) *
 										jitter_falloff *
 										jitter_scale;
-									real_vector3d displacement;
 
 									match_assert("c:\\halo\\SOURCE\\objects\\widgets\\lightning.c", 426, !points[point_count+segment_point_index].valid);
 									scale_vector3d(&up, real_local_random_range(-1.f, 1.f) * jitter, &displacement);
@@ -427,10 +422,10 @@ void lightning_submit(
 									point->valid = TRUE;
 								}
 
-								jitter_falloff *= 0.5f;
+								jitter_falloff *= jitter_falloff_scale;
 							}
 
-							point_count += FLAG(marker_definition->octaves_to_next_marker);
+							point_count += 1 << marker_definition->octaves_to_next_marker;
 						}
 					}
 				}

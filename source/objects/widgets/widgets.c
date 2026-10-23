@@ -30,6 +30,7 @@ enum
 /* ---------- macros */
 
 #define widget_get(index) ((struct widget_datum *)datum_get(widget_data, (index))) /* fake name */
+#define widget_try_and_get(index) ((struct widget_datum *)datum_try_and_get(widget_data, (index))) /* fake name */
 
 /* ---------- structures */
 
@@ -136,14 +137,14 @@ void widgets_dispose(
 void widgets_new(
 	long object_index)
 {
+	struct object_datum *object = object_get(object_index);
+	struct object_definition *definition = object_definition_get(object->definition_index);
 	short widget_reference_index;
 	struct object_definition_widget *widget_reference;
 	short type;
 	struct widget_type_definition *type_definition;
 	long widget_index;
 	struct widget_datum *widget;
-	struct object_datum *object = object_get(object_index);
-	struct object_definition *definition = object_definition_get(object->definition_index);
 
 	object->object.first_widget_index = NONE;
 
@@ -197,11 +198,11 @@ void widgets_new(
 void widgets_delete(
 	long object_index)
 {
+	struct object_datum *object = object_get(object_index);
 	long widget_index;
 	struct widget_datum *widget;
 	struct widget_type_definition *type_definition;
 	long next_widget_index;
-	struct object_datum *object = object_get(object_index);
 
 	for (widget_index = object->object.first_widget_index;
 		widget_index != NONE;
@@ -233,8 +234,9 @@ boolean widgets_need_lighting(
 	while (widget_index != NONE)
 	{
 		struct widget_datum *widget = widget_get(widget_index);
+		struct widget_type_definition *type_definition = widget_type_definition_get(widget->type);
 
-		if (widget_type_definition_get(widget->type)->needs_lighting)
+		if (type_definition->needs_lighting)
 		{
 			result = TRUE;
 			break;
@@ -251,11 +253,12 @@ void widgets_render(
 	struct render_lighting const *lighting,
 	struct render_animation const *animation)
 {
+	struct object_datum *object = object_get(object_index);
 	long widget_index;
 	struct widget_datum *widget;
 	struct widget_type_definition *type_definition;
 
-	for (widget_index = object_get(object_index)->object.first_widget_index;
+	for (widget_index = object->object.first_widget_index;
 		widget_index != NONE;
 		widget_index = widget->next_widget_index)
 	{

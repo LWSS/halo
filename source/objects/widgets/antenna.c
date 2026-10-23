@@ -22,13 +22,12 @@ enum
 };
 
 #define ANTENNA_CATCH_UP_DT 0.05f					/* fake name */
-#define ANTENNA_MAXIMUM_DT (2 * SECONDS_PER_TICK)	/* fake name */
-#define ANTENNA_FADE_PIXELS 100.f					/* fake name */
 #define ANTENNA_VERTEX_RADIUS 0.02f					/* fake name */
 
 /* ---------- macros */
 
 #define antenna_get(index) ((struct antenna_datum *)datum_get(antenna_data, (index))) /* fake name */
+#define antenna_try_and_get(index) ((struct antenna_datum *)datum_try_and_get(antenna_data, (index))) /* fake name */
 
 /* ---------- structures */
 
@@ -119,10 +118,9 @@ long antenna_new(
 
 		if (antenna_index != NONE)
 		{
+			struct antenna_datum *antenna = antenna_get(antenna_index);
 			short vertex_index;
 			real_point3d last_point;
-			struct antenna_vertex_datum *vertex;
-			struct antenna_datum *antenna = antenna_get(antenna_index);
 
 			antenna->initialized = FALSE;
 			antenna->disabled = definition->vertices.count < 2;
@@ -136,13 +134,12 @@ long antenna_new(
 
 			for (vertex_index = 0; vertex_index < definition->vertices.count; vertex_index++)
 			{
-				struct antenna_vertex const *vertex_definition;
-
-				vertex = &antenna->vertices[vertex_index];
-				vertex_definition = TAG_BLOCK_GET_ELEMENT(
+				struct antenna_vertex_datum *vertex = &antenna->vertices[vertex_index];
+				struct antenna_vertex const *vertex_definition = TAG_BLOCK_GET_ELEMENT(
 					&definition->vertices,
 					vertex_index,
 					struct antenna_vertex);
+
 				vertex->p = last_point;
 				vertex->v.k = 0.f;
 				vertex->v.j = 0.f;
@@ -175,7 +172,7 @@ long antenna_new(
 							if (bitmap)
 							{
 								vertex->sprite_scale = vertex_definition->length_to_next /
-									((sprite->bounds.x1 - sprite->bounds.x0) * bitmap->width - bitmap_group->sprite_spacing * 2.f - 1.f);
+									(bitmap->width * (sprite->bounds.x1 - sprite->bounds.x0) - bitmap_group->sprite_spacing * 2.f - 1.f);
 							}
 						}
 					}
@@ -186,11 +183,14 @@ long antenna_new(
 				last_point.z += vertex_definition->vector_to_next.k;
 			}
 
-			vertex = &antenna->vertices[vertex_index];
-			vertex->p = last_point;
-			vertex->v.k = 0.f;
-			vertex->v.j = 0.f;
-			vertex->v.i = 0.f;
+			{
+				struct antenna_vertex_datum *vertex = &antenna->vertices[vertex_index];
+
+				vertex->p = last_point;
+				vertex->v.k = 0.f;
+				vertex->v.j = 0.f;
+				vertex->v.i = 0.f;
+			}
 		}
 	}
 
@@ -211,12 +211,9 @@ void antenna_render(
 	struct render_lighting const *lighting,
 	struct render_animation const *animation)
 {
-	struct antenna_datum *antenna;
-	struct antenna_definition *definition;
-
-	object_get(object_index);
-	antenna = antenna_get(antenna_index);
-	definition = antenna_definition_get(antenna->definition_index);
+	struct object_datum *object = object_get(object_index);
+	struct antenna_datum *antenna = antenna_get(antenna_index);
+	struct antenna_definition *definition = antenna_definition_get(antenna->definition_index);
 
 	if (!antenna->disabled)
 	{
@@ -255,7 +252,9 @@ void antennas_update(
 			if (antenna->object_index != NONE &&
 				antenna->updates_since_last_render < MAXIMUM_UPDATES_BETWEEN_RENDERS)
 			{
-				antenna_update(antenna, definition, MIN(dt, ANTENNA_MAXIMUM_DT));
+				real const maximum_dt = 2 * SECONDS_PER_TICK;
+
+				antenna_update(antenna, definition, MIN(dt, maximum_dt));
 			}
 		}
 	}
@@ -282,7 +281,7 @@ static void antenna_update(
 	real_point3d new_position;
 	real spring;
 	real one_over_dt;
-	real_vector3d difference;
+	real_vector3d to_new;
 	real magnitude;
 	real scale;
 	real_point3d p_parent;
@@ -329,14 +328,14 @@ static void antenna_update(
 					NULL,
 					ANTENNA_VERTEX_RADIUS,
 					dt);
-				difference.i = new_position.x - last_point.x;
-				difference.j = new_position.y - last_point.y;
-				difference.k = new_position.z - last_point.z;
-				magnitude = magnitude3d(&difference);
+				to_new.i = new_position.x - last_point.x;
+				to_new.j = new_position.y - last_point.y;
+				to_new.k = new_position.z - last_point.z;
+				magnitude = magnitude3d(&to_new);
 				scale = vertex_definition->length_to_next / magnitude;
-				p_parent.x = scale * difference.i + last_point.x;
-				p_parent.y = scale * difference.j + last_point.y;
-				p_parent.z = scale * difference.k + last_point.z;
+				p_parent.x = scale * to_new.i + last_point.x;
+				p_parent.y = scale * to_new.j + last_point.y;
+				p_parent.z = scale * to_new.k + last_point.z;
 				new_position.x = (1.f - spring) * p_parent.x + spring * next_desired_point.x;
 				new_position.y = (1.f - spring) * p_parent.y + spring * next_desired_point.y;
 				new_position.z = (1.f - spring) * p_parent.z + spring * next_desired_point.z;
@@ -383,6 +382,7 @@ static void antenna_update_attachment(
 	real_point3d *attachment_point,
 	real_vector3d *attachment_vector)
 {
+	real const maximum_displacement = 1.f;
 	struct object_marker marker;
 	real_vector3d attachment_displacement;
 	short vertex_index;
@@ -395,9 +395,9 @@ static void antenna_update_attachment(
 	attachment_displacement.j = attachment_point->y - antenna->last_attachment_location.y;
 	attachment_displacement.k = attachment_point->z - antenna->last_attachment_location.z;
 
-	if (abs(attachment_displacement.i) > 1.f ||
-		abs(attachment_displacement.j) > 1.f ||
-		abs(attachment_displacement.k) > 1.f)
+	if (abs(attachment_displacement.i) > maximum_displacement ||
+		abs(attachment_displacement.j) > maximum_displacement ||
+		abs(attachment_displacement.k) > maximum_displacement)
 	{
 		for (vertex_index = 0; vertex_index < antenna_definition->vertices.count + 1; vertex_index++)
 		{
@@ -421,10 +421,9 @@ static void antenna_render_proper(
 	if (antenna_definition->vertices.count)
 	{
 		struct build_sprite_data build_sprite_data;
-		real_vector3d difference;
-		real_argb_color color;
 		short vertex_index;
-		real fade = (ANTENNA_FADE_PIXELS - antenna_definition->cutoff_pixels) /
+		real pixels = 100.f;
+		real fade = (pixels - antenna_definition->cutoff_pixels) /
 			(antenna_definition->falloff_pixels - antenna_definition->cutoff_pixels);
 
 		fade = PIN(fade, 0.f, 1.f);
@@ -443,6 +442,8 @@ static void antenna_render_proper(
 				vertex_index,
 				struct antenna_vertex);
 			struct antenna_vertex_datum *next_vertex = &antenna->vertices[vertex_index + 1];
+			real_vector3d difference;
+			real_argb_color color;
 
 			difference.i = next_vertex->p.x - vertex->p.x;
 			difference.j = next_vertex->p.y - vertex->p.y;

@@ -48,12 +48,11 @@ enum
 
 #define FLAG_CATCH_UP_DT 5.f								/* fake name */
 #define FLAG_VERTEX_RADIUS 0.02f							/* fake name */
-#define FLAG_WIND_SCALE (0.02f * 0.02f)						/* fake name */
-#define FLAG_UNDERWATER_WIND_SCALE (0.4f * FLAG_WIND_SCALE)	/* fake name */
 
 /* ---------- macros */
 
 #define flag_get(index) ((struct flag_datum *)datum_get(flag_data, (index))) /* fake name */
+#define flag_try_and_get(index) ((struct flag_datum *)datum_try_and_get(flag_data, (index))) /* fake name */
 
 /* ---------- structures */
 
@@ -168,10 +167,8 @@ void flags_dispose(
 long flag_new(
 	long flag_definition_index)
 {
-	long flag_index;
-
-	global_scenario_get();
-	flag_index = NONE;
+	struct scenario *scenario = global_scenario_get();
+	long flag_index = NONE;
 
 	if (flag_definition_index != NONE)
 	{
@@ -209,7 +206,9 @@ long flag_new(
 
 						if (x < definition->width - 1 && y < definition->height - 1)
 						{
-							flag_datum_get_cell(flag, definition, x, y)->tesselation = _tesselate_both;
+							struct flag_cell_datum *cell = flag_datum_get_cell(flag, definition, x, y);
+
+							cell->tesselation = _tesselate_both;
 						}
 					}
 				}
@@ -244,22 +243,22 @@ void flag_set_attachment_shape(
 				&flag_definition->attachment_points,
 				attachment_index,
 				struct flag_attachment_point);
-			short height = PIN(attachment_point->height_to_next_attachment, 0, flag_definition->height - y);
-			short even_height = height & ~MASK(1);
+			short even_height = PIN(attachment_point->height_to_next_attachment, 0, flag_definition->height - y) & ~MASK(1);
+			short half_height = even_height >> 1;
 
 			flag_tesselate_region(
 				flag_definition,
 				flag,
 				0,
 				y,
-				even_height >> 1,
+				half_height,
 				_tesselate_top_right);
 			flag_tesselate_region(
 				flag_definition,
 				flag,
 				0,
-				(even_height >> 1) + y,
-				even_height >> 1,
+				y + half_height,
+				half_height,
 				_tesselate_bottom_right);
 			y += even_height;
 		}
@@ -274,20 +273,11 @@ void flag_set_trailing_shape(
 {
 	if (flag_definition->trailing_edge_shape)
 	{
-		short size;
-		short x;
-
-		if (flag_definition->trailing_edge_shape == _trailing_edge_shape_trapezoid_short_top ||
-			flag_definition->trailing_edge_shape == _trailing_edge_shape_trapezoid_short_bottom)
-		{
-			size = flag_definition->height - 1;
-		}
-		else
-		{
-			size = flag_definition->height >> 1;
-		}
-
-		x = FLOOR(flag_definition->width - size + flag_definition->trailing_edge_offset - 1, 0);
+		short size = flag_definition->trailing_edge_shape == _trailing_edge_shape_trapezoid_short_top ||
+			flag_definition->trailing_edge_shape == _trailing_edge_shape_trapezoid_short_bottom ?
+			flag_definition->height - 1 :
+			flag_definition->height >> 1;
+		short x = FLOOR(flag_definition->width - size + flag_definition->trailing_edge_offset - 1, 0);
 
 		if (flag_definition->trailing_edge_shape == _trailing_edge_shape_trapezoid_short_top)
 		{
@@ -330,21 +320,21 @@ void flag_tesselate_region(
 		{
 			if (i >= 0 && j >= 0 && i < flag_definition->width - 1 && j < flag_definition->height - 1)
 			{
-				short u;
-				short v;
-				struct flag_cell_datum *cell;
-
-				u = (tesselation == _tesselate_top_right || tesselation == _tesselate_bottom_right) ? i - x : size - (i - x) - 1;
-				v = (tesselation == _tesselate_top_right || tesselation == _tesselate_top_left) ? j - y : size - (j - y) - 1;
-				cell = flag_datum_get_cell(flag, flag_definition, i, j);
+				short u = (tesselation == _tesselate_top_right || tesselation == _tesselate_bottom_right) ? i - x : size - (i - x) - 1;
+				short v = (tesselation == _tesselate_top_right || tesselation == _tesselate_top_left) ? j - y : size - (j - y) - 1;
+				struct flag_cell_datum *cell = flag_datum_get_cell(flag, flag_definition, i, j);
 
 				if (u == v)
 				{
 					cell->tesselation = tesselation;
 				}
+				else if (u > v)
+				{
+					cell->tesselation = _tesselate_both;
+				}
 				else
 				{
-					cell->tesselation = (u > v) ? _tesselate_both : _tesselate_none;
+					cell->tesselation = _tesselate_none;
 				}
 			}
 		}
@@ -367,12 +357,10 @@ void flag_render(
 	struct render_lighting const *lighting,
 	struct render_animation const *animation)
 {
-	struct flag_datum *flag;
-	struct flag_definition *definition;
+	struct object_datum *object = object_get(object_index);
+	struct flag_datum *flag = flag_get(flag_index);
+	struct flag_definition *definition = flag_definition_get(flag->definition_index);
 
-	object_get(object_index);
-	flag = flag_get(flag_index);
-	definition = flag_definition_get(flag->definition_index);
 	flag->object_index = object_index;
 
 	if (flag->updates_since_last_render > MAXIMUM_UPDATES_BETWEEN_RENDERS || !flag->initialized)
@@ -422,15 +410,15 @@ void flag_update(
 	real time)
 {
 	short x;
+	short forward = flag->update_state == 0;
 	struct location attachment_location;
 	real_point3d attachment_points[MAXIMUM_NUMBER_OF_ATTACHMENT_POINTS];
 	real_point3d attachment_force_points[MAXIMUM_FLAG_HEIGHT];
 	short attachment_y[MAXIMUM_NUMBER_OF_ATTACHMENT_POINTS];
 	short y_attachments[MAXIMUM_FLAG_HEIGHT];
+	struct object_datum *object = object_get(flag->object_index);
 	boolean underwater;
 	short weather_palette_index;
-	short forward = flag->update_state == 0;
-	struct object_datum *object = object_get(flag->object_index);
 
 	flag_update_attachment(
 		flag,
@@ -447,9 +435,9 @@ void flag_update(
 
 	if (!flag->disabled)
 	{
+		point2d const parent_deltas[MAXIMUM_NUMBER_OF_ESTIMATED_POSITIONS] = { { -1, 0 }, { 0, 1 }, { 0, -1 } };
 		real parent_distances[MAXIMUM_NUMBER_OF_ESTIMATED_POSITIONS];
 		short i;
-		point2d const parent_deltas[MAXIMUM_NUMBER_OF_ESTIMATED_POSITIONS] = { { -1, 0 }, { 0, 1 }, { 0, -1 } };
 
 		for (i = 0; i < MAXIMUM_NUMBER_OF_ESTIMATED_POSITIONS; i++)
 		{
@@ -469,27 +457,30 @@ void flag_update(
 				forward ? y < flag_definition->height : y > 0;
 				y += step)
 			{
+				short attachment_index = y_attachments[y];
+				struct flag_vertex_datum *vertex = flag_datum_get_vertex(flag, flag_definition, x, y);
 				real_vector3d turbulence;
 				real wind_scale;
 				real_point3d new_position;
 				struct location new_location;
-				real_point3d estimated_positions[MAXIMUM_NUMBER_OF_ESTIMATED_POSITIONS];
-				short attachment_index = y_attachments[y];
-				struct flag_vertex_datum *vertex = flag_datum_get_vertex(flag, flag_definition, x, y);
 				short estimated_position_count = 0;
+				real_point3d estimated_positions[MAXIMUM_NUMBER_OF_ESTIMATED_POSITIONS];
 				unsigned long physics_flags = FLAG(_point_physics_ignore_position_bit);
 
 				if (!underwater)
 				{
-					wind_scale = point_physics_definition_get(flag_definition->physics.index)->air_friction *
-						flag_definition->wind_noise *
-						FLAG_WIND_SCALE;
+					wind_scale = flag_definition->wind_noise *
+						point_physics_definition_get(flag_definition->physics.index)->air_friction *
+						0.02f *
+						0.02f;
 				}
 				else
 				{
-					wind_scale = point_physics_definition_get(flag_definition->physics.index)->water_friction *
+					wind_scale = 0.4f *
 						flag_definition->wind_noise *
-						FLAG_UNDERWATER_WIND_SCALE;
+						point_physics_definition_get(flag_definition->physics.index)->water_friction *
+						0.02f *
+						0.02f;
 					SET_FLAG(physics_flags, _point_physics_ignore_position_under_water_bit, TRUE);
 				}
 
@@ -512,10 +503,13 @@ void flag_update(
 					FLAG_VERTEX_RADIUS,
 					time);
 
-				if (x || attachment_index == NONE)
+				if (!x && attachment_index != NONE)
 				{
-					short estimated_position_index;
-					real total_weight;
+					new_position = attachment_points[attachment_index];
+				}
+				else
+				{
+					short i;
 
 					for (i = 0; i < MAXIMUM_NUMBER_OF_ESTIMATED_POSITIONS; i++)
 					{
@@ -527,12 +521,12 @@ void flag_update(
 							parent_y >= 0 &&
 							parent_y < flag_definition->height)
 						{
-							real_vector3d parent;
 							struct flag_vertex_datum *parent_vertex = flag_datum_get_vertex(
 								flag,
 								flag_definition,
 								parent_x,
 								parent_y);
+							real_vector3d parent;
 
 							parent.i = new_position.x - parent_vertex->p.x;
 							parent.j = new_position.y - parent_vertex->p.y;
@@ -545,39 +539,41 @@ void flag_update(
 						}
 					}
 
-					total_weight = 0.f;
-					new_position.z = 0.f;
-					new_position.y = 0.f;
-					new_position.x = 0.f;
-
-					for (estimated_position_index = 0;
-						estimated_position_index < estimated_position_count;
-						estimated_position_index++)
 					{
-						real weight = (x && !estimated_position_index) ? 4.f : 1.f;
+						short estimated_position_index;
+						real total_weight = 0.f;
 
-						new_position.x += weight * estimated_positions[estimated_position_index].x;
-						new_position.y += weight * estimated_positions[estimated_position_index].y;
-						new_position.z += weight * estimated_positions[estimated_position_index].z;
-						total_weight += weight;
+						new_position.z = 0.f;
+						new_position.y = new_position.z;
+						new_position.x = new_position.y;
+
+						for (estimated_position_index = 0;
+							estimated_position_index < estimated_position_count;
+							estimated_position_index++)
+						{
+							real weight = (x && !estimated_position_index) ? 4.f : 1.f;
+
+							new_position.x += weight * estimated_positions[estimated_position_index].x;
+							new_position.y += weight * estimated_positions[estimated_position_index].y;
+							new_position.z += weight * estimated_positions[estimated_position_index].z;
+							total_weight += weight;
+						}
+
+						if (!x)
+						{
+							real weight = 4.f;
+
+							new_position.x += weight * attachment_force_points[y].x;
+							new_position.y += weight * attachment_force_points[y].y;
+							new_position.z += weight * attachment_force_points[y].z;
+							total_weight += weight;
+						}
+
+						total_weight = 1.f / total_weight;
+						new_position.x *= total_weight;
+						new_position.y *= total_weight;
+						new_position.z *= total_weight;
 					}
-
-					if (!x)
-					{
-						new_position.x += 4.f * attachment_force_points[y].x;
-						new_position.y += 4.f * attachment_force_points[y].y;
-						new_position.z += 4.f * attachment_force_points[y].z;
-						total_weight += 4.f;
-					}
-
-					total_weight = 1.f / total_weight;
-					new_position.x *= total_weight;
-					new_position.y *= total_weight;
-					new_position.z *= total_weight;
-				}
-				else
-				{
-					new_position = attachment_points[attachment_index];
 				}
 
 				vertex->v.i = (new_position.x - vertex->p.x) / time;
@@ -600,9 +596,9 @@ void flag_update_attachment(
 	short *attachment_y,
 	short *y_attachments)
 {
+	real const maximum_displacement = 1.f;
 	short attachment_index;
 	short y;
-	struct object_marker marker;
 
 	for (attachment_index = 0; attachment_index < flag_definition->attachment_points.count; attachment_index++)
 	{
@@ -610,6 +606,7 @@ void flag_update_attachment(
 			&flag_definition->attachment_points,
 			attachment_index,
 			struct flag_attachment_point);
+		struct object_marker marker;
 
 		object_get_marker_by_name(flag->object_index, attachment_point->marker_name, &marker, 1);
 		attachment_points[attachment_index] = marker.matrix.position;
@@ -619,8 +616,6 @@ void flag_update_attachment(
 
 	if (!flag->disabled)
 	{
-		real_vector3d attachment_displacement;
-
 		for (y = 0; y < flag_definition->height; y++)
 		{
 			y_attachments[y] = NONE;
@@ -634,9 +629,9 @@ void flag_update_attachment(
 				&flag_definition->attachment_points,
 				attachment_index,
 				struct flag_attachment_point);
-			short height = PIN(attachment_point->height_to_next_attachment, 0, flag_definition->height - y);
+			short height = PIN(attachment_point->height_to_next_attachment, 0, flag_definition->height - y) & ~MASK(1);
 			short first_y = y;
-			short last_y = (height & ~MASK(1)) + y;
+			short last_y = first_y + height;
 
 			attachment_y[attachment_index] = y;
 			y_attachments[y] = attachment_index;
@@ -644,42 +639,48 @@ void flag_update_attachment(
 			for (; y <= last_y; y++)
 			{
 				real t = ((real)y - (real)first_y) / ((real)last_y - (real)first_y);
+				real one_minus_t = 1.f - t;
 
-				attachment_force_points[y].x = (1.f - t) * attachment_points[attachment_index].x +
+				attachment_force_points[y].x = one_minus_t * attachment_points[attachment_index].x +
 					t * attachment_points[attachment_index + 1].x;
-				attachment_force_points[y].y = (1.f - t) * attachment_points[attachment_index].y +
+				attachment_force_points[y].y = one_minus_t * attachment_points[attachment_index].y +
 					t * attachment_points[attachment_index + 1].y;
-				attachment_force_points[y].z = (1.f - t) * attachment_points[attachment_index].z +
+				attachment_force_points[y].z = one_minus_t * attachment_points[attachment_index].z +
 					t * attachment_points[attachment_index + 1].z;
 			}
 
 			y--;
 		}
 
-		attachment_displacement.i = attachment_points->x - flag->first_attachment.x;
-		attachment_displacement.j = attachment_points->y - flag->first_attachment.y;
-		attachment_displacement.k = attachment_points->z - flag->first_attachment.z;
-
-		if (abs(attachment_displacement.i) > 1.f ||
-			abs(attachment_displacement.j) > 1.f ||
-			abs(attachment_displacement.k) > 1.f)
 		{
-			short x;
+			real_vector3d attachment_displacement;
 
-			for (x = 0; x < flag_definition->width; x++)
+			attachment_displacement.i = attachment_points[0].x - flag->first_attachment.x;
+			attachment_displacement.j = attachment_points[0].y - flag->first_attachment.y;
+			attachment_displacement.k = attachment_points[0].z - flag->first_attachment.z;
+
+			if (abs(attachment_displacement.i) > maximum_displacement ||
+				abs(attachment_displacement.j) > maximum_displacement ||
+				abs(attachment_displacement.k) > maximum_displacement)
 			{
-				for (y = 0; y < flag_definition->height; y++)
-				{
-					struct flag_vertex_datum *vertex = flag_datum_get_vertex(flag, flag_definition, x, y);
+				short x;
+				short y;
 
-					vertex->p.x += attachment_displacement.i;
-					vertex->p.y += attachment_displacement.j;
-					vertex->p.z += attachment_displacement.k;
+				for (x = 0; x < flag_definition->width; x++)
+				{
+					for (y = 0; y < flag_definition->height; y++)
+					{
+						struct flag_vertex_datum *vertex = flag_datum_get_vertex(flag, flag_definition, x, y);
+
+						vertex->p.x += attachment_displacement.i;
+						vertex->p.y += attachment_displacement.j;
+						vertex->p.z += attachment_displacement.k;
+					}
 				}
 			}
-		}
 
-		flag->first_attachment = *attachment_points;
+			flag->first_attachment = attachment_points[0];
+		}
 	}
 
 	return;
@@ -691,11 +692,11 @@ void flag_render_proper(
 	struct render_lighting const *lighting,
 	struct render_animation const *animation)
 {
+	struct object_datum *object = object_get(flag->object_index);
+	long shader_index = object->object.owner_team_index ? flag_definition->shader_blue.index : flag_definition->shader_red.index;
 	short maximum_triangles;
 	long dynamic_triangle_buffer_index;
 	long dynamic_vertex_buffer_index;
-	struct object_datum *object = object_get(flag->object_index);
-	long shader_index = object->object.owner_team_index ? flag_definition->shader_blue.index : flag_definition->shader_red.index;
 
 	if (shader_index == NONE)
 	{
@@ -703,7 +704,7 @@ void flag_render_proper(
 	}
 
 	rasterizer_globals.current_lock_operation = _rasterizer_lock_flag;
-	maximum_triangles = 2 * (flag_definition->height - 1) * (flag_definition->width - 1);
+	maximum_triangles = (flag_definition->width - 1) * (flag_definition->height - 1) * 2;
 	dynamic_triangle_buffer_index = rasterizer_dynamic_triangles_new(maximum_triangles);
 	dynamic_vertex_buffer_index = rasterizer_dynamic_vertices_new(
 		_rasterizer_vertex_type_model_compressed,
@@ -711,117 +712,125 @@ void flag_render_proper(
 
 	if (dynamic_triangle_buffer_index != NONE && dynamic_vertex_buffer_index != NONE)
 	{
-		struct model_vertex_uncompressed uncompressed_vertex;
-		short x;
-		short y;
-		short vertex_index;
-		short i;
 		struct object_datum *parent_object = object_get(flag->object_index);
 		struct object_definition *object_definition = object_definition_get(parent_object->definition_index);
 		struct model_vertex_compressed *vertices = rasterizer_dynamic_vertices_lock(dynamic_vertex_buffer_index);
 		struct rasterizer_triangle *triangles = rasterizer_dynamic_triangles_lock(dynamic_triangle_buffer_index);
 		short triangle_count = 0;
-		real u_scale = 1.f / (flag_definition->width - 1);
-		real v_scale = 1.f / (flag_definition->height - 1);
 
-		memset(&uncompressed_vertex, 0, sizeof(uncompressed_vertex));
-
-		for (x = 0, vertex_index = 0; x < flag_definition->width; x++)
 		{
-			for (y = 0; y < flag_definition->height; y++, vertex_index++)
+			struct model_vertex_uncompressed uncompressed_vertex;
+			short x;
+			short y;
+			short vertex_index;
+			real u_scale = 1.f / (flag_definition->width - 1);
+			real v_scale = 1.f / (flag_definition->height - 1);
+
+			memset(&uncompressed_vertex, 0, sizeof(uncompressed_vertex));
+
+			for (x = 0, vertex_index = x; x < flag_definition->width; x++)
 			{
-				real_vector3d v1;
-				real_vector3d v2;
-				struct flag_vertex_datum *vertex = flag_datum_get_vertex(flag, flag_definition, x, y);
-				short x0 = (x >= flag_definition->width - 1) ? x - 1 : x;
-				short y0 = (y >= flag_definition->height - 1) ? y - 1 : y;
-				struct flag_vertex_datum *vertex0 = flag_datum_get_vertex(flag, flag_definition, x0, y0);
-				struct flag_vertex_datum *vertex1 = flag_datum_get_vertex(flag, flag_definition, x0 + 1, y0);
-				struct flag_vertex_datum *vertex2 = flag_datum_get_vertex(flag, flag_definition, x0, y0 + 1);
-
-				vector_from_points3d(&vertex0->p, &vertex1->p, &v1);
-				vector_from_points3d(&vertex0->p, &vertex2->p, &v2);
-				cross_product3d(&v1, &v2, &uncompressed_vertex.normal);
-				normalize3d(&uncompressed_vertex.normal);
-				uncompressed_vertex.position.x = vertex->p.x;
-				uncompressed_vertex.position.y = vertex->p.y;
-				uncompressed_vertex.position.z = vertex->p.z;
-				uncompressed_vertex.texcoord.x = x * u_scale;
-				uncompressed_vertex.texcoord.y = y * v_scale;
-				rasterizer_geometry_compress_vertices(
-					_rasterizer_vertex_type_model_uncompressed,
-					1,
-					&vertices[vertex_index],
-					sizeof(*vertices),
-					&uncompressed_vertex,
-					sizeof(uncompressed_vertex));
-			}
-		}
-
-		for (x = 0, i = 0; x < flag_definition->width - 1; x++)
-		{
-			for (y = 0; y < flag_definition->height - 1; y++)
-			{
-				short tesselation = flag_datum_get_cell(flag, flag_definition, x, y)->tesselation;
-
-				switch (tesselation)
+				for (y = 0; y < flag_definition->height; y++, vertex_index++)
 				{
-				case _tesselate_both:
-					match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 742, i<maximum_triangles);
-					triangles[i].vertex_indices[0] = y + flag_definition->height * x;
-					triangles[i].vertex_indices[1] = y + flag_definition->height * (x + 1);
-					triangles[i].vertex_indices[2] = flag_definition->height * x + y + 1;
-					i++;
-					match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 747, i<maximum_triangles);
-					triangles[i].vertex_indices[0] = flag_definition->height * x + y + 1;
-					triangles[i].vertex_indices[1] = y + flag_definition->height * (x + 1);
-					triangles[i].vertex_indices[2] = flag_definition->height * (x + 1) + y + 1;
-					i++;
-					break;
-				case _tesselate_none:
-					break;
-				case _tesselate_top_left:
-					match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 754, i<maximum_triangles);
-					triangles[i].vertex_indices[0] = y + flag_definition->height * x;
-					triangles[i].vertex_indices[1] = flag_definition->height * x + y + 1;
-					triangles[i].vertex_indices[2] = y + flag_definition->height * (x + 1);
-					i++;
-					break;
-				case _tesselate_bottom_left:
-					match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 761, i<maximum_triangles);
-					triangles[i].vertex_indices[0] = y + flag_definition->height * x;
-					triangles[i].vertex_indices[1] = flag_definition->height * x + y + 1;
-					triangles[i].vertex_indices[2] = flag_definition->height * (x + 1) + y + 1;
-					i++;
-					break;
-				case _tesselate_top_right:
-					match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 768, i<maximum_triangles);
-					triangles[i].vertex_indices[0] = y + flag_definition->height * x;
-					triangles[i].vertex_indices[1] = flag_definition->height * (x + 1) + y + 1;
-					triangles[i].vertex_indices[2] = y + flag_definition->height * (x + 1);
-					i++;
-					break;
-				case _tesselate_bottom_right:
-					match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 775, i<maximum_triangles);
-					triangles[i].vertex_indices[0] = flag_definition->height * x + y + 1;
-					triangles[i].vertex_indices[1] = flag_definition->height * (x + 1) + y + 1;
-					triangles[i].vertex_indices[2] = y + flag_definition->height * (x + 1);
-					i++;
-					break;
-				default:
-					match_halt("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 784);
+					struct flag_vertex_datum *vertex = flag_datum_get_vertex(flag, flag_definition, x, y);
+					short x0 = x < flag_definition->width - 1 ? x : x - 1;
+					short y0 = y < flag_definition->height - 1 ? y : y - 1;
+					struct flag_vertex_datum *vertex0 = flag_datum_get_vertex(flag, flag_definition, x0, y0);
+					struct flag_vertex_datum *vertex1 = flag_datum_get_vertex(flag, flag_definition, x0 + 1, y0);
+					struct flag_vertex_datum *vertex2 = flag_datum_get_vertex(flag, flag_definition, x0, y0 + 1);
+					real_vector3d v1;
+					real_vector3d v2;
+
+					vector_from_points3d(&vertex0->p, &vertex1->p, &v1);
+					vector_from_points3d(&vertex0->p, &vertex2->p, &v2);
+					cross_product3d(&v1, &v2, &uncompressed_vertex.normal);
+					normalize3d(&uncompressed_vertex.normal);
+					uncompressed_vertex.position.x = vertex->p.x;
+					uncompressed_vertex.position.y = vertex->p.y;
+					uncompressed_vertex.position.z = vertex->p.z;
+					uncompressed_vertex.texcoord.x = x * u_scale;
+					uncompressed_vertex.texcoord.y = y * v_scale;
+					rasterizer_geometry_compress_vertices(
+						_rasterizer_vertex_type_model_uncompressed,
+						1,
+						&vertices[vertex_index],
+						sizeof(*vertices),
+						&uncompressed_vertex,
+						sizeof(uncompressed_vertex));
 				}
 			}
 		}
 
-		triangle_count = i;
+		{
+			short x;
+			short y;
+			short i;
+
+			for (x = 0, i = x; x < flag_definition->width - 1; x++)
+			{
+				for (y = 0; y < flag_definition->height - 1; y++)
+				{
+					short tesselation = flag_datum_get_cell(flag, flag_definition, x, y)->tesselation;
+
+					switch (tesselation)
+					{
+					case _tesselate_both:
+						match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 742, i<maximum_triangles);
+						triangles[i].vertex_indices[0] = y + flag_definition->height * x;
+						triangles[i].vertex_indices[1] = y + flag_definition->height * (x + 1);
+						triangles[i].vertex_indices[2] = flag_definition->height * x + y + 1;
+						i++;
+						match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 747, i<maximum_triangles);
+						triangles[i].vertex_indices[0] = flag_definition->height * x + y + 1;
+						triangles[i].vertex_indices[1] = y + flag_definition->height * (x + 1);
+						triangles[i].vertex_indices[2] = flag_definition->height * (x + 1) + y + 1;
+						i++;
+						break;
+					case _tesselate_none:
+						break;
+					case _tesselate_top_left:
+						match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 754, i<maximum_triangles);
+						triangles[i].vertex_indices[0] = y + flag_definition->height * x;
+						triangles[i].vertex_indices[1] = flag_definition->height * x + y + 1;
+						triangles[i].vertex_indices[2] = y + flag_definition->height * (x + 1);
+						i++;
+						break;
+					case _tesselate_bottom_left:
+						match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 761, i<maximum_triangles);
+						triangles[i].vertex_indices[0] = y + flag_definition->height * x;
+						triangles[i].vertex_indices[1] = flag_definition->height * x + y + 1;
+						triangles[i].vertex_indices[2] = flag_definition->height * (x + 1) + y + 1;
+						i++;
+						break;
+					case _tesselate_top_right:
+						match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 768, i<maximum_triangles);
+						triangles[i].vertex_indices[0] = y + flag_definition->height * x;
+						triangles[i].vertex_indices[1] = flag_definition->height * (x + 1) + y + 1;
+						triangles[i].vertex_indices[2] = y + flag_definition->height * (x + 1);
+						i++;
+						break;
+					case _tesselate_bottom_right:
+						match_assert("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 775, i<maximum_triangles);
+						triangles[i].vertex_indices[0] = flag_definition->height * x + y + 1;
+						triangles[i].vertex_indices[1] = flag_definition->height * (x + 1) + y + 1;
+						triangles[i].vertex_indices[2] = y + flag_definition->height * (x + 1);
+						i++;
+						break;
+					default:
+						match_halt("c:\\halo\\SOURCE\\objects\\widgets\\flags.c", 784);
+					}
+				}
+			}
+
+			triangle_count = i;
+		}
+
 		rasterizer_dynamic_triangles_unlock(dynamic_triangle_buffer_index);
 		rasterizer_dynamic_vertices_unlock(dynamic_vertex_buffer_index);
 
 		{
-			struct rasterizer_model_begin_parameters parameters;
-			real_point3d centroid;
 			struct shader *shader = shader_definition_get(shader_index);
+			struct rasterizer_model_begin_parameters parameters;
 			struct flag_vertex_datum *vertex00 = flag_datum_get_vertex(flag, flag_definition, 0, 0);
 			struct flag_vertex_datum *vertex10 = flag_datum_get_vertex(
 				flag,
@@ -838,6 +847,7 @@ void flag_render_proper(
 				flag_definition,
 				flag_definition->width - 1,
 				flag_definition->height - 1);
+			real_point3d centroid;
 
 			centroid.x = (vertex00->p.x + vertex10->p.x + vertex01->p.x + vertex11->p.x) / 4.f;
 			centroid.y = (vertex00->p.y + vertex10->p.y + vertex01->p.y + vertex11->p.y) / 4.f;
@@ -850,7 +860,7 @@ void flag_render_proper(
 			parameters.animation = *animation;
 			parameters.centroid = centroid;
 			parameters.base_map_scale.j = 1.f;
-			parameters.base_map_scale.i = 1.f;
+			parameters.base_map_scale.i = parameters.base_map_scale.j;
 			rasterizer_profile_enable(FALSE);
 			rasterizer_models_begin(FALSE);
 			rasterizer_model_begin(&parameters, FALSE);

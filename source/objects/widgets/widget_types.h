@@ -99,8 +99,8 @@ static struct widget_type_definition widget_type_definitions[NUMBER_OF_WIDGET_TY
 short tag_group_to_widget_type(
 	tag group_tag)
 {
-	short type;
 	short result = NONE;
+	short type;
 
 	for (type = 0; type < NUMBER_OF_WIDGET_TYPES; type++)
 	{

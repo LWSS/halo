@@ -25,6 +25,7 @@ enum
 /* ---------- macros */
 
 #define light_volume_get(index) ((struct light_volume_datum *)datum_get(light_volume_globals.light_volume_data, (index))) /* fake name */
+#define light_volume_try_and_get(index) ((struct light_volume_datum *)datum_try_and_get(light_volume_globals.light_volume_data, (index))) /* fake name */
 
 /* ---------- structures */
 
@@ -125,9 +126,9 @@ static struct light_volume_frame *light_volume_interpolate_frames(
 
 	if (definition->frames.count > 1)
 	{
-		real q;
 		struct light_volume_frame *frame0 = TAG_BLOCK_GET_ELEMENT(&definition->frames, 0, struct light_volume_frame);
 		struct light_volume_frame *frame1 = TAG_BLOCK_GET_ELEMENT(&definition->frames, 0, struct light_volume_frame);
+		real q;
 
 		if (object_get_function_value(object_index, definition->frame_animation_source - 1, &q))
 		{
@@ -173,9 +174,10 @@ void light_volume_submit(
 			(!definition->brightness_scale_source || !animation || animation->values[definition->brightness_scale_source - 1] > 0.f))
 		{
 			struct object_marker marker;
+			short marker_count;
 			real_vector3d eye_to_marker_vector;
 
-			object_get_marker_by_name(object_index, definition->attachment_marker, &marker, 1);
+			marker_count = object_get_marker_by_name(object_index, definition->attachment_marker, &marker, 1);
 			vector_from_points3d(&render.camera.position, &marker.matrix.position, &eye_to_marker_vector);
 
 			if (definition->far_fade_distance == 0.f || dot_product3d(&render.camera.forward, &eye_to_marker_vector) < definition->far_fade_distance)
@@ -206,14 +208,14 @@ void light_volume_render(
 
 		if (definition->count > 0 && definition->frames.count > 0)
 		{
-			struct object_marker marker;
-			real_vector3d eye_to_marker_vector;
 			struct light_volume_frame *frame = light_volume_interpolate_frames(definition, object_index);
+			struct object_marker marker;
 			short marker_count = object_get_marker_by_name(
 				object_index,
 				definition->attachment_marker,
 				&marker,
 				1);
+			real_vector3d eye_to_marker_vector;
 			real brightness = 1.f;
 
 			vector_from_points3d(&render.camera.position, &marker.matrix.position, &eye_to_marker_vector);
@@ -254,13 +256,13 @@ void light_volume_render(
 
 				for (index = 0; index < count; index++)
 				{
-					real_point3d position;
-					real_argb_color color;
 					real t = pow1((real)index / (count - 1), frame->offset_exponent);
+					real_point3d position;
 					real radius_t = pow1(t, frame->radius_exponent);
 					real radius = (1.f - radius_t) * frame->radius_hither + frame->radius_yon * radius_t;
 					real color_t = pow1(t, frame->color_exponent);
 					real brightness_t = pow1(t, frame->brightness_exponent);
+					real_argb_color color;
 
 					point_from_line3d(
 						&marker.matrix.position,

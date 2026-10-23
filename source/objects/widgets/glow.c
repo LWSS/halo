@@ -40,7 +40,9 @@ enum
 /* ---------- macros */
 
 #define glow_get(index) ((struct glow_datum *)datum_get(glow_globals.glow_data, (index))) /* fake name */
+#define glow_try_and_get(index) ((struct glow_datum *)datum_try_and_get(glow_globals.glow_data, (index))) /* fake name */
 #define glow_particle_get(index) ((struct glow_particle *)datum_get(glow_globals.glow_particle_data, (index))) /* fake name */
+#define glow_particle_try_and_get(index) ((struct glow_particle *)datum_try_and_get(glow_globals.glow_particle_data, (index))) /* fake name */
 
 /* ---------- structures */
 
@@ -256,11 +258,12 @@ void glow_submit(
 {
 	if (object_index != NONE && widget_index != NONE)
 	{
-		struct object_marker marker;
 		struct glow_definition *definition = glow_definition_get(glow_get(widget_index)->definition_index);
+		struct object_marker marker;
+		short marker_count;
 
 		glow_update(glow_get(widget_index), object_index);
-		object_get_marker_by_name(object_index, definition->attachment_marker, &marker, 1);
+		marker_count = object_get_marker_by_name(object_index, definition->attachment_marker, &marker, 1);
 		glow_render(object_index, widget_index);
 	}
 
@@ -283,9 +286,9 @@ static void glow_update(
 
 		if (!glow->initialized && glow->number_of_markers > 1)
 		{
-			short next_marker[MAXIMUM_MARKERS_PER_GLOW_EFFECT];
 			short marker_index;
 			short other_marker_index;
+			short next_marker[MAXIMUM_MARKERS_PER_GLOW_EFFECT];
 
 			for (marker_index = 0; marker_index < glow->number_of_markers; marker_index++)
 			{
@@ -296,10 +299,10 @@ static void glow_update(
 				{
 					if (marker_index != other_marker_index)
 					{
-						real_vector3d forward;
-						real dot_product;
 						struct object_marker *marker = &glow->markers[marker_index];
 						struct object_marker *other_marker = &glow->markers[other_marker_index];
+						real_vector3d forward;
+						real dot_product;
 
 						vector_from_points3d(&marker->matrix.position, &other_marker->matrix.position, &forward);
 						normalize3d(&forward);
@@ -342,14 +345,18 @@ static void glow_update(
 
 				for (segment_index = 0; segment_index < glow->number_of_markers - 1; segment_index++)
 				{
-					real_vector3d segment;
-					struct object_marker *marker0 = &glow->markers[glow->marker_order[segment_index]];
-					struct object_marker *marker1 = &glow->markers[glow->marker_order[segment_index + 1]];
+					short marker0_index = glow->marker_order[segment_index];
+					short marker1_index = glow->marker_order[segment_index + 1];
+					struct object_marker *marker0 = &glow->markers[marker0_index];
+					struct object_marker *marker1 = &glow->markers[marker1_index];
 					real_point3d p0 = marker0->matrix.position;
 					real_point3d p1 = marker1->matrix.position;
+					real_vector3d segment;
+					real segment_length;
 
 					vector_from_points3d(&p0, &p1, &segment);
-					glow->total_time += magnitude3d(&segment);
+					segment_length = magnitude3d(&segment);
+					glow->total_time += segment_length;
 					glow->marker_time_index[segment_index + 1] = glow->total_time;
 				}
 			}
@@ -362,7 +369,6 @@ static void glow_update(
 		{
 			real effect_translational_velocity;
 			real rotation_per_unit_t;
-			struct glow_particle *particle;
 
 			if (glow->number_of_markers > 1)
 			{
@@ -371,15 +377,16 @@ static void glow_update(
 				if (definition->effect_rotational_velocity_attachment_index != NONE)
 				{
 					real magnitude;
+					real scale;
 
 					if (!object_get_function_value(object_index, definition->effect_rotational_velocity_attachment_index, &magnitude))
 					{
 						magnitude = 0.f;
 					}
 
-					effect_rotational_velocity *=
-						(definition->glow_effect_rotational_velocity_scale_upper_bound - definition->glow_effect_rotational_velocity_scale_lower_bound) * magnitude +
+					scale = (definition->glow_effect_rotational_velocity_scale_upper_bound - definition->glow_effect_rotational_velocity_scale_lower_bound) * magnitude +
 						definition->glow_effect_rotational_velocity_scale_lower_bound;
+					effect_rotational_velocity *= scale;
 				}
 
 				effect_translational_velocity = definition->glow_effect_translational_velocity;
@@ -387,15 +394,16 @@ static void glow_update(
 				if (definition->effect_translational_velocity_attachment_index != NONE)
 				{
 					real magnitude;
+					real scale;
 
 					if (!object_get_function_value(object_index, definition->effect_translational_velocity_attachment_index, &magnitude))
 					{
 						magnitude = 0.f;
 					}
 
-					effect_translational_velocity *=
-						(definition->glow_effect_translational_velocity_scale_upper_bound - definition->glow_effect_translational_velocity_scale_lower_bound) * magnitude +
+					scale = (definition->glow_effect_translational_velocity_scale_upper_bound - definition->glow_effect_translational_velocity_scale_lower_bound) * magnitude +
 						definition->glow_effect_translational_velocity_scale_lower_bound;
+					effect_translational_velocity *= scale;
 				}
 
 				rotation_per_unit_t = effect_rotational_velocity / effect_translational_velocity;
@@ -403,34 +411,38 @@ static void glow_update(
 
 			glow->accumulated_trailing_particle_generation_ticks += game_time_get();
 
-			if (glow->number_of_markers > 1)
 			{
-				for (particle = glow->head_particle; particle; particle = particle->next)
+				struct glow_particle *particle;
+
+				if (glow->number_of_markers > 1)
 				{
-					if (!TEST_FLAG(particle->flags, _glow_particle_is_trailing_particle_bit))
+					for (particle = glow->head_particle; particle; particle = particle->next)
 					{
-						glow_normal_particle_update_position(
-							object_index,
-							glow,
-							particle,
-							render.time_delta_since_tick_sec * effect_translational_velocity,
-							rotation_per_unit_t);
-						glow_normal_particle_update_color(object_index, glow, particle);
-						glow_normal_particle_update_size(object_index, glow, particle);
+						if (!TEST_FLAG(particle->flags, _glow_particle_is_trailing_particle_bit))
+						{
+							glow_normal_particle_update_position(
+								object_index,
+								glow,
+								particle,
+								render.time_delta_since_tick_sec * effect_translational_velocity,
+								rotation_per_unit_t);
+							glow_normal_particle_update_color(object_index, glow, particle);
+							glow_normal_particle_update_size(object_index, glow, particle);
+						}
 					}
 				}
-			}
 
-			for (particle = glow->head_particle; particle; particle = particle->next)
-			{
-				if (TEST_FLAG(particle->flags, _glow_particle_is_trailing_particle_bit))
+				for (particle = glow->head_particle; particle; particle = particle->next)
 				{
-					particle->ticks_in_existence += game_time_get();
-					glow_trailing_particle_update_color(glow, particle);
-					glow_trailing_particle_update_size(glow, particle);
-					glow_trailing_particle_update_velocity(glow, particle);
-					glow_trailing_particle_update_position(glow, particle, render.time_delta_since_tick_sec);
-					glow_trailing_particle_age(glow, particle);
+					if (TEST_FLAG(particle->flags, _glow_particle_is_trailing_particle_bit))
+					{
+						particle->ticks_in_existence += game_time_get();
+						glow_trailing_particle_update_color(glow, particle);
+						glow_trailing_particle_update_size(glow, particle);
+						glow_trailing_particle_update_velocity(glow, particle);
+						glow_trailing_particle_update_position(glow, particle, render.time_delta_since_tick_sec);
+						glow_trailing_particle_age(glow, particle);
+					}
 				}
 			}
 
@@ -445,29 +457,31 @@ static void glow_update(
 
 				while (glow->accumulated_trailing_particle_generation_ticks > ticks_per_particle)
 				{
-					particle = glow_trailing_particle_new(glow);
+					struct glow_particle *particle = glow_trailing_particle_new(glow);
 
-					if (!particle)
+					if (particle)
+					{
+						glow->number_of_particles++;
+
+						if (glow->tail_particle)
+						{
+							glow->tail_particle->next = particle;
+							particle->previous = glow->tail_particle;
+							glow->tail_particle = particle;
+						}
+						else
+						{
+							glow->tail_particle = particle;
+							glow->head_particle = particle;
+						}
+
+						glow->accumulated_trailing_particle_generation_ticks -= (short)ticks_per_particle;
+					}
+					else
 					{
 						match_vhalt("c:\\halo\\SOURCE\\objects\\widgets\\glow.c", 521, "the map limit for the number of active glow particles has been reached");
 						break;
 					}
-
-					glow->number_of_particles++;
-
-					if (glow->tail_particle)
-					{
-						glow->tail_particle->next = particle;
-						particle->previous = glow->tail_particle;
-						glow->tail_particle = particle;
-					}
-					else
-					{
-						glow->tail_particle = particle;
-						glow->head_particle = particle;
-					}
-
-					glow->accumulated_trailing_particle_generation_ticks -= (long)ticks_per_particle;
 				}
 			}
 		}
@@ -503,7 +517,10 @@ static void glow_trailing_particle_update_size(
 
 	if (TEST_FLAG(definition->flags, _glow_trailing_particles_shrink_over_time_bit))
 	{
-		particle->present_size = MAX(0.f, 1.f - (real)particle->ticks_in_existence / particle->lifetime) * particle->initial_size;
+		real scale = 1.f - (real)particle->ticks_in_existence / particle->lifetime;
+
+		scale = MAX(0.f, scale);
+		particle->present_size = scale * particle->initial_size;
 	}
 
 	return;
@@ -517,8 +534,9 @@ static void glow_trailing_particle_update_velocity(
 
 	if (TEST_FLAG(definition->flags, _glow_trailing_particles_slow_over_time_bit))
 	{
-		real scale = MAX(0.f, 1.f - (real)particle->ticks_in_existence / particle->lifetime);
+		real scale = 1.f - (real)particle->ticks_in_existence / particle->lifetime;
 
+		scale = MAX(0.f, scale);
 		particle->present_velocity.i = scale * particle->initial_velocity.i;
 		particle->present_velocity.j = scale * particle->initial_velocity.j;
 		particle->present_velocity.k = scale * particle->initial_velocity.k;
@@ -586,8 +604,6 @@ static void glow_normal_particle_update_color(
 	struct glow_datum *glow,
 	struct glow_particle *particle)
 {
-	real normalized_t;
-	real edge_fade;
 	struct glow_definition *definition = glow_definition_get(glow->definition_index);
 
 	if (definition->color_attachment_index != NONE)
@@ -607,29 +623,31 @@ static void glow_normal_particle_update_color(
 
 	if (TEST_FLAG(definition->flags, _glow_interpolate_color_per_particle_bit))
 	{
-		particle->color.red = (definition->color_bound_1.red - definition->color_bound_0.red) * definition->color_rate_of_change * particle->t + definition->color_bound_0.red;
-		particle->color.green = (definition->color_bound_1.green - definition->color_bound_0.green) * definition->color_rate_of_change * particle->t + definition->color_bound_0.green;
-		particle->color.blue = (definition->color_bound_1.blue - definition->color_bound_0.blue) * definition->color_rate_of_change * particle->t + definition->color_bound_0.blue;
+		particle->color.red = particle->t * definition->color_rate_of_change * (definition->color_bound_1.red - definition->color_bound_0.red) + definition->color_bound_0.red;
+		particle->color.green = particle->t * definition->color_rate_of_change * (definition->color_bound_1.green - definition->color_bound_0.green) + definition->color_bound_0.green;
+		particle->color.blue = particle->t * definition->color_rate_of_change * (definition->color_bound_1.blue - definition->color_bound_0.blue) + definition->color_bound_0.blue;
 		particle->color.alpha = 1.f;
 	}
 
-	normalized_t = particle->t / glow->total_time;
-	edge_fade = definition->percentage_edge_fade * 0.5f;
+	{
+		real normalized_t = particle->t / glow->total_time;
+		real edge_fade = definition->percentage_edge_fade * 0.5f;
 
-	if (normalized_t < edge_fade)
-	{
-		particle->fade = normalized_t / edge_fade;
-	}
-	else if (normalized_t > 1.f - edge_fade)
-	{
-		particle->fade = (1.f - normalized_t) / edge_fade;
-	}
-	else
-	{
-		particle->fade = 1.f;
-	}
+		if (normalized_t < edge_fade)
+		{
+			particle->fade = normalized_t / edge_fade;
+		}
+		else if (normalized_t > 1.f - edge_fade)
+		{
+			particle->fade = (1.f - normalized_t) / edge_fade;
+		}
+		else
+		{
+			particle->fade = 1.f;
+		}
 
-	particle->fade = PIN(particle->fade, 0.f, 1.f);
+		particle->fade = PIN(particle->fade, 0.f, 1.f);
+	}
 
 	return;
 }
@@ -651,18 +669,21 @@ static void glow_normal_particle_update_position(
 	real elapsed_time,
 	real rotation_per_unit_t)
 {
-	real magnitude;
 	struct glow_definition *definition = glow_definition_get(glow->definition_index);
+	real magnitude;
 
 	if (definition->distance_to_object_attachment_index != NONE)
 	{
+		real scale;
+
 		if (!object_get_function_value(object_index, definition->distance_to_object_attachment_index, &magnitude))
 		{
 			magnitude = 0.f;
 		}
 
-		particle->distance_to_object = (definition->maximum_distance_glow_particle_to_object - definition->minimum_distance_glow_particle_to_object) *
-			((definition->distance_to_object_scale_upper_bound - definition->distance_to_object_scale_lower_bound) * magnitude + definition->distance_to_object_scale_lower_bound) +
+		scale = (definition->distance_to_object_scale_upper_bound - definition->distance_to_object_scale_lower_bound) * magnitude +
+			definition->distance_to_object_scale_lower_bound;
+		particle->distance_to_object = (definition->maximum_distance_glow_particle_to_object - definition->minimum_distance_glow_particle_to_object) * scale +
 			definition->minimum_distance_glow_particle_to_object;
 	}
 
@@ -731,14 +752,15 @@ static void glow_normal_particle_update_position(
 static void glow_particles_initialize(
 	struct glow_datum *glow)
 {
-	short particle_index;
 	struct glow_definition *definition = glow_definition_get(glow->definition_index);
+	short particle_index;
 	boolean direction = TRUE;
+	struct glow_particle *particle;
 	struct glow_particle *previous_particle = NULL;
 
 	for (particle_index = 0; particle_index < glow->number_of_particles; particle_index++)
 	{
-		struct glow_particle *particle = glow_normal_particle_new(glow, particle_index, glow->number_of_particles);
+		particle = glow_normal_particle_new(glow, particle_index, glow->number_of_particles);
 
 		if (!particle)
 		{
@@ -780,7 +802,9 @@ static struct glow_particle *glow_normal_particle_new(
 	short total)
 {
 	struct glow_definition *definition = glow_definition_get(glow->definition_index);
-	struct glow_particle *particle = glow_particle_new(glow);
+	struct glow_particle *particle = NULL;
+
+	particle = glow_particle_new(glow);
 
 	if (particle)
 	{
@@ -816,9 +840,13 @@ static struct glow_particle *glow_normal_particle_new(
 			particle->initial_angle = real_local_random_range(0.f, 2.f * _pi);
 			break;
 		case _glow_particle_distribution_type_uniform:
-			particle->t = (real)index / total * glow->total_time;
+		{
+			real normalized_t = (real)index / total;
+
+			particle->t = normalized_t * glow->total_time;
 			particle->initial_angle = real_local_random_range(0.f, 2.f * _pi);
 			break;
+		}
 		default:
 			match_halt("c:\\halo\\SOURCE\\objects\\widgets\\glow.c", 945);
 		}
@@ -830,13 +858,14 @@ static struct glow_particle *glow_normal_particle_new(
 static struct glow_particle *glow_trailing_particle_new(
 	struct glow_datum *glow)
 {
+	struct glow_particle *particle = NULL;
 	struct glow_definition *definition = glow_definition_get(glow->definition_index);
-	struct glow_particle *particle = glow_particle_new(glow);
+
+	particle = glow_particle_new(glow);
 
 	if (particle)
 	{
-		real velocity_scale;
-		real color_random;
+		real scale;
 
 		if (glow->number_of_markers > 1)
 		{
@@ -870,20 +899,20 @@ static struct glow_particle *glow_trailing_particle_new(
 			match_vhalt("c:\\halo\\SOURCE\\objects\\widgets\\glow.c", 996, "unknown trailing particle distribution?");
 		}
 
-		velocity_scale = definition->trailing_particle_velocity / TICKS_PER_SECOND;
-		particle->initial_velocity.i *= velocity_scale;
-		particle->initial_velocity.j *= velocity_scale;
-		particle->initial_velocity.k *= velocity_scale;
+		scale = definition->trailing_particle_velocity / TICKS_PER_SECOND;
+		particle->initial_velocity.i *= scale;
+		particle->initial_velocity.j *= scale;
+		particle->initial_velocity.k *= scale;
 		particle->initial_size = real_local_random_range(
 			definition->particle_size_lower_bound,
 			definition->particle_size_upper_bound);
 		particle->initial_size = particle->initial_size / glow->bitmap_dimension;
 		particle->lifetime = (short)(definition->trailing_particle_lifetime * TICKS_PER_SECOND);
-		color_random = real_local_random_range(0.f, 1.f);
+		scale = real_local_random_range(0.f, 1.f);
 		particle->color.alpha = 1.f;
-		particle->color.red = (definition->color_bound_1.red - definition->color_bound_0.red) * color_random + definition->color_bound_0.red;
-		particle->color.green = (definition->color_bound_1.green - definition->color_bound_0.green) * color_random + definition->color_bound_0.green;
-		particle->color.blue = (definition->color_bound_1.blue - definition->color_bound_0.blue) * color_random + definition->color_bound_0.blue;
+		particle->color.red = (definition->color_bound_1.red - definition->color_bound_0.red) * scale + definition->color_bound_0.red;
+		particle->color.green = (definition->color_bound_1.green - definition->color_bound_0.green) * scale + definition->color_bound_0.green;
+		particle->color.blue = (definition->color_bound_1.blue - definition->color_bound_0.blue) * scale + definition->color_bound_0.blue;
 		SET_FLAG(particle->flags, _glow_particle_is_trailing_particle_bit, TRUE);
 	}
 
@@ -931,9 +960,6 @@ static void get_particle_world_position(
 	real_vector3d u;
 	real_vector3d v;
 	short marker_index;
-	real angle;
-	real sine_angle;
-	real cosine_angle;
 
 	for (marker_index = 0; marker_index < glow->number_of_markers - 1; marker_index++)
 	{
@@ -1102,12 +1128,16 @@ static void get_particle_world_position(
 		traversal_time_indices[2],
 		traversal_time_indices[3],
 		particle->t);
-	angle = particle->t * rotation_per_unit_t + particle->initial_angle;
-	sine_angle = sine(angle);
-	cosine_angle = cosine(angle);
-	particle->position.x += (u.i * sine_angle + v.i * cosine_angle) * particle->distance_to_object;
-	particle->position.y += (u.j * sine_angle + v.j * cosine_angle) * particle->distance_to_object;
-	particle->position.z += (u.k * sine_angle + v.k * cosine_angle) * particle->distance_to_object;
+
+	{
+		real angle = particle->t * rotation_per_unit_t + particle->initial_angle;
+		real sine_angle = sine(angle);
+		real cosine_angle = cosine(angle);
+
+		particle->position.x += (u.i * sine_angle + v.i * cosine_angle) * particle->distance_to_object;
+		particle->position.y += (u.j * sine_angle + v.j * cosine_angle) * particle->distance_to_object;
+		particle->position.z += (u.k * sine_angle + v.k * cosine_angle) * particle->distance_to_object;
+	}
 
 	return;
 }
@@ -1116,10 +1146,10 @@ void glow_render(
 	long object_index,
 	long widget_index)
 {
-	struct build_sprite_data data;
-	struct glow_particle *particle;
 	struct glow_datum *glow = glow_get(widget_index);
 	struct glow_definition *definition = glow_definition_get(glow->definition_index);
+	struct build_sprite_data data;
+	struct glow_particle *particle;
 
 	build_sprites_begin(
 		&data,
@@ -1130,13 +1160,15 @@ void glow_render(
 
 	for (particle = glow->head_particle; particle; particle = particle->next)
 	{
+		struct object_marker *marker = &glow->markers[particle->parent_marker_index];
+
 		build_sprite(
 			&data,
 			_build_sprite_normal,
 			0,
 			0,
 			&particle->position,
-			&glow->markers[particle->parent_marker_index].matrix.forward,
+			&marker->matrix.forward,
 			0.f,
 			particle->present_size,
 			&particle->color,
