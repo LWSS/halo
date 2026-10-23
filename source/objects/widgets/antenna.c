@@ -18,10 +18,11 @@ ANTENNA.C
 enum
 {
 	MAXIMUM_ANTENNAS_PER_MAP = 12,
-	MAXIMUM_UPDATES_BETWEEN_RENDERS = 5,	/* fake name */
 };
 
-#define ANTENNA_CATCH_UP_DT 0.05f					/* fake name */
+#define ANTENNA_RENDER_CATCH_UP_UPDATE_THRESHOLD 5
+#define ANTENNA_RENDER_CATCH_UP_DT 0.05f
+#define ANTENNA_RENDER_PROJECTED_PIXELS 100.f
 #define ANTENNA_VERTEX_RADIUS 0.02f					/* fake name */
 
 /* ---------- macros */
@@ -45,7 +46,7 @@ struct antenna_datum
 	short identifier;
 	word pad;
 	boolean initialized;
-	boolean disabled; /* fake name */
+	boolean error;
 	short updates_since_last_render;
 	long definition_index;
 	long object_index;
@@ -123,7 +124,7 @@ long antenna_new(
 			real_point3d last_point;
 
 			antenna->initialized = FALSE;
-			antenna->disabled = definition->vertices.count < 2;
+			antenna->error = definition->vertices.count < 2;
 			antenna->definition_index = antenna_definition_index;
 			antenna->object_index = NONE;
 			antenna->updates_since_last_render = 0;
@@ -215,15 +216,15 @@ void antenna_render(
 	struct antenna_datum *antenna = antenna_get(antenna_index);
 	struct antenna_definition *definition = antenna_definition_get(antenna->definition_index);
 
-	if (!antenna->disabled)
+	if (!antenna->error)
 	{
 		antenna->object_index = object_index;
 
-		if (antenna->updates_since_last_render > MAXIMUM_UPDATES_BETWEEN_RENDERS)
+		if (antenna->updates_since_last_render > ANTENNA_RENDER_CATCH_UP_UPDATE_THRESHOLD)
 		{
-			antenna_update(antenna, definition, ANTENNA_CATCH_UP_DT);
-			antenna_update(antenna, definition, ANTENNA_CATCH_UP_DT);
-			antenna_update(antenna, definition, ANTENNA_CATCH_UP_DT);
+			antenna_update(antenna, definition, ANTENNA_RENDER_CATCH_UP_DT);
+			antenna_update(antenna, definition, ANTENNA_RENDER_CATCH_UP_DT);
+			antenna_update(antenna, definition, ANTENNA_RENDER_CATCH_UP_DT);
 		}
 
 		antenna->updates_since_last_render = 0;
@@ -245,16 +246,16 @@ void antennas_update(
 		struct antenna_datum *antenna = antenna_get(antenna_index);
 		struct antenna_definition *definition = antenna_definition_get(antenna->definition_index);
 
-		if (!antenna->disabled)
+		if (!antenna->error)
 		{
 			antenna->updates_since_last_render++;
 
 			if (antenna->object_index != NONE &&
-				antenna->updates_since_last_render < MAXIMUM_UPDATES_BETWEEN_RENDERS)
+				antenna->updates_since_last_render < ANTENNA_RENDER_CATCH_UP_UPDATE_THRESHOLD)
 			{
-				real const maximum_dt = 2 * SECONDS_PER_TICK;
+				real const maximum_update_dt = 2 * SECONDS_PER_TICK;
 
-				antenna_update(antenna, definition, MIN(dt, maximum_dt));
+				antenna_update(antenna, definition, MIN(dt, maximum_update_dt));
 			}
 		}
 	}
@@ -295,7 +296,7 @@ static void antenna_update(
 		&attachment_point,
 		&attachment_vector);
 
-	if (!antenna->disabled && dt > 0.f)
+	if (!antenna->error && dt > 0.f)
 	{
 		for (vertex_index = 0; vertex_index < antenna_definition->vertices.count + 1; vertex_index++)
 		{
@@ -422,8 +423,8 @@ static void antenna_render_proper(
 	{
 		struct build_sprite_data build_sprite_data;
 		short vertex_index;
-		real pixels = 100.f;
-		real fade = (pixels - antenna_definition->cutoff_pixels) /
+		real projected_pixels = ANTENNA_RENDER_PROJECTED_PIXELS;
+		real fade = (projected_pixels - antenna_definition->cutoff_pixels) /
 			(antenna_definition->falloff_pixels - antenna_definition->cutoff_pixels);
 
 		fade = PIN(fade, 0.f, 1.f);

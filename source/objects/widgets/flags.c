@@ -41,12 +41,8 @@ enum
 	MAXIMUM_FLAGS_PER_MAP = 2,
 };
 
-enum
-{
-	MAXIMUM_UPDATES_BETWEEN_RENDERS = 5,	/* fake name */
-};
-
-#define FLAG_CATCH_UP_DT 5.f								/* fake name */
+#define FLAG_RENDER_CATCH_UP_UPDATE_THRESHOLD 5				/* fake name */
+#define FLAG_RENDER_CATCH_UP_DT 5.f							/* fake name */
 #define FLAG_VERTEX_RADIUS 0.02f							/* fake name */
 
 /* ---------- macros */
@@ -70,7 +66,7 @@ struct flag_cell_datum
 struct flag_datum
 {
 	short identifier;
-	boolean disabled; /* fake name */
+	boolean error;
 	boolean initialized;
 	boolean update_state;
 	short updates_since_last_render;
@@ -187,7 +183,7 @@ long flag_new(
 				short x;
 				short y;
 
-				flag->disabled = FALSE;
+				flag->error = FALSE;
 				flag->initialized = FALSE;
 				flag->object_index = NONE;
 				flag->definition_index = flag_definition_index;
@@ -218,7 +214,7 @@ long flag_new(
 			}
 			else
 			{
-				flag->disabled = TRUE;
+				flag->error = TRUE;
 			}
 		}
 	}
@@ -363,15 +359,15 @@ void flag_render(
 
 	flag->object_index = object_index;
 
-	if (flag->updates_since_last_render > MAXIMUM_UPDATES_BETWEEN_RENDERS || !flag->initialized)
+	if (flag->updates_since_last_render > FLAG_RENDER_CATCH_UP_UPDATE_THRESHOLD || !flag->initialized)
 	{
-		flag_update(flag, definition, FLAG_CATCH_UP_DT);
+		flag_update(flag, definition, FLAG_RENDER_CATCH_UP_DT);
 		flag->initialized = TRUE;
 	}
 
 	flag->updates_since_last_render = 0;
 
-	if (!flag->disabled)
+	if (!flag->error)
 	{
 		flag_render_proper(flag, definition, lighting, animation);
 	}
@@ -394,7 +390,7 @@ void flags_update(
 		flag->updates_since_last_render++;
 
 		if (flag->object_index != NONE &&
-			flag->updates_since_last_render < MAXIMUM_UPDATES_BETWEEN_RENDERS &&
+			flag->updates_since_last_render < FLAG_RENDER_CATCH_UP_UPDATE_THRESHOLD &&
 			dt != 0.f)
 		{
 			flag_update(flag, definition, dt);
@@ -433,7 +429,7 @@ void flag_update(
 		&attachment_points[flag_definition->attachment_points.count - 1],
 		&weather_palette_index);
 
-	if (!flag->disabled)
+	if (!flag->error)
 	{
 		point2d const parent_deltas[MAXIMUM_NUMBER_OF_ESTIMATED_POSITIONS] = { { -1, 0 }, { 0, 1 }, { 0, -1 } };
 		real parent_distances[MAXIMUM_NUMBER_OF_ESTIMATED_POSITIONS];
@@ -614,7 +610,7 @@ void flag_update_attachment(
 
 	scenario_location_from_point(attachment_location, attachment_points);
 
-	if (!flag->disabled)
+	if (!flag->error)
 	{
 		for (y = 0; y < flag_definition->height; y++)
 		{

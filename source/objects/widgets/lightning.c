@@ -45,18 +45,16 @@ struct intermediate_lightning_point
 	boolean valid;
 };
 
-struct lightning_globals
-{
-	struct data_array *lightning_data;
-};
-
 /* ---------- prototypes */
 
 static void lightning_offset_marker_position(real_point3d *position, real_matrix4x3 const *matrix, real_vector3d const *random_position_bounds);
 
 /* ---------- globals */
 
-static struct lightning_globals lightning_globals;
+static struct
+{
+	struct data_array *lightning_data;
+} lightning_globals;
 
 /* ---------- public code */
 
