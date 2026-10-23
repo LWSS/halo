@@ -41,6 +41,7 @@ enum
 /* ---------- macros */
 
 #define flag_definition_get(index) ((struct flag_definition *)tag_get(FLAG_DEFINITION_TAG, (index))) /* fake name */
+#define flag_definition_try_and_get(index) ((index) == NONE ? (struct flag_definition *)NULL : flag_definition_get(index)) /* fake name */
 
 /* ---------- structures */
 

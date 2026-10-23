@@ -52,6 +52,7 @@ enum
 /* ---------- macros */
 
 #define glow_definition_get(index) ((struct glow_definition *)tag_get(GLOW_DEFINITION_TAG, (index))) /* fake name */
+#define glow_definition_try_and_get(index) ((index) == NONE ? (struct glow_definition *)NULL : glow_definition_get(index)) /* fake name */
 
 /* ---------- structures */
 

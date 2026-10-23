@@ -24,6 +24,7 @@ enum
 /* ---------- macros */
 
 #define antenna_definition_get(index) ((struct antenna_definition *)tag_get(ANTENNA_DEFINITION_TAG, (index))) /* fake name */
+#define antenna_definition_try_and_get(index) ((index) == NONE ? (struct antenna_definition *)NULL : antenna_definition_get(index)) /* fake name */
 
 /* ---------- structures */
 

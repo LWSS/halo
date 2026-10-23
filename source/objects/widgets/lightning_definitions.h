@@ -27,6 +27,7 @@ enum
 /* ---------- macros */
 
 #define lightning_definition_get(index) ((struct lightning_definition *)tag_get(LIGHTNING_DEFINITION_TAG, (index))) /* fake name */
+#define lightning_definition_try_and_get(index) ((index) == NONE ? (struct lightning_definition *)NULL : lightning_definition_get(index)) /* fake name */
 
 /* ---------- structures */
 

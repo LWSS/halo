@@ -26,6 +26,7 @@ enum
 /* ---------- macros */
 
 #define light_volume_definition_get(index) ((struct light_volume_definition *)tag_get(LIGHT_VOLUME_DEFINITION_TAG, (index))) /* fake name */
+#define light_volume_definition_try_and_get(index) ((index) == NONE ? (struct light_volume_definition *)NULL : light_volume_definition_get(index)) /* fake name */
 
 /* ---------- structures */
 
