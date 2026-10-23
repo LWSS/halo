@@ -605,6 +605,7 @@ extern const real_vector3d *const global_right3d;
 extern const real_vector3d *const global_down3d;
 
 extern const real_quaternion *const global_identity_quaternion;
+extern const real_matrix4x3 *const global_identity4x3;
 
 /* ---------- public code */
 
@@ -1345,14 +1346,20 @@ __inline short local_random_range(
 __inline real real_local_random(
 	void)
 {
-	return real_seed_random(get_global_local_random_seed_address());
+	// This temporary exists in sapien /Od
+	real result = real_seed_random(get_global_local_random_seed_address());
+
+	return result;
 }
 
 __inline real real_local_random_range(
 	real lower_bound,
 	real upper_bound)
 {
-	return real_seed_random_range(get_global_local_random_seed_address(), lower_bound, upper_bound);
+	// This temporary exists in sapien /Od
+	real result = real_seed_random_range(get_global_local_random_seed_address(), lower_bound, upper_bound);
+
+	return result;
 }
 
 __inline real_vector3d *local_random_direction3d(
@@ -1391,30 +1398,26 @@ __inline real uniform_cubic_spline(
 	return (((((((t - ((h * 2.f) + t0)) * f3) / (h * 3.f)) + f2) * (t - (t0 + h))) / (h * 2.f)) + f1) * (t - t0) / h + f0;
 }
 
-// TODO: doesn't match, needs cleanup
 __inline real nonuniform_cubic_spline(
 	real f0,
 	real f1,
-	real f2, 
+	real f2,
 	real f3,
-	real t0, 
-	real t1, 
-	real t2, 
-	real t3, 
+	real t0,
+	real t1,
+	real t2,
+	real t3,
 	real t)
 {
-	real v9, v10, v11;
-	v10 = ((f2 - f1) / (t2 - t1)) - ((f1 - f0) / (t1 - t0));
-	v11 = (((((((((((f3 - f2) / (t3 - t2)) - ((f2 - f1) 
-		/ (t2 - t1))) / (t3 - t1)) - (v10 / (t2 - t0))) 
-		/ (t3 - t0))
-		* (v9 - t2))
-		+ (v10 / (t2 - t0)))
-		* (v9 - t1))
-		+ ((f1 - f0) / (t1 - t0)))
-		* (v9 - t0))
-		 + f0;
-	return v11;
+	match_assert("..\\math\\real_math.h", 1530, t>= t0 && t <= t3);
+
+	f3 = (f3 - f2) / (t3 - t2);
+	f2 = (f2 - f1) / (t2 - t1);
+	f1 = (f1 - f0) / (t1 - t0);
+	f3 = (f3 - f2) / (t3 - t1);
+	f2 = (f2 - f1) / (t2 - t0);
+	f3 = (f3 - f2) / (t3 - t0);
+	return ((f3 * (t - t2) + f2) * (t - t1) + f1) * (t - t0) + f0;
 }
 
 __inline void uniform_cubic_spline_vector3d(
@@ -1434,56 +1437,23 @@ __inline void uniform_cubic_spline_vector3d(
 	return;
 }
 
-// TODO: doesn't match, needs cleanup. uses above inlines
 __inline void nonuniform_cubic_spline_vector3d(
 	real_vector3d *result,
-	real_vector3d const *f0, 
+	real_vector3d const *f0,
 	real_vector3d const *f1,
 	real_vector3d const *f2,
-	real_vector3d const *f3, 
-	real t0, 
-	real t1, 
+	real_vector3d const *f3,
+	real t0,
+	real t1,
 	real t2,
 	real t3,
 	real t)
 {
-	real v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20;
-	v10 = t3 - t2;
-	v11 = t2 - t1;
-	v12 = t1 - t0;
-	v13 = t3 - t1;
-	v14 = t2 - t0;
-	v15 = t3 - t0;
-	v16 = t - t2;
-	v17 = t - t1;
-	v18 = t - t0;
+	result->i = nonuniform_cubic_spline(f0->i, f1->i, f2->i, f3->i, t0, t1, t2, t3, t);
+	result->j = nonuniform_cubic_spline(f0->j, f1->j, f2->j, f3->j, t0, t1, t2, t3, t);
+	result->k = nonuniform_cubic_spline(f0->k, f1->k, f2->k, f3->k, t0, t1, t2, t3, t);
 
-	result->i = (((((((((((f3->i - f2->i) / v10) - ((f2->i - f1->i) / v11)) / v13)
-		- ((((f2->i - f1->i) / v11) - ((f1->i - f0->i) / v12)) / v14))
-		/ v15)
-		* v16)
-		+ ((((f2->i - f1->i) / v11) - ((f1->i - f0->i) / v12)) / v14))
-		* v17)
-		+ ((f1->i - f0->i) / v12))
-		* v18)
-		+ f0->i;
-
-	result->j = (((((((((((f3->j - f2->j) / v10) - ((f2->j - f1->j) / v11)) / v13)
-		- ((((f2->j - f1->j) / v11) - ((f1->j - f0->j) / v12)) / v14))
-		/ v15)
-		* v16)
-		+ ((((f2->j - f1->j) / v11) - ((f1->j - f0->j) / v12)) / v14))
-		* v17)
-		+ ((f1->j - f0->j) / v12))
-		* v18)
-		+ f0->j;
-
-	v19 = (((f3->k - f2->k) / v10) - ((f2->k - f1->k) / v11));
-	v20 = (((f2->k - f1->k) / v11) - ((f1->k - f0->k) / v12));
-
-	result->k = ((((((((v19 / v13) - (v20 / v14)) / v15) * v16) + (v20 / v14)) * v17) + ((f1->k - f0->k) / v12))
-				* v18)
-				+ f0->k;
+	return;
 }
 
 __inline boolean valid_real(

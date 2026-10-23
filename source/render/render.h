@@ -15,6 +15,19 @@ header included in hcex build.
 
 /* ---------- constants */
 
+enum
+{
+	MAXIMUM_NUMBER_OF_BUILD_SPRITE_BITMAPS = 8,
+};
+
+enum
+{
+	_build_sprite_normal = 0,
+	_build_sprite_parallel,
+	_build_sprite_perpendicular,
+	NUMBER_OF_BUILD_SPRITE_ORIENTATIONS,
+};
+
 /* ---------- macros */
 
 /* ---------- structures */
@@ -97,6 +110,27 @@ struct render_globals
 	long environment_surface_indices[MAXIMUM_RENDERED_ENVIRONMENT_SURFACES];
 };
 
+struct build_sprite_group
+{
+	long vertex_buffer_index;
+	void *vertices;
+	short sprite_count;
+	struct bitmap_data *bitmap;
+};
+
+struct build_sprite_data
+{
+	long bitmap_group_index;
+	short maximum_sprite_count;
+	short screen_space;
+	struct shader_effect const *shader;
+	short sprite_count;
+	unsigned long flags;
+	real_point3d centroid;
+	short group_count;
+	struct build_sprite_group groups[MAXIMUM_NUMBER_OF_BUILD_SPRITE_BITMAPS];
+};
+
 /* ---------- prototypes/RENDER.C */
 
 void render_frame(struct render_window const *windoze, short window_count, point2d const *screenshot_page_index, point2d const *screenshot_index, struct bitmap_data *screenshot_bitmap, real time_delta_since_tick_sec);
@@ -111,6 +145,12 @@ void render_frame_pregame(struct render_window const *window, struct bitmap_data
 void render_frame_present(point2d const *screenshot_index, struct bitmap_data *bitmap);
 boolean render_location_visible(struct location *location);
 struct rendered_cluster *rendered_cluster_get(short rendered_cluster_index);
+
+/* ---------- prototypes/RENDER_SPRITE.C */
+
+void build_sprites_begin(struct build_sprite_data *data, short maximum_sprite_count, long bitmap_group_index, struct shader_effect const *shader, unsigned long flags);
+void build_sprites_end(struct build_sprite_data *data);
+void build_sprite(struct build_sprite_data *data, short mode, short sequence_index, short sprite_index, real_point3d const *untransformed_origin, real_vector3d const *untransformed_direction, real rotation, real scale, real_argb_color const *color, real fade, unsigned long flags);
 
 /* ---------- prototypes/RENDER_OBJECTS.C */
 
