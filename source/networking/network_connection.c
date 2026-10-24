@@ -97,7 +97,7 @@ static void network_connection_log_traffic_event(struct network_connection *conn
 
 /* ---------- globals */
 
-boolean global_connection_dont_timeout;
+boolean global_connection_dont_timeout = FALSE;
 
 /* ---------- public code */
 
@@ -115,7 +115,7 @@ struct network_connection *network_connection_new(
 	long unreliable_queue_size;
 	struct network_connection *connection = NULL;
 
-	match_assert("c:\\halo\\SOURCE\\networking\\network_connection.c", 157, (flags&FLAG(_connection_create_server_bit)) || (flags&FLAG(_connection_create_clientside_client_bit)));
+	match_assert("c:\\halo\\SOURCE\\networking\\network_connection.c", 157, (flags&FLAG(_connection_create_server_bit))|| (flags&FLAG(_connection_create_clientside_client_bit)));
 
 	if (TEST_FLAG(flags, _connection_create_server_bit))
 	{
