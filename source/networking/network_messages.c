@@ -27,7 +27,7 @@ enum
 
 /* ---------- prototypes */
 
-static boolean encode_network_game_message(void const *message_struct, void *encoded_message, short *encoded_message_size, short packet_type, short packet_version);
+static boolean encode_network_game_message(void *message_struct, void *encoded_message, short *encoded_message_size, short packet_type, short packet_version);
 
 /* ---------- globals */
 
@@ -38,7 +38,7 @@ static struct data_packet_field message_client_broadcast_game_search_fields[] = 
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_broadcast_game_search_packet = /* fake name */
+static struct data_packet_definition message_client_broadcast_game_search_packet =
 {
 	"message_client_broadcast_game_search_packet",
 	0,
@@ -56,7 +56,7 @@ static struct data_packet_field message_client_ping_fields[] = /* fake name */
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_ping_packet = /* fake name */
+static struct data_packet_definition message_client_ping_packet =
 {
 	"message_client_ping_packet",
 	0,
@@ -72,7 +72,7 @@ static struct data_packet_field message_server_game_advertise_fields[] = /* fake
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_game_advertise_packet = /* fake name */
+static struct data_packet_definition message_server_game_advertise_packet =
 {
 	"message_server_game_advertise_packet",
 	0,
@@ -88,7 +88,7 @@ static struct data_packet_field message_server_pong_fields[] = /* fake name */
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_pong_packet = /* fake name */
+static struct data_packet_definition message_server_pong_packet =
 {
 	"message_server_pong_packet",
 	0,
@@ -106,7 +106,7 @@ static struct data_packet_field message_server_machine_accepted_fields[] = /* fa
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_machine_accepted_packet = /* fake name */
+static struct data_packet_definition message_server_machine_accepted_packet =
 {
 	"message_server_machine_accepted_packet",
 	0,
@@ -122,7 +122,7 @@ static struct data_packet_field message_server_machine_rejected_fields[] = /* fa
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_machine_rejected_packet = /* fake name */
+static struct data_packet_definition message_server_machine_rejected_packet =
 {
 	"message_server_machine_rejected_packet",
 	0,
@@ -138,7 +138,7 @@ static struct data_packet_field message_server_game_settings_update_fields[] = /
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_game_settings_update_packet = /* fake name */
+static struct data_packet_definition message_server_game_settings_update_packet =
 {
 	"message_server_game_settings_update_packet",
 	0,
@@ -154,7 +154,7 @@ static struct data_packet_field message_server_pregame_countdown_fields[] = /* f
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_pregame_countdown_packet = /* fake name */
+static struct data_packet_definition message_server_pregame_countdown_packet =
 {
 	"message_server_pregame_countdown_packet",
 	0,
@@ -170,7 +170,7 @@ static struct data_packet_field message_server_pregame_keep_alive_fields[] = /* 
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_pregame_keep_alive_packet = /* fake name */
+static struct data_packet_definition message_server_pregame_keep_alive_packet =
 {
 	"message_server_pregame_keep_alive_packet",
 	0,
@@ -186,7 +186,7 @@ static struct data_packet_field message_server_postgame_keep_alive_fields[] = /*
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_postgame_keep_alive_packet = /* fake name */
+static struct data_packet_definition message_server_postgame_keep_alive_packet =
 {
 	"message_server_postgame_keep_alive_packet",
 	0,
@@ -202,7 +202,7 @@ static struct data_packet_field message_server_begin_game_fields[] = /* fake nam
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_begin_game_packet = /* fake name */
+static struct data_packet_definition message_server_begin_game_packet =
 {
 	"message_server_begin_game_packet",
 	0,
@@ -218,7 +218,7 @@ static struct data_packet_field message_server_graceful_game_exit_pregame_fields
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_graceful_game_exit_pregame_packet = /* fake name */
+static struct data_packet_definition message_server_graceful_game_exit_pregame_packet =
 {
 	"message_server_graceful_game_exit_pregame_packet",
 	0,
@@ -235,7 +235,7 @@ static struct data_packet_field message_client_join_game_request_fields[] = /* f
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_join_game_request_packet = /* fake name */
+static struct data_packet_definition message_client_join_game_request_packet =
 {
 	"message_client_join_game_request_packet",
 	0,
@@ -253,7 +253,7 @@ static struct data_packet_field message_client_add_player_request_pregame_fields
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_add_player_request_pregame_packet = /* fake name */
+static struct data_packet_definition message_client_add_player_request_pregame_packet =
 {
 	"message_client_add_player_request_pregame_packet",
 	0,
@@ -271,7 +271,7 @@ static struct data_packet_field message_client_remove_player_request_pregame_fie
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_remove_player_request_pregame_packet = /* fake name */
+static struct data_packet_definition message_client_remove_player_request_pregame_packet =
 {
 	"message_client_remove_player_request_pregame_packet",
 	0,
@@ -289,7 +289,7 @@ static struct data_packet_field message_client_settings_request_fields[] = /* fa
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_settings_request_packet = /* fake name */
+static struct data_packet_definition message_client_settings_request_packet =
 {
 	"message_client_settings_request_packet",
 	0,
@@ -307,7 +307,7 @@ static struct data_packet_field message_client_player_settings_request_fields[] 
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_player_settings_request_packet = /* fake name */
+static struct data_packet_definition message_client_player_settings_request_packet =
 {
 	"message_client_player_settings_request_packet",
 	0,
@@ -323,7 +323,7 @@ static struct data_packet_field message_client_game_start_request_fields[] = /* 
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_game_start_request_packet = /* fake name */
+static struct data_packet_definition message_client_game_start_request_packet =
 {
 	"message_client_game_start_request_packet",
 	0,
@@ -339,7 +339,7 @@ static struct data_packet_field message_client_graceful_game_exit_pregame_fields
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_graceful_game_exit_pregame_packet = /* fake name */
+static struct data_packet_definition message_client_graceful_game_exit_pregame_packet =
 {
 	"message_client_graceful_game_exit_pregame_packet",
 	0,
@@ -355,7 +355,7 @@ static struct data_packet_field message_client_map_is_precached_pregame_fields[]
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_map_is_precached_pregame_packet = /* fake name */
+static struct data_packet_definition message_client_map_is_precached_pregame_packet =
 {
 	"message_client_map_is_precached_pregame_packet",
 	0,
@@ -377,7 +377,7 @@ static struct data_packet_field message_server_game_update_fields[] = /* fake na
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_game_update_packet = /* fake name */
+static struct data_packet_definition message_server_game_update_packet =
 {
 	"message_server_game_update_packet",
 	0,
@@ -395,7 +395,7 @@ static struct data_packet_field message_server_add_player_ingame_fields[] = /* f
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_add_player_ingame_packet = /* fake name */
+static struct data_packet_definition message_server_add_player_ingame_packet =
 {
 	"message_server_add_player_ingame_packet",
 	0,
@@ -414,7 +414,7 @@ static struct data_packet_field message_server_remove_player_ingame_fields[] = /
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_remove_player_ingame_packet = /* fake name */
+static struct data_packet_definition message_server_remove_player_ingame_packet =
 {
 	"message_server_remove_player_ingame_packet",
 	0,
@@ -430,7 +430,7 @@ static struct data_packet_field message_server_game_over_fields[] = /* fake name
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_game_over_packet = /* fake name */
+static struct data_packet_definition message_server_game_over_packet =
 {
 	"message_server_game_over_packet",
 	0,
@@ -446,7 +446,7 @@ static struct data_packet_field message_client_loaded_fields[] = /* fake name */
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_loaded_packet = /* fake name */
+static struct data_packet_definition message_client_loaded_packet =
 {
 	"message_client_loaded_packet",
 	0,
@@ -468,7 +468,7 @@ static struct data_packet_field message_client_game_update_fields[] = /* fake na
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_game_update_packet = /* fake name */
+static struct data_packet_definition message_client_game_update_packet =
 {
 	"message_client_game_update_packet",
 	0,
@@ -486,7 +486,7 @@ static struct data_packet_field message_client_add_player_request_ingame_fields[
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_add_player_request_ingame_packet = /* fake name */
+static struct data_packet_definition message_client_add_player_request_ingame_packet =
 {
 	"message_client_add_player_request_ingame_packet",
 	0,
@@ -504,7 +504,7 @@ static struct data_packet_field message_client_remove_player_request_ingame_fiel
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_remove_player_request_ingame_packet = /* fake name */
+static struct data_packet_definition message_client_remove_player_request_ingame_packet =
 {
 	"message_client_remove_player_request_ingame_packet",
 	0,
@@ -522,7 +522,7 @@ static struct data_packet_field message_client_host_crashed_cry_for_help_fields[
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_host_crashed_cry_for_help_packet = /* fake name */
+static struct data_packet_definition message_client_host_crashed_cry_for_help_packet =
 {
 	"message_client_host_crashed_cry_for_help_packet",
 	0,
@@ -540,7 +540,7 @@ static struct data_packet_field message_client_join_new_host_fields[] = /* fake 
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_join_new_host_packet = /* fake name */
+static struct data_packet_definition message_client_join_new_host_packet =
 {
 	"message_client_join_new_host_packet",
 	0,
@@ -556,7 +556,7 @@ static struct data_packet_field message_server_switch_to_pregame_fields[] = /* f
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_switch_to_pregame_packet = /* fake name */
+static struct data_packet_definition message_server_switch_to_pregame_packet =
 {
 	"message_server_switch_to_pregame_packet",
 	0,
@@ -572,7 +572,7 @@ static struct data_packet_field message_server_graceful_game_exit_postgame_field
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_server_graceful_game_exit_postgame_packet = /* fake name */
+static struct data_packet_definition message_server_graceful_game_exit_postgame_packet =
 {
 	"message_server_graceful_game_exit_postgame_packet",
 	0,
@@ -590,7 +590,7 @@ static struct data_packet_field message_client_remove_player_request_postgame_fi
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_remove_player_request_postgame_packet = /* fake name */
+static struct data_packet_definition message_client_remove_player_request_postgame_packet =
 {
 	"message_client_remove_player_request_postgame_packet",
 	0,
@@ -606,7 +606,7 @@ static struct data_packet_field message_client_switch_to_pregame_fields[] = /* f
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_switch_to_pregame_packet = /* fake name */
+static struct data_packet_definition message_client_switch_to_pregame_packet =
 {
 	"message_client_switch_to_pregame_packet",
 	0,
@@ -622,7 +622,7 @@ static struct data_packet_field message_client_graceful_game_exit_postgame_field
 	{__pack_end, 0, 0, 0, 0},
 };
 
-static struct data_packet_definition message_client_graceful_game_exit_postgame_packet = /* fake name */
+static struct data_packet_definition message_client_graceful_game_exit_postgame_packet =
 {
 	"message_client_graceful_game_exit_postgame_packet",
 	0,
@@ -695,7 +695,7 @@ void initialize_network_game_packets(
 
 message_header *create_network_game_message(
 	short message_type,
-	void const *message_struct,
+	void *message_struct,
 	short message_struct_size)
 {
 	message_header *message;
@@ -786,7 +786,7 @@ message_header *create_network_game_message(
 
 boolean decode_network_game_message(
 	void *message_struct,
-	void const *encoded_message,
+	void *encoded_message,
 	short *encoded_message_size,
 	short *packet_type,
 	short *packet_version,
@@ -831,7 +831,7 @@ void network_event(
 /* ---------- private code */
 
 static boolean encode_network_game_message(
-	void const *message_struct,
+	void *message_struct,
 	void *encoded_message,
 	short *encoded_message_size,
 	short packet_type,

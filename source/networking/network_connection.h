@@ -39,7 +39,7 @@ boolean network_connection_connected(struct network_connection *connection);
 boolean network_connection_write(struct network_connection *connection, void *message, word buffer_size, struct transport_address const *dest_address, boolean reliable);
 boolean network_connection_read(struct network_connection *connection, void *message, word *buffer_size, struct transport_address *source_address);
 boolean network_server_close_client_connection(struct network_connection *server_connection, struct network_connection *client_connection);
-boolean network_connection_idle(struct network_connection *connection, unsigned long timeout, struct network_connection **new_client_connection);
+boolean network_connection_idle(struct network_connection *connection, long timeout, struct network_connection **new_client_connection);
 void network_connection_get_address(struct network_connection *connection, struct transport_address *reliable_address, struct transport_address *unreliable_address);
 boolean network_connection_connect(struct network_connection *connection, struct transport_address const *remote_address, struct transport_connect_process **process_reference);
 void network_connection_set_connection_rejection_procedure(struct network_connection *connection, network_connection_rejection_procedure connection_rejection_procedure);

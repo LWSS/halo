@@ -428,7 +428,7 @@ boolean network_game_server_idle(
 
 boolean network_game_server_set_game_name(
 	struct network_game_server *server,
-	wchar_t const *name)
+	wchar_t *const name)
 {
 	match_assert("c:\\halo\\SOURCE\\networking\\network_server_manager.c", 477, server);
 	match_assert("c:\\halo\\SOURCE\\networking\\network_server_manager.c", 478, name);
@@ -1263,7 +1263,7 @@ void network_game_server_client_machine_game_loading_complete(
 void network_game_server_client_machine_is_precached(
 	struct network_game_server *server,
 	struct network_client_machine *machine,
-	char const *map_name)
+	char *map_name)
 {
 	char *multiplayer_map_name = main_get_multiplayer_map_name();
 
@@ -1502,7 +1502,7 @@ void network_game_server_queue_player_for_addition(
 
 void network_game_server_begin_game_start_countdown(
 	struct network_game_server *server,
-	long time_remaining)
+	unsigned long time_remaining)
 {
 	match_assert("c:\\halo\\SOURCE\\networking\\network_server_manager.c", 1517, server);
 
@@ -1714,7 +1714,7 @@ void network_game_server_invalidate_network_machine(
 void network_game_generate_join_game_token(
 	byte join_token[NETWORK_JOIN_GAME_TOKEN_SIZE])
 {
-	char const join_token_seed[19] = {'m', 'e', 's', 's', 'a', 'g', 'e', ' ', 'i', 'n', ' ', 'a', ' ', 'b', 'o', 't', 't', 'l', 'e'}; // no \0 terminate
+	char const join_token_seed[19] = {'m', 'e', 's', 's', 'a', 'g', 'e', ' ', 'i', 'n', ' ', 'a', ' ', 'b', 'o', 't', 't', 'l', 'e'};
 
 	match_assert("c:\\halo\\SOURCE\\networking\\network_server_manager.c", 1754, join_token);
 

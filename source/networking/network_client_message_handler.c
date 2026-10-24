@@ -42,7 +42,7 @@ boolean network_game_client_handle_message(
 	struct network_game_client *client,
 	message_header *message,
 	short message_size,
-	struct transport_address *source_address)
+	struct transport_address const *source_address)
 {
 	word message_type;
 	boolean success = TRUE;
@@ -82,7 +82,7 @@ boolean network_game_client_handle_message(
 			switch (GET_MESSAGE_PACKET_TYPE(message, message_size))
 			{
 			case _message_type_server_game_advertise:
-				success = network_game_client_handle_message_server_game_advertise(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_game_advertise(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -91,7 +91,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_pong:
-				success = network_game_client_handle_message_server_pong(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_pong(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -100,7 +100,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_machine_accepted:
-				success = network_game_client_handle_message_server_machine_accepted(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_machine_accepted(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -109,7 +109,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_machine_rejected:
-				success = network_game_client_handle_message_server_machine_rejected(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_machine_rejected(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -118,7 +118,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_game_settings_update:
-				success = network_game_client_handle_message_server_game_settings_update(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_game_settings_update(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -127,7 +127,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_pregame_countdown:
-				success = network_game_client_handle_message_server_pregame_countdown(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_pregame_countdown(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -136,7 +136,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_pregame_keep_alive:
-				success = network_game_client_handle_message_server_pregame_keep_alive(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_pregame_keep_alive(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -145,7 +145,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_postgame_keep_alive:
-				success = network_game_client_handle_message_server_postgame_keep_alive(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_postgame_keep_alive(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -154,7 +154,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_begin_game:
-				success = network_game_client_handle_message_server_begin_game(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_begin_game(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -163,7 +163,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_graceful_game_exit_pregame:
-				success = network_game_client_handle_message_server_graceful_game_exit_pregame(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_graceful_game_exit_pregame(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -172,7 +172,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_game_update:
-				success = network_game_client_handle_message_server_game_update(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_game_update(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -181,7 +181,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_add_player_ingame:
-				success = network_game_client_handle_message_server_add_player_ingame(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_add_player_ingame(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -190,7 +190,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_remove_player_ingame:
-				success = network_game_client_handle_message_server_remove_player_ingame(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_remove_player_ingame(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -199,7 +199,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_game_over:
-				success = network_game_client_handle_message_server_game_over(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_game_over(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -208,7 +208,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_switch_to_pregame:
-				success = network_game_client_handle_message_server_switch_to_pregame(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_switch_to_pregame(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{
@@ -217,7 +217,7 @@ boolean network_game_client_handle_message(
 
 				break;
 			case _message_type_server_graceful_game_exit_postgame:
-				success = network_game_client_handle_message_server_graceful_game_exit_postgame(client, message, message_size, source_address);
+				success = network_game_client_handle_message_server_graceful_game_exit_postgame(client, message, message_size, (struct transport_address *)source_address);
 
 				if (!success)
 				{

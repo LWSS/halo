@@ -63,8 +63,8 @@ enum
 struct network_connection
 {
 	struct transport_endpoint *reliable_endpoint;
-	struct transport_endpoint *unreliable_endpoint;
-	unsigned long last_keep_alive_time;
+	struct transport_endpoint *unreliable_endpoint; /* fake name */
+	unsigned long last_keep_alive_time; /* fake name */
 	network_connection_rejection_procedure connection_rejection_procedure;
 	struct circular_queue *reliable_incoming_queue;
 	struct circular_queue *unreliable_incoming_queue;
@@ -83,7 +83,7 @@ struct network_server_connection /* fake name */
 	struct network_connection connection;
 	struct transport_endpoint_set *endpoint_set;
 	struct network_connection *client_list[MAXIMUM_SERVER_CLIENT_CONNECTIONS];
-	boolean allow_client_connections;
+	boolean allow_client_connections; /* fake name */
 };
 
 /* ---------- prototypes */
@@ -165,7 +165,7 @@ struct network_connection *network_connection_new(
 	{
 		boolean success = TRUE;
 
-		connection->last_keep_alive_time = system_milliseconds();
+		network_connection_keep_alive(connection);
 		connection->flags = flags;
 		connection->reliable_endpoint = create_transport_endpoint(_transport_type_tcp);
 
@@ -503,7 +503,7 @@ boolean network_server_close_client_connection(
 
 boolean network_connection_idle(
 	struct network_connection *connection,
-	unsigned long timeout,
+	long timeout,
 	struct network_connection **new_client_connection)
 {
 	struct transport_address address;
@@ -709,7 +709,6 @@ boolean network_connection_connect(
 
 		if (success && !connection->reliable_endpoint)
 		{
-			// only an unreliable endpoint, nothing left to connect
 		}
 		else if (success && process_reference &&
 			(error_code = connect_endpoint_async(connection->reliable_endpoint, remote_address, process_reference)) != _transport_error_none &&
@@ -746,6 +745,39 @@ boolean network_connection_connect(
 				success = FALSE;
 			}
 		}
+	}
+
+	return success;
+}
+
+boolean network_connection_disconnect(
+	struct network_connection *connection)
+{
+	struct transport_address address;
+	boolean success = TRUE;
+
+	if (network_connection_connected(connection))
+	{
+		if (TEST_FLAG(connection->flags, _connection_create_clientside_client_bit) ||
+			TEST_FLAG(connection->flags, _connection_create_serverside_client_bit))
+		{
+			network_connection_idle_client_reliable_endpoint(connection);
+		}
+
+		disconnect_endpoint(connection->reliable_endpoint);
+	}
+
+	if (connection->unreliable_endpoint && connection->well_known_port)
+	{
+		address.address_length = IPV4_ADDRESS_LENGTH;
+		address.address.ipv4_address = 0;
+		address.port = connection->well_known_port;
+		delete_transport_endpoint(connection->unreliable_endpoint);
+		connection->unreliable_endpoint = create_transport_endpoint(_transport_type_udp);
+		success =
+			connection->unreliable_endpoint &&
+			bind_endpoint(connection->unreliable_endpoint, &address) == _transport_error_none &&
+			set_endpoint_blocking(connection->unreliable_endpoint, FALSE) == _transport_error_none;
 	}
 
 	return success;
@@ -794,49 +826,6 @@ boolean network_connection_going_stale(
 
 	return TEST_FLAG(connection->flags, _connection_going_stale_bit);
 }
-
-void network_connection_keep_alive(
-	struct network_connection *connection)
-{
-	connection->last_keep_alive_time = system_milliseconds();
-
-	return;
-}
-
-boolean network_connection_disconnect(
-	struct network_connection *connection)
-{
-	struct transport_address address;
-	boolean success = TRUE;
-
-	if (network_connection_connected(connection))
-	{
-		if (TEST_FLAG(connection->flags, _connection_create_clientside_client_bit) ||
-			TEST_FLAG(connection->flags, _connection_create_serverside_client_bit))
-		{
-			network_connection_idle_client_reliable_endpoint(connection);
-		}
-
-		disconnect_endpoint(connection->reliable_endpoint);
-	}
-
-	if (connection->unreliable_endpoint && connection->well_known_port)
-	{
-		address.address_length = IPV4_ADDRESS_LENGTH;
-		address.address.ipv4_address = 0;
-		address.port = connection->well_known_port;
-		delete_transport_endpoint(connection->unreliable_endpoint);
-		connection->unreliable_endpoint = create_transport_endpoint(_transport_type_udp);
-		success =
-			connection->unreliable_endpoint &&
-			bind_endpoint(connection->unreliable_endpoint, &address) == _transport_error_none &&
-			set_endpoint_blocking(connection->unreliable_endpoint, FALSE) == _transport_error_none;
-	}
-
-	return success;
-}
-
-/* ---------- private code */
 
 static struct network_connection *network_connection_create_client_from_endpoint(
 	struct transport_endpoint *reliable_endpoint)
@@ -922,7 +911,7 @@ static boolean network_client_reliable_connection_read(
 
 			*buffer_size = message_size;
 			success = TRUE;
-			connection->stream_messages_received++;
+			network_connection_log_traffic_event(connection, _network_connection_traffic_event_stream_message_received, 1);
 		}
 
 		if (reset_queue)
@@ -1148,7 +1137,7 @@ static boolean network_connection_idle_client_reliable_endpoint(
 
 		if (bytes_read > 0)
 		{
-			connection->last_keep_alive_time = system_milliseconds();
+			network_connection_keep_alive(connection);
 			network_connection_log_traffic_event(
 				connection,
 				_network_connection_traffic_event_stream_bytes_received,
@@ -1329,3 +1318,13 @@ static void network_connection_log_traffic_event(
 
 	return;
 }
+
+void network_connection_keep_alive(
+	struct network_connection *connection)
+{
+	connection->last_keep_alive_time = system_milliseconds();
+
+	return;
+}
+
+/* ---------- private code */

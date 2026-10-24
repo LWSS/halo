@@ -123,6 +123,14 @@ void network_game_client_dispose(
 	return;
 }
 
+void network_game_client_keep_alive(
+	struct network_game_client *client)
+{
+	network_connection_keep_alive(client->connection);
+
+	return;
+}
+
 boolean network_game_client_idle(
 	struct network_game_client *client)
 {
@@ -185,14 +193,6 @@ boolean network_game_client_idle(
 	return success;
 }
 
-void network_game_client_keep_alive(
-	struct network_game_client *client)
-{
-	network_connection_keep_alive(client->connection);
-
-	return;
-}
-
 word network_game_client_get_state(
 	struct network_game_client *client,
 	word *progress)
@@ -205,7 +205,7 @@ word network_game_client_get_state(
 
 		if (client->state == _network_game_client_state_joining)
 		{
-			*progress = (100 * system_milliseconds() - 100 * client->connection_start_time) / NETWORK_GAME_CLIENT_CONNECTION_PROCESS_TIMEOUT_MILLISECONDS_DEFAULT;
+			*progress = 100 * (system_milliseconds() - client->connection_start_time) / NETWORK_GAME_CLIENT_CONNECTION_PROCESS_TIMEOUT_MILLISECONDS_DEFAULT;
 		}
 	}
 
@@ -858,7 +858,7 @@ boolean network_game_client_game_has_started(
 	match_assert("c:\\halo\\SOURCE\\networking\\network_client_manager.c", 944, client && (client->state == _network_game_client_state_pregame));
 
 	client->seconds_to_game_start = NONE;
-	network_connection_keep_alive(client->connection);
+	network_game_client_keep_alive(client);
 
 	if (network_game_create_game_objects(&client->game))
 	{
@@ -883,7 +883,7 @@ boolean network_game_client_game_has_started(
 			}
 		}
 
-		network_connection_keep_alive(client->connection);
+		network_game_client_keep_alive(client);
 		loaded_message.unused = 0;
 		message = create_network_game_message(_message_type_client_loaded, &loaded_message, sizeof(loaded_message));
 
@@ -1070,7 +1070,7 @@ boolean network_game_client_switch_to_pregame(
 	if (client->state != _network_game_client_state_pregame)
 	{
 		network_game_reset_for_next_round(&client->game, TRUE);
-		network_connection_keep_alive(client->connection);
+		network_game_client_keep_alive(client);
 		client->next_update_number = 0;
 		client->packet_sequence_number = NETWORK_GAME_CLIENT_INITIAL_PACKET_SEQUENCE_NUMBER;
 		client->last_update_time = 0;
@@ -1079,7 +1079,7 @@ boolean network_game_client_switch_to_pregame(
 		client->out_of_sync = FALSE;
 		network_event("switching to pregame");
 		network_game_reset_to_pregame_ui();
-		network_connection_keep_alive(client->connection);
+		network_game_client_keep_alive(client);
 	}
 
 	return TRUE;
@@ -1490,7 +1490,7 @@ static boolean network_game_client_idle_searching(
 	boolean success;
 	unsigned long current_time = system_milliseconds();
 
-	network_connection_keep_alive(client->connection);
+	network_game_client_keep_alive(client);
 	success = check_networking_and_generate_error();
 
 	if (success == TRUE)
@@ -1732,6 +1732,38 @@ static boolean network_game_client_idle_pregame(
 	return success;
 }
 
+static void network_game_client_update_precache_status(
+	struct network_game_client *client)
+{
+	long current_time = system_milliseconds();
+
+	if (current_time > client->last_precache_time + NETWORK_GAME_CLIENT_PRECACHE_STATUS_INTERVAL_MILLISECONDS)
+	{
+		char *map_name = main_get_multiplayer_map_name();
+
+		client->last_precache_time = current_time;
+
+		if (cache_files_give_time_to_precache(map_name))
+		{
+			message_header *message;
+			struct message_client_map_is_precached_pregame precached_message = { 0 };
+
+			strncpy(precached_message.map_name, map_name, sizeof(precached_message.map_name));
+			message = create_network_game_message(
+				_message_type_client_map_is_precached_pregame,
+				&precached_message,
+				sizeof(precached_message));
+
+			if (message && !network_game_client_write(client->connection, message, GET_MESSAGE_SIZE(*message), NULL, TRUE))
+			{
+				network_event("network_game_client_write() failed while sending a message_client_graceful_game_exit_pregame message");
+			}
+		}
+	}
+
+	return;
+}
+
 static boolean network_game_client_idle_ingame(
 	struct network_game_client *client)
 {
@@ -1833,38 +1865,6 @@ static boolean network_game_client_idle_postgame(
 	}
 
 	return success;
-}
-
-static void network_game_client_update_precache_status(
-	struct network_game_client *client)
-{
-	long current_time = system_milliseconds();
-
-	if (current_time > client->last_precache_time + NETWORK_GAME_CLIENT_PRECACHE_STATUS_INTERVAL_MILLISECONDS)
-	{
-		char *map_name = main_get_multiplayer_map_name();
-
-		client->last_precache_time = current_time;
-
-		if (cache_files_give_time_to_precache(map_name))
-		{
-			message_header *message;
-			struct message_client_map_is_precached_pregame precached_message = { 0 };
-
-			strncpy(precached_message.map_name, map_name, sizeof(precached_message.map_name));
-			message = create_network_game_message(
-				_message_type_client_map_is_precached_pregame,
-				&precached_message,
-				sizeof(precached_message));
-
-			if (message && !network_game_client_write(client->connection, message, GET_MESSAGE_SIZE(*message), NULL, TRUE))
-			{
-				network_event("network_game_client_write() failed while sending a message_client_graceful_game_exit_pregame message");
-			}
-		}
-	}
-
-	return;
 }
 
 static boolean network_game_client_process_incoming_messages(

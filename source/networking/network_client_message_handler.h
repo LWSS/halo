@@ -20,7 +20,7 @@ header included in hcex build.
 
 /* ---------- prototypes/NETWORK_CLIENT_MESSAGE_HANDLER.C */
 
-boolean network_game_client_handle_message(struct network_game_client *client, message_header *message, short message_size, struct transport_address *source_address);
+boolean network_game_client_handle_message(struct network_game_client *client, message_header *message, short message_size, struct transport_address const *source_address);
 
 /* ---------- globals */
 

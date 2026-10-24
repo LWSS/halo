@@ -58,7 +58,7 @@ boolean network_game_server_handle_datagram(
 	struct network_game_server *server,
 	message_header *message,
 	short datagram_size,
-	struct transport_address *source_address)
+	struct transport_address const *source_address)
 {
 	word message_type;
 
@@ -76,6 +76,29 @@ boolean network_game_server_handle_datagram(
 	{
 		switch (message_type)
 		{
+		case _message_type_error:
+			if (datagram_size >= sizeof(message_header) + sizeof(struct message_error))
+			{
+				struct message_error *error_message = (struct message_error *)(message + 1);
+
+				network_event(
+					"server received low-level error message: error= #%d (%s); sender= '%s'",
+					error_message->error_code,
+					error_message->error_string,
+					transport_address_to_string(source_address));
+			}
+			else
+			{
+				network_event(
+					"server received a malformed/damaged message; sender= '%s'",
+					transport_address_to_string(source_address));
+			}
+			break;
+		case _message_type_data:
+			network_event(
+				"server received a bad message type (_message_type_data); sender= '%s'",
+				transport_address_to_string(source_address));
+			break;
 		case _message_type_packet:
 		{
 			short packet_version = NETWORK_GAME_MESSAGE_VERSION;
@@ -100,7 +123,7 @@ boolean network_game_server_handle_datagram(
 					{
 						if (!handle_message_client_broadcast_game_search(
 							server,
-							source_address,
+							(struct transport_address *)source_address,
 							&game_search))
 						{
 							network_event(
@@ -129,7 +152,7 @@ boolean network_game_server_handle_datagram(
 					{
 						if (!handle_message_client_ping(
 							server,
-							source_address,
+							(struct transport_address *)source_address,
 							&ping))
 						{
 							network_event("server failed to handle a client ping");
@@ -188,29 +211,6 @@ boolean network_game_server_handle_datagram(
 			}
 			break;
 		}
-		case _message_type_data:
-			network_event(
-				"server received a bad message type (_message_type_data); sender= '%s'",
-				transport_address_to_string(source_address));
-			break;
-		case _message_type_error:
-			if (datagram_size >= sizeof(message_header) + sizeof(struct message_error))
-			{
-				struct message_error *error_message = (struct message_error *)(message + 1);
-
-				network_event(
-					"server received low-level error message: error= #%d (%s); sender= '%s'",
-					error_message->error_code,
-					error_message->error_string,
-					transport_address_to_string(source_address));
-			}
-			else
-			{
-				network_event(
-					"server received a malformed/damaged message; sender= '%s'",
-					transport_address_to_string(source_address));
-			}
-			break;
 		default:
 			network_event(
 				"server received a datagram with an unknown message type (#%d); sender= '%s'",
@@ -244,6 +244,24 @@ boolean network_game_server_handle_client_message(
 	{
 		switch (message_type)
 		{
+		case _message_type_error:
+			if (message_buffer_size >= sizeof(message_header) + sizeof(struct message_error))
+			{
+				struct message_error *error_message = (struct message_error *)(message + 1);
+
+				network_event(
+					"server received low-level error message from a client: error= #%d (%s)",
+					error_message->error_code,
+					error_message->error_string);
+			}
+			else
+			{
+				network_event("server received a malformed/damaged message from a client");
+			}
+			break;
+		case _message_type_data:
+			network_event("server received a bad message type from a client (_message_type_data)");
+			break;
 		case _message_type_packet:
 		{
 			byte packet_type = GET_MESSAGE_PACKET_TYPE(message, message_buffer_size);
@@ -434,24 +452,6 @@ boolean network_game_server_handle_client_message(
 			}
 			break;
 		}
-		case _message_type_data:
-			network_event("server received a bad message type from a client (_message_type_data)");
-			break;
-		case _message_type_error:
-			if (message_buffer_size >= sizeof(message_header) + sizeof(struct message_error))
-			{
-				struct message_error *error_message = (struct message_error *)(message + 1);
-
-				network_event(
-					"server received low-level error message from a client: error= #%d (%s)",
-					error_message->error_code,
-					error_message->error_string);
-			}
-			else
-			{
-				network_event("server received a malformed/damaged message from a client");
-			}
-			break;
 		default:
 			network_event(
 				"server received a client message with an unknown message type (#%d)",

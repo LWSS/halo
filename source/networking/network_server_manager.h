@@ -37,7 +37,7 @@ enum
 
 struct countdown_timer
 {
-	long time_remaining; /* fake name */
+	long time_remaining;
 	unsigned long last_update_time; /* fake name */
 };
 
@@ -86,7 +86,7 @@ void countdown_timer_set_time_remaining(struct countdown_timer *timer, long time
 struct network_game_server *network_game_server_create(void);
 void network_game_server_dispose(struct network_game_server *server);
 boolean network_game_server_idle(struct network_game_server *server);
-boolean network_game_server_set_game_name(struct network_game_server *server, wchar_t const *name);
+boolean network_game_server_set_game_name(struct network_game_server *server, wchar_t *const name);
 wchar_t *network_game_server_get_game_name(struct network_game_server *server);
 word network_game_server_get_state(struct network_game_server *server, word *progress);
 void network_game_server_open_game(struct network_game_server *server);
@@ -108,20 +108,20 @@ boolean network_game_server_remove_player_from_game(struct network_game_server *
 boolean network_game_server_adjust_machine_settings(struct network_game_server *server, struct network_client_machine *machine, struct network_machine *machine_description);
 void network_game_server_all_machines_have_loaded(struct network_game_server *server);
 void network_game_server_client_machine_game_loading_complete(struct network_game_server *server, struct network_client_machine *machine);
-void network_game_server_client_machine_is_precached(struct network_game_server *server, struct network_client_machine *machine, char const *map_name);
+void network_game_server_client_machine_is_precached(struct network_game_server *server, struct network_client_machine *machine, char *map_name);
 void network_game_server_handle_client_update_packet(struct network_game_server *server, struct network_client_machine *machine, struct message_client_game_update *message_packet);
 boolean network_game_server_switch_machine_from_postgame_to_pregame(struct network_game_server *server, struct network_client_machine *machine);
 void network_game_server_update_ticks(struct network_game_server *server, short tick_count);
 void network_game_server_stalled_on_client(struct network_game_server *server, boolean stalled);
 void network_game_server_queue_player_for_addition(struct network_game_server *server, struct network_player *player);
-void network_game_server_begin_game_start_countdown(struct network_game_server *server, long time_remaining);
+void network_game_server_begin_game_start_countdown(struct network_game_server *server, unsigned long time_remaining);
 boolean server_needs_more_teams(struct network_game_server *server);
 boolean server_has_a_player_on_each_machine(struct network_game_server *server);
 boolean server_has_enough_machines(struct network_game_server *server);
 boolean server_ok_to_countdown(struct network_game_server *server);
 void network_game_server_update_countdown(struct network_game_server *server, short countdown_event);
 void network_game_server_invalidate_network_machine(struct network_machine *machine);
-void network_game_generate_join_game_token(byte *join_token);
+void network_game_generate_join_game_token(byte join_token[]);
 struct network_machine *network_game_server_get_client_machine(struct network_game_server *server, struct network_client_machine *client_machine, long *machine_index);
 struct network_connection *network_game_server_get_connection(struct network_game_server *server);
 struct network_connection *network_game_server_get_client_connection(struct network_client_machine *client_machine);

@@ -92,7 +92,7 @@ struct advertised_game_data
 struct network_game_client
 {
 	word machine_index;
-	struct advertised_game_data available_games[MAXIMUM_NETWORK_ADVERTISED_GAMES];
+	struct advertised_game_data available_games[MAXIMUM_NETWORK_ADVERTISED_GAMES]; /* fake name */
 	struct transport_address ping_address; /* fake name */
 	unsigned long last_ping_time; /* fake name */
 	word unused; /* fake name */
@@ -109,7 +109,7 @@ struct network_game_client
 	unsigned long next_update_number;
 	unsigned long last_update_time; /* fake name */
 	long last_precache_time; /* fake name */
-	short seconds_to_game_start;
+	short seconds_to_game_start; /* fake name */
 	word state;
 	word error;
 	word flags;
