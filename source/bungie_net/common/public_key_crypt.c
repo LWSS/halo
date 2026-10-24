@@ -29,6 +29,63 @@ static unsigned long generate_diffie_hellman_private_key(unsigned long public_ke
 
 /* ---------- globals */
 
+/* ---------- private code */
+
+static unsigned long x_exp_y_mod_n(
+	unsigned long base,
+	unsigned long exponent,
+	unsigned long modulus)
+{
+	struct qword_value s;
+	struct qword_value x;
+	struct qword_value n;
+	struct qword_value product;
+
+	s.qword = 1;
+	x.qword = base;
+	n.qword = modulus;
+
+	while (exponent)
+	{
+		if (exponent & 1)
+		{
+			multiply64(&s, &x, &product);
+			divide64(&product, &n, NULL, &s);
+		}
+
+		exponent >>= 1;
+		multiply64(&x, &x, &product);
+		divide64(&product, &n, NULL, &x);
+	}
+
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 95, s.qword <= 0xFFFFFFFF);
+
+	return (unsigned long)s.qword;
+}
+
+static unsigned long generate_diffie_hellman_public_key(
+	unsigned long p,
+	unsigned long x,
+	unsigned long g)
+{
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 112, p>2);
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 113, x<(p-1));
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 114, g<p);
+
+	return x_exp_y_mod_n(g, x, p);
+}
+
+static unsigned long generate_diffie_hellman_private_key(
+	unsigned long public_key,
+	unsigned long p,
+	unsigned long x)
+{
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 133, p>2);
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 134, x<(p-1));
+
+	return x_exp_y_mod_n(public_key, x, p);
+}
+
 /* ---------- public code */
 
 void generate_key_parameters(
@@ -102,61 +159,4 @@ void generate_private_key(
 		x->dwords[0], x->dwords[1], private_key->dwords[0], private_key->dwords[1]);
 
 	return;
-}
-
-/* ---------- private code */
-
-static unsigned long x_exp_y_mod_n(
-	unsigned long base,
-	unsigned long exponent,
-	unsigned long modulus)
-{
-	struct qword_value s;
-	struct qword_value x;
-	struct qword_value n;
-	struct qword_value product;
-
-	s.qword = 1;
-	x.qword = base;
-	n.qword = modulus;
-
-	while (exponent)
-	{
-		if (exponent & 1)
-		{
-			multiply64(&s, &x, &product);
-			divide64(&product, &n, NULL, &s);
-		}
-
-		exponent >>= 1;
-		multiply64(&x, &x, &product);
-		divide64(&product, &n, NULL, &x);
-	}
-
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 95, s.qword <= 0xFFFFFFFF);
-
-	return (unsigned long)s.qword;
-}
-
-static unsigned long generate_diffie_hellman_public_key(
-	unsigned long p,
-	unsigned long x,
-	unsigned long g)
-{
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 112, p>2);
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 113, x<(p-1));
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 114, g<p);
-
-	return x_exp_y_mod_n(g, x, p);
-}
-
-static unsigned long generate_diffie_hellman_private_key(
-	unsigned long public_key,
-	unsigned long p,
-	unsigned long x)
-{
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 133, p>2);
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\public_key_crypt.c", 134, x<(p-1));
-
-	return x_exp_y_mod_n(public_key, x, p);
 }

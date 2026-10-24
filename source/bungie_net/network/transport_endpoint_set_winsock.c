@@ -49,6 +49,14 @@ void net_startup_debug(
 	return;
 }
 
+static long get_next_available_set_array_index(
+	struct transport_endpoint_set const *set)
+{
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_set_winsock.c", 57, set);
+
+	return set->last_index > set->max_endpoints - 1 ? NONE : set->last_index + 1;
+}
+
 void transport_push_key(
 	XNKEY const *key,
 	XNKID const *key_id)
@@ -149,6 +157,27 @@ boolean transport_is_nonce(
 	return transport_nonce_is_equal(src, &global_nonce);
 }
 
+void transport_client_start(
+	XNADDR const *address,
+	XNKEY const *key,
+	XNKID const *key_id,
+	word port,
+	struct transport_address *result)
+{
+	struct in_addr ip;
+
+	transport_client_stop();
+	transport_push_key(key, key_id);
+	XNetXnAddrToInAddr(address, key_id, &ip);
+	result->address.ipv4_address = SWAP4(ip.s_addr);
+	result->address_length = IPV4_ADDRESS_LENGTH;
+	result->port = port;
+	result->address_type = 0;
+	global_client_active = TRUE;
+
+	return;
+}
+
 void transport_client_stop(
 	void)
 {
@@ -181,27 +210,6 @@ XNKEY transport_get_key(
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_set_winsock.c", 231, global_key_depth > 0);
 
 	return global_key;
-}
-
-void transport_client_start(
-	XNADDR const *address,
-	XNKEY const *key,
-	XNKID const *key_id,
-	word port,
-	struct transport_address *result)
-{
-	struct in_addr ip;
-
-	transport_client_stop();
-	transport_push_key(key, key_id);
-	XNetXnAddrToInAddr(address, key_id, &ip);
-	result->address.ipv4_address = SWAP4(ip.s_addr);
-	result->address_length = IPV4_ADDRESS_LENGTH;
-	result->port = port;
-	result->address_type = 0;
-	global_client_active = TRUE;
-
-	return;
 }
 
 long transport_initialize(
@@ -381,7 +389,32 @@ short delete_endpoint_set(
 	return _transport_error_none;
 }
 
-long poll_endpoint_set(
+static int __cdecl poll_ep_array_compare_proc(
+	void const *a,
+	void const *b)
+{
+	int result;
+
+	a = *(struct transport_endpoint const *const *)a;
+	b = *(struct transport_endpoint const *const *)b;
+
+	if (!a && b)
+	{
+		result = 1;
+	}
+	else if (a && !b)
+	{
+		result = -1;
+	}
+	else
+	{
+		result = 0;
+	}
+
+	return result;
+}
+
+short poll_endpoint_set(
 	struct transport_endpoint_set *set,
 	word timeout)
 {
@@ -462,7 +495,7 @@ long poll_endpoint_set(
 	return result;
 }
 
-long add_endpoint_to_set(
+short add_endpoint_to_set(
 	struct transport_endpoint *ep,
 	struct transport_endpoint_set *set)
 {
@@ -499,7 +532,7 @@ long add_endpoint_to_set(
 	return result;
 }
 
-long remove_endpoint_from_set(
+short remove_endpoint_from_set(
 	struct transport_endpoint *ep,
 	struct transport_endpoint_set *set)
 {
@@ -562,36 +595,3 @@ long count_endpoints_in_set(
 }
 
 /* ---------- private code */
-
-static long get_next_available_set_array_index(
-	struct transport_endpoint_set const *set)
-{
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_set_winsock.c", 57, set);
-
-	return set->last_index > set->max_endpoints - 1 ? NONE : set->last_index + 1;
-}
-
-static int __cdecl poll_ep_array_compare_proc(
-	void const *a,
-	void const *b)
-{
-	int result;
-
-	a = *(struct transport_endpoint const *const *)a;
-	b = *(struct transport_endpoint const *const *)b;
-
-	if (!a && b)
-	{
-		result = 1;
-	}
-	else if (a && !b)
-	{
-		result = -1;
-	}
-	else
-	{
-		result = 0;
-	}
-
-	return result;
-}

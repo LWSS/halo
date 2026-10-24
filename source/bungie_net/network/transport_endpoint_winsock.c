@@ -61,6 +61,121 @@ static DWORD WINAPI connect_async_thread_proc(void *input_data);
 
 static struct _transport_endpoint_globals transport_endpoint_globals; /* fake name */
 
+/* ---------- private code */
+
+static boolean add_connect_thread(
+	struct thread *thread)
+{
+	long i = 0;
+	boolean occupied = transport_endpoint_globals.threads[i].thread != NULL;
+
+	while (occupied && i < MAXIMUM_CONNECT_THREADS)
+	{
+		occupied = transport_endpoint_globals.threads[++i].thread != NULL;
+	}
+
+	if (i < MAXIMUM_CONNECT_THREADS)
+	{
+		transport_endpoint_globals.threads[i].thread = thread;
+		transport_endpoint_globals.threads[i].dispose = FALSE;
+	}
+	else
+	{
+		i = NONE;
+	}
+
+	return i != NONE;
+}
+
+static void mark_connection_thread_as_terminated(
+	struct thread *thread)
+{
+	long i;
+
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 79, thread);
+
+	for (i = 0; i < MAXIMUM_CONNECT_THREADS; i++)
+	{
+		if (transport_endpoint_globals.threads[i].thread == thread)
+		{
+			transport_endpoint_globals.threads[i].dispose = TRUE;
+			break;
+		}
+	}
+
+	return;
+}
+
+static void connection_thread_list_maintenance(
+	void)
+{
+	long i;
+
+	for (i = 0; i < MAXIMUM_CONNECT_THREADS; i++)
+	{
+		if (transport_endpoint_globals.threads[i].thread && transport_endpoint_globals.threads[i].dispose)
+		{
+			dispose_thread(transport_endpoint_globals.threads[i].thread);
+			transport_endpoint_globals.threads[i].thread = NULL;
+			transport_endpoint_globals.threads[i].dispose = FALSE;
+		}
+	}
+
+	return;
+}
+
+static SOCKET create_socket(
+	long family,
+	long type,
+	long protocol)
+{
+	long option;
+	long option_size;
+	SOCKET result = socket(family, type, protocol);
+
+	if (result != INVALID_SOCKET)
+	{
+		if (type == SOCK_DGRAM)
+		{
+			option = -1;
+
+			if (setsockopt(result, SOL_SOCKET, SO_BROADCAST, (char const *)&option, sizeof(long)))
+			{
+				winsock_error_to_string(WSAGetLastError());
+			}
+		}
+
+		option = 1;
+
+		if (setsockopt(result, SOL_SOCKET, SO_REUSEADDR, (char const *)&option, sizeof(long)))
+		{
+			winsock_error_to_string(WSAGetLastError());
+		}
+
+		option_size = sizeof(long);
+
+		if (getsockopt(result, SOL_SOCKET, SO_SNDBUF, (char *)&option, &option_size) ||
+			(option < MINIMUM_SOCKET_BUFFER_SIZE && (option = MINIMUM_SOCKET_BUFFER_SIZE, setsockopt(result, SOL_SOCKET, SO_SNDBUF, (char const *)&option, sizeof(long)))))
+		{
+			winsock_error_to_string(WSAGetLastError());
+		}
+
+		option_size = sizeof(long);
+
+		if (getsockopt(result, SOL_SOCKET, SO_RCVBUF, (char *)&option, &option_size) ||
+			(option < MINIMUM_SOCKET_BUFFER_SIZE && (option = MINIMUM_SOCKET_BUFFER_SIZE, setsockopt(result, SOL_SOCKET, SO_RCVBUF, (char const *)&option, sizeof(long)))))
+		{
+			winsock_error_to_string(WSAGetLastError());
+		}
+	}
+	else
+	{
+		winsock_error_to_string(WSAGetLastError());
+	}
+
+	return result;
+}
+
 /* ---------- public code */
 
 struct transport_endpoint *create_transport_endpoint(
@@ -382,6 +497,53 @@ void disconnect_endpoint(
 	SET_FLAG(ep->flags, _endpoint_connected_bit, FALSE);
 
 	return;
+}
+
+static DWORD WINAPI connect_async_thread_proc(
+	void *input_data)
+{
+	struct thread *thread;
+	short result;
+	struct transport_connect_process *input = (struct transport_connect_process *)input_data;
+	struct mutex *mutex = NULL;
+
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 569, input);
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 570, input->ep);
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 571, input->thread);
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 572, transport_initialized);
+
+	result = connect_endpoint(input->ep, &input->address);
+
+	if (take_mutex(input->mutex, CONNECT_MUTEX_TIMEOUT))
+	{
+		if (input->cancelled)
+		{
+			disconnect_endpoint(input->ep);
+		}
+
+		mutex = input->mutex;
+		thread = input->thread;
+	}
+	else
+	{
+		result = _transport_error_unknown;
+	}
+
+	input->ep->error = result;
+
+	if (mutex)
+	{
+		match_free("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 594, input);
+		release_mutex(mutex);
+		dispose_mutex(mutex);
+	}
+
+	if (thread)
+	{
+		mark_connection_thread_as_terminated(thread);
+	}
+
+	return result;
 }
 
 short connect_endpoint_async(
@@ -804,7 +966,7 @@ boolean endpoint_writeable(
 	return result;
 }
 
-long endpoint_connected(
+boolean endpoint_connected(
 	struct transport_endpoint const *ep)
 {
 	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 1062, ep);
@@ -1119,166 +1281,4 @@ char const *winsock_error_to_string(
 	}
 
 	return transport_endpoint_globals.error_string;
-}
-
-/* ---------- private code */
-
-static boolean add_connect_thread(
-	struct thread *thread)
-{
-	long i = 0;
-	boolean occupied = transport_endpoint_globals.threads[i].thread != NULL;
-
-	while (occupied && i < MAXIMUM_CONNECT_THREADS)
-	{
-		occupied = transport_endpoint_globals.threads[++i].thread != NULL;
-	}
-
-	if (i < MAXIMUM_CONNECT_THREADS)
-	{
-		transport_endpoint_globals.threads[i].thread = thread;
-		transport_endpoint_globals.threads[i].dispose = FALSE;
-	}
-	else
-	{
-		i = NONE;
-	}
-
-	return i != NONE;
-}
-
-static void mark_connection_thread_as_terminated(
-	struct thread *thread)
-{
-	long i;
-
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 79, thread);
-
-	for (i = 0; i < MAXIMUM_CONNECT_THREADS; i++)
-	{
-		if (transport_endpoint_globals.threads[i].thread == thread)
-		{
-			transport_endpoint_globals.threads[i].dispose = TRUE;
-			break;
-		}
-	}
-
-	return;
-}
-
-static void connection_thread_list_maintenance(
-	void)
-{
-	long i;
-
-	for (i = 0; i < MAXIMUM_CONNECT_THREADS; i++)
-	{
-		if (transport_endpoint_globals.threads[i].thread && transport_endpoint_globals.threads[i].dispose)
-		{
-			dispose_thread(transport_endpoint_globals.threads[i].thread);
-			transport_endpoint_globals.threads[i].thread = NULL;
-			transport_endpoint_globals.threads[i].dispose = FALSE;
-		}
-	}
-
-	return;
-}
-
-static SOCKET create_socket(
-	long family,
-	long type,
-	long protocol)
-{
-	long option;
-	long option_size;
-	SOCKET result = socket(family, type, protocol);
-
-	if (result != INVALID_SOCKET)
-	{
-		if (type == SOCK_DGRAM)
-		{
-			option = -1;
-
-			if (setsockopt(result, SOL_SOCKET, SO_BROADCAST, (char const *)&option, sizeof(long)))
-			{
-				winsock_error_to_string(WSAGetLastError());
-			}
-		}
-
-		option = 1;
-
-		if (setsockopt(result, SOL_SOCKET, SO_REUSEADDR, (char const *)&option, sizeof(long)))
-		{
-			winsock_error_to_string(WSAGetLastError());
-		}
-
-		option_size = sizeof(long);
-
-		if (getsockopt(result, SOL_SOCKET, SO_SNDBUF, (char *)&option, &option_size) ||
-			(option < MINIMUM_SOCKET_BUFFER_SIZE && (option = MINIMUM_SOCKET_BUFFER_SIZE, setsockopt(result, SOL_SOCKET, SO_SNDBUF, (char const *)&option, sizeof(long)))))
-		{
-			winsock_error_to_string(WSAGetLastError());
-		}
-
-		option_size = sizeof(long);
-
-		if (getsockopt(result, SOL_SOCKET, SO_RCVBUF, (char *)&option, &option_size) ||
-			(option < MINIMUM_SOCKET_BUFFER_SIZE && (option = MINIMUM_SOCKET_BUFFER_SIZE, setsockopt(result, SOL_SOCKET, SO_RCVBUF, (char const *)&option, sizeof(long)))))
-		{
-			winsock_error_to_string(WSAGetLastError());
-		}
-	}
-	else
-	{
-		winsock_error_to_string(WSAGetLastError());
-	}
-
-	return result;
-}
-
-static DWORD WINAPI connect_async_thread_proc(
-	void *input_data)
-{
-	struct thread *thread;
-	short result;
-	struct transport_connect_process *input = (struct transport_connect_process *)input_data;
-	struct mutex *mutex = NULL;
-
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 569, input);
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 570, input->ep);
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 571, input->thread);
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 572, transport_initialized);
-
-	result = connect_endpoint(input->ep, &input->address);
-
-	if (take_mutex(input->mutex, CONNECT_MUTEX_TIMEOUT))
-	{
-		if (input->cancelled)
-		{
-			disconnect_endpoint(input->ep);
-		}
-
-		mutex = input->mutex;
-		thread = input->thread;
-	}
-	else
-	{
-		result = _transport_error_unknown;
-	}
-
-	input->ep->error = result;
-
-	if (mutex)
-	{
-		match_free("c:\\halo\\SOURCE\\bungie_net\\network\\transport_endpoint_winsock.c", 594, input);
-		release_mutex(mutex);
-		dispose_mutex(mutex);
-	}
-
-	if (thread)
-	{
-		mark_connection_thread_as_terminated(thread);
-	}
-
-	return result;
 }

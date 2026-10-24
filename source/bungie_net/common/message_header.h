@@ -15,20 +15,27 @@ enum
 	MAXIMUM_MESSAGE_SIZE = 0xFFF,
 	NUMBER_OF_MESSAGE_TYPES = 4,
 	MESSAGE_FLAG_BITS_MASK = 3,
-	MESSAGE_TYPE_BITS_MASK = 3, /* fake name */
-	MESSAGE_TYPE_SHIFT = 2, /* fake name */
-	MESSAGE_SIZE_SHIFT = 4, /* fake name */
+	_message_type_bit0 = 2,
+	_message_size_bit0 = 4,
 };
 
 enum
 {
-	_message_type_packet = 3,
+	_message_type_unknown = 0,
+	_message_type_error,
+	_message_type_data,
+	_message_type_packet,
 };
 
 enum
 {
-	_message_encrypted_bit = 0, /* fake name */
-	_message_key_agreement_bit, /* fake name */
+	MAXIMUM_ERROR_STRING_LENGTH = 128,
+};
+
+enum
+{
+	_message_flag_encrypted_bit = 0,
+	_message_flag_new_encryption_key_bit,
 	NUMBER_OF_MESSAGE_FLAGS,
 };
 
@@ -41,15 +48,22 @@ enum
 /* ---------- macros */
 
 #define GET_MESSAGE_FLAGS(message) ((message)&MESSAGE_FLAG_BITS_MASK) /* fake name */
-#define GET_MESSAGE_TYPE(message) (((message)>>MESSAGE_TYPE_SHIFT)&MESSAGE_TYPE_BITS_MASK)
-#define GET_MESSAGE_SIZE(message) ((message)>>MESSAGE_SIZE_SHIFT)
+#define GET_MESSAGE_TYPE(message) (((message)>>_message_type_bit0)&(NUMBER_OF_MESSAGE_TYPES-1))
+#define GET_MESSAGE_SIZE(message) ((message)>>_message_size_bit0)
+#define GET_MESSAGE_PACKET_TYPE(message, message_size) (((byte *)(message))[(message_size) - 1]) /* fake name */
 #define SET_MESSAGE_FLAGS(message, flags) ((message) = ((message)&~MESSAGE_FLAG_BITS_MASK)|(flags)) /* fake name */
-#define SET_MESSAGE_TYPE(message, type) ((message) = ((message)&(word)~(MESSAGE_TYPE_BITS_MASK<<MESSAGE_TYPE_SHIFT))|(((type)&MESSAGE_TYPE_BITS_MASK)<<MESSAGE_TYPE_SHIFT)) /* fake name */
-#define SET_MESSAGE_SIZE(message, size) ((message) = ((message)&(FLAG(MESSAGE_SIZE_SHIFT)-1))|((size)<<MESSAGE_SIZE_SHIFT)) /* fake name */
+#define SET_MESSAGE_TYPE(message, type) ((message) = ((message)&(word)~((NUMBER_OF_MESSAGE_TYPES-1)<<_message_type_bit0))|(((type)&(NUMBER_OF_MESSAGE_TYPES-1))<<_message_type_bit0)) /* fake name */
+#define SET_MESSAGE_SIZE(message, size) ((message) = ((message)&(FLAG(_message_size_bit0)-1))|((size)<<_message_size_bit0)) /* fake name */
 
 /* ---------- structures */
 
 typedef word message_header;
+
+struct message_error /* fake name */
+{
+	char error_string[MAXIMUM_ERROR_STRING_LENGTH]; /* fake name */
+	byte error_code; /* fake name */
+};
 
 /* ---------- prototypes/MESSAGE_HEADER.C */
 

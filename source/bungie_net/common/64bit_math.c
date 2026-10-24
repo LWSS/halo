@@ -51,6 +51,28 @@ void add64(
 	return;
 }
 
+static void negate64(
+	struct qword_value const *a,
+	struct qword_value *result)
+{
+	long i;
+	word carry = 0;
+
+	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\64bit_math.c", 58, a && result);
+
+	for (i = 0; i < 4; i++)
+	{
+		result->words[i] = (word)-(a->words[i] + carry);
+
+		if (a->words[i])
+		{
+			carry = 1;
+		}
+	}
+
+	return;
+}
+
 void subtract64(
 	struct qword_value const *a,
 	struct qword_value const *b,
@@ -151,25 +173,3 @@ void divide64(
 }
 
 /* ---------- private code */
-
-static void negate64(
-	struct qword_value const *a,
-	struct qword_value *result)
-{
-	long i;
-	word carry = 0;
-
-	match_assert("c:\\halo\\SOURCE\\bungie_net\\common\\64bit_math.c", 58, a && result);
-
-	for (i = 0; i < 4; i++)
-	{
-		result->words[i] = (word)-(a->words[i] + carry);
-
-		if (a->words[i])
-		{
-			carry = 1;
-		}
-	}
-
-	return;
-}

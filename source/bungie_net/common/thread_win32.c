@@ -18,6 +18,49 @@ static unsigned long mutex_count = 0;
 static struct thread thread_pool[MAXIMUM_THREADS] = {0};
 static struct mutex mutex_pool[MAXIMUM_MUTEXES] = {0};
 
+/* ---------- private code */
+
+static struct thread *get_thread_from_pool(
+	void)
+{
+	struct thread *thread = NULL;
+	long i;
+
+	for (i = 0; i<MAXIMUM_THREADS; i++)
+	{
+		if (!thread_pool[i].in_use)
+		{
+			thread = &thread_pool[i];
+			thread->object = NULL;
+			thread->in_use = TRUE;
+			break;
+		}
+	}
+
+	return thread;
+}
+
+static struct mutex *get_mutex_from_pool(
+	void)
+{
+	struct mutex *mutex = NULL;
+	long i;
+
+	for (i = 0; i<MAXIMUM_MUTEXES; i++)
+	{
+		if (!mutex_pool[i].in_use)
+		{
+			mutex = &mutex_pool[i];
+			mutex->name[0] = 0;
+			mutex->object = NULL;
+			mutex->in_use = TRUE;
+			break;
+		}
+	}
+
+	return mutex;
+}
+
 /* ---------- public code */
 
 boolean create_thread(
@@ -158,47 +201,4 @@ void dispose_mutex(
 	mutex_reference->in_use = FALSE;
 
 	return;
-}
-
-/* ---------- private code */
-
-static struct thread *get_thread_from_pool(
-	void)
-{
-	struct thread *thread = NULL;
-	long i;
-
-	for (i = 0; i<MAXIMUM_THREADS; i++)
-	{
-		if (!thread_pool[i].in_use)
-		{
-			thread = &thread_pool[i];
-			thread->object = NULL;
-			thread->in_use = TRUE;
-			break;
-		}
-	}
-
-	return thread;
-}
-
-static struct mutex *get_mutex_from_pool(
-	void)
-{
-	struct mutex *mutex = NULL;
-	long i;
-
-	for (i = 0; i<MAXIMUM_MUTEXES; i++)
-	{
-		if (!mutex_pool[i].in_use)
-		{
-			mutex = &mutex_pool[i];
-			mutex->name[0] = 0;
-			mutex->object = NULL;
-			mutex->in_use = TRUE;
-			break;
-		}
-	}
-
-	return mutex;
 }
