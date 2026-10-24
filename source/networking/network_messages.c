@@ -20,6 +20,7 @@ enum
 
 /* ---------- macros */
 
+#define FIELD_COUNT(structure, first, last, element) ((offsetof(structure, last) - offsetof(structure, first)) / sizeof(element) + 1) /* fake name */
 #define CASE_MESSAGE_TYPE(type, line) case _message_type_##type: match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", line, message_struct_size==sizeof(message_##type)); break /* fake name */
 
 /* ---------- structures */
@@ -32,7 +33,7 @@ static boolean encode_network_game_message(void const *message_struct, void *enc
 
 static struct data_packet_field message_client_broadcast_game_search_fields[] = /* fake name */
 {
-	{__pack_short, 2, 0, 0, 0},
+	{__pack_short, FIELD_COUNT(struct message_client_broadcast_game_search, port, version, word), 0, 0, 0},
 	{__pack_char, NETWORK_GAME_NONCE_BYTES, 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 };
@@ -247,8 +248,8 @@ static struct data_packet_definition message_client_join_game_request_packet = /
 static struct data_packet_field message_client_add_player_request_pregame_fields[] = /* fake name */
 {
 	{__pack_short, MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH, 0, 0, 0},
-	{__pack_short, 2, 0, 0, 0},
-	{__pack_char, 4, 0, 0, 0},
+	{__pack_short, FIELD_COUNT(struct network_player, primary_color_index, icon_index, short), 0, 0, 0},
+	{__pack_char, FIELD_COUNT(struct network_player, machine_index, player_list_index, char), 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 };
 
@@ -265,8 +266,8 @@ static struct data_packet_definition message_client_add_player_request_pregame_p
 static struct data_packet_field message_client_remove_player_request_pregame_fields[] = /* fake name */
 {
 	{__pack_short, MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH, 0, 0, 0},
-	{__pack_short, 2, 0, 0, 0},
-	{__pack_char, 4, 0, 0, 0},
+	{__pack_short, FIELD_COUNT(struct network_player, primary_color_index, icon_index, short), 0, 0, 0},
+	{__pack_char, FIELD_COUNT(struct network_player, machine_index, player_list_index, char), 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 };
 
@@ -301,8 +302,8 @@ static struct data_packet_definition message_client_settings_request_packet = /*
 static struct data_packet_field message_client_player_settings_request_fields[] = /* fake name */
 {
 	{__pack_short, MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH, 0, 0, 0},
-	{__pack_short, 2, 0, 0, 0},
-	{__pack_char, 4, 0, 0, 0},
+	{__pack_short, FIELD_COUNT(struct network_player, primary_color_index, icon_index, short), 0, 0, 0},
+	{__pack_char, FIELD_COUNT(struct network_player, machine_index, player_list_index, char), 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 };
 
@@ -366,11 +367,11 @@ static struct data_packet_definition message_client_map_is_precached_pregame_pac
 
 static struct data_packet_field message_server_game_update_fields[] = /* fake name */
 {
-	{__pack_long, 3, 0, 0, 0},
+	{__pack_long, FIELD_COUNT(struct message_server_game_update, update_number, debug_game_time, long), 0, 0, 0},
 	{__pack_pad, 2, 0, 0, 0},
 	{__pack_array, NETWORK_GAME_MAXIMUM_PLAYER_COUNT, 0, 0, 0},
-	{__pack_long, 6, 0, 0, 0},
-	{__pack_short, 3, 0, 0, 0},
+	{__pack_long, FIELD_COUNT(struct player_action, control_flags, primary_trigger, long), 0, 0, 0},
+	{__pack_short, FIELD_COUNT(struct player_action, desired_weapon_index, desired_zoom_level, short), 0, 0, 0},
 	{__pack_pad, 2, 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
@@ -389,8 +390,8 @@ static struct data_packet_definition message_server_game_update_packet = /* fake
 static struct data_packet_field message_server_add_player_ingame_fields[] = /* fake name */
 {
 	{__pack_short, MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH, 0, 0, 0},
-	{__pack_short, 2, 0, 0, 0},
-	{__pack_char, 4, 0, 0, 0},
+	{__pack_short, FIELD_COUNT(struct network_player, primary_color_index, icon_index, short), 0, 0, 0},
+	{__pack_char, FIELD_COUNT(struct network_player, machine_index, player_list_index, char), 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 };
 
@@ -407,8 +408,8 @@ static struct data_packet_definition message_server_add_player_ingame_packet = /
 static struct data_packet_field message_server_remove_player_ingame_fields[] = /* fake name */
 {
 	{__pack_short, MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH, 0, 0, 0},
-	{__pack_short, 2, 0, 0, 0},
-	{__pack_char, 4, 0, 0, 0},
+	{__pack_short, FIELD_COUNT(struct network_player, primary_color_index, icon_index, short), 0, 0, 0},
+	{__pack_char, FIELD_COUNT(struct network_player, machine_index, player_list_index, char), 0, 0, 0},
 	{__pack_long, 1, 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 };
@@ -460,8 +461,8 @@ static struct data_packet_field message_client_game_update_fields[] = /* fake na
 	{__pack_long, 1, 0, 0, 0},
 	{__pack_pad, 2, 0, 0, 0},
 	{__pack_array, MAXIMUM_NUMBER_OF_LOCAL_PLAYERS, 0, 0, 0},
-	{__pack_long, 6, 0, 0, 0},
-	{__pack_short, 3, 0, 0, 0},
+	{__pack_long, FIELD_COUNT(struct player_action, control_flags, primary_trigger, long), 0, 0, 0},
+	{__pack_short, FIELD_COUNT(struct player_action, desired_weapon_index, desired_zoom_level, short), 0, 0, 0},
 	{__pack_pad, 2, 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
@@ -480,8 +481,8 @@ static struct data_packet_definition message_client_game_update_packet = /* fake
 static struct data_packet_field message_client_add_player_request_ingame_fields[] = /* fake name */
 {
 	{__pack_short, MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH, 0, 0, 0},
-	{__pack_short, 2, 0, 0, 0},
-	{__pack_char, 4, 0, 0, 0},
+	{__pack_short, FIELD_COUNT(struct network_player, primary_color_index, icon_index, short), 0, 0, 0},
+	{__pack_char, FIELD_COUNT(struct network_player, machine_index, player_list_index, char), 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 };
 
@@ -498,8 +499,8 @@ static struct data_packet_definition message_client_add_player_request_ingame_pa
 static struct data_packet_field message_client_remove_player_request_ingame_fields[] = /* fake name */
 {
 	{__pack_short, MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH, 0, 0, 0},
-	{__pack_short, 2, 0, 0, 0},
-	{__pack_char, 4, 0, 0, 0},
+	{__pack_short, FIELD_COUNT(struct network_player, primary_color_index, icon_index, short), 0, 0, 0},
+	{__pack_char, FIELD_COUNT(struct network_player, machine_index, player_list_index, char), 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 };
 
@@ -584,8 +585,8 @@ static struct data_packet_definition message_server_graceful_game_exit_postgame_
 static struct data_packet_field message_client_remove_player_request_postgame_fields[] = /* fake name */
 {
 	{__pack_short, MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH, 0, 0, 0},
-	{__pack_short, 2, 0, 0, 0},
-	{__pack_char, 4, 0, 0, 0},
+	{__pack_short, FIELD_COUNT(struct network_player, primary_color_index, icon_index, short), 0, 0, 0},
+	{__pack_char, FIELD_COUNT(struct network_player, machine_index, player_list_index, char), 0, 0, 0},
 	{__pack_end, 0, 0, 0, 0},
 };
 
@@ -705,8 +706,12 @@ message_header *create_network_game_message(
 	{
 	CASE_MESSAGE_TYPE(client_broadcast_game_search, 160);
 	CASE_MESSAGE_TYPE(client_ping, 161);
+
+
 	CASE_MESSAGE_TYPE(server_game_advertise, 164);
 	CASE_MESSAGE_TYPE(server_pong, 165);
+
+
 	CASE_MESSAGE_TYPE(server_machine_accepted, 168);
 	CASE_MESSAGE_TYPE(server_machine_rejected, 169);
 	CASE_MESSAGE_TYPE(server_game_settings_update, 170);
@@ -714,7 +719,11 @@ message_header *create_network_game_message(
 	CASE_MESSAGE_TYPE(server_pregame_keep_alive, 172);
 	CASE_MESSAGE_TYPE(server_begin_game, 173);
 	CASE_MESSAGE_TYPE(server_graceful_game_exit_pregame, 174);
+
+
 	CASE_MESSAGE_TYPE(server_postgame_keep_alive, 177);
+
+
 	CASE_MESSAGE_TYPE(client_join_game_request, 180);
 	CASE_MESSAGE_TYPE(client_add_player_request_pregame, 181);
 	CASE_MESSAGE_TYPE(client_remove_player_request_pregame, 182);
@@ -723,18 +732,27 @@ message_header *create_network_game_message(
 	CASE_MESSAGE_TYPE(client_game_start_request, 185);
 	CASE_MESSAGE_TYPE(client_graceful_game_exit_pregame, 186);
 	CASE_MESSAGE_TYPE(client_map_is_precached_pregame, 187);
+
+
 	CASE_MESSAGE_TYPE(server_game_update, 190);
 	CASE_MESSAGE_TYPE(server_add_player_ingame, 191);
 	CASE_MESSAGE_TYPE(server_remove_player_ingame, 192);
 	CASE_MESSAGE_TYPE(server_game_over, 193);
+
+
 	CASE_MESSAGE_TYPE(client_loaded, 196);
 	CASE_MESSAGE_TYPE(client_game_update, 197);
 	CASE_MESSAGE_TYPE(client_add_player_request_ingame, 198);
 	CASE_MESSAGE_TYPE(client_remove_player_request_ingame, 199);
+
 	CASE_MESSAGE_TYPE(client_host_crashed_cry_for_help, 201);
 	CASE_MESSAGE_TYPE(client_join_new_host, 202);
+
+
 	CASE_MESSAGE_TYPE(server_switch_to_pregame, 205);
 	CASE_MESSAGE_TYPE(server_graceful_game_exit_postgame, 206);
+
+
 	CASE_MESSAGE_TYPE(client_remove_player_request_postgame, 209);
 	CASE_MESSAGE_TYPE(client_switch_to_pregame, 210);
 	CASE_MESSAGE_TYPE(client_graceful_game_exit_postgame, 211);
