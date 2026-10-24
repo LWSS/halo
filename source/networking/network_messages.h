@@ -154,7 +154,7 @@ struct message_server_game_advertise
 	word version;
 	word platform;
 	wchar_t name[MAXIMUM_NETWORK_GAME_NAME_LENGTH];
-	wchar_t human_readable_game_description[12];
+	wchar_t human_readable_game_description[MAXIMUM_GAME_VARIANT_NAME_LENGTH];
 	struct network_map map;
 	short game_engine;
 	short current_number_of_machines;

@@ -25,7 +25,7 @@ NETWORK_GAME_MANAGER.C
 
 /* ---------- prototypes */
 
-static long sort_network_players(struct network_player *p1, struct network_player *p2);
+static int sort_network_players(void const *elem0, void const *elem1);
 
 /* ---------- globals */
 
@@ -65,7 +65,7 @@ void network_game_invalidate_machine(
 	match_assert("c:\\halo\\SOURCE\\networking\\network_game_manager.c", 64, game && (machine_index<MAXIMUM_NETWORK_MACHINE_COUNT));
 
 	game->machines[machine_index].machine_index = NONE;
-	game->machines[machine_index].name[0] = 0;
+	game->machines[machine_index].name[0] = '\0';
 
 	for (player_index = 0; player_index < NETWORK_GAME_MAXIMUM_PLAYER_COUNT; player_index++)
 	{
@@ -87,7 +87,7 @@ void network_game_invalidate_player(
 	player->controller_index = NONE;
 	player->team_index = NONE;
 	player->player_list_index = NONE;
-	player->name[0] = 0;
+	player->name[0] = '\0';
 
 	return;
 }
@@ -292,11 +292,14 @@ boolean network_game_remove_player(
 	return success;
 }
 
-static long sort_network_players(
-	struct network_player *p1,
-	struct network_player *p2)
+/* bungie didn't follow code conventions here */
+static int sort_network_players(
+	void const *elem0,
+	void const *elem1)
 {
-	long result = 0;
+	struct network_player *p1 = (struct network_player *)elem0;
+	struct network_player *p2 = (struct network_player *)elem1;
+	int result = 0;
 
 	match_assert("c:\\halo\\SOURCE\\networking\\network_game_manager.c", 322, p1 && p2);
 
@@ -381,11 +384,7 @@ boolean network_game_create_game_objects(
 
 		game->local_data.game_objects_loaded = TRUE;
 		game_initialize_for_new_map();
-		qsort(
-			game->players,
-			NUMBEROF(game->players),
-			sizeof(struct network_player),
-			(int(__cdecl *)(const void *, const void *))sort_network_players);
+		qsort(game->players, NUMBEROF(game->players), sizeof(*game->players), sort_network_players);
 
 		for (player_index = 0; player_index < NETWORK_GAME_MAXIMUM_PLAYER_COUNT; player_index++)
 		{
@@ -439,7 +438,7 @@ void xbox_set_machine_name(
 	{
 		if (ascii_to_wide(machine_name, wide_machine_name, sizeof(wide_machine_name)))
 		{
-			wide_machine_name[NUMBEROF(wide_machine_name) - 1] = 0;
+			wide_machine_name[NUMBEROF(wide_machine_name) - 1] = '\0';
 
 			if (!XSetNicknameW(wide_machine_name, TRUE))
 			{
@@ -468,7 +467,7 @@ void network_game_generate_local_machine_name(
 	if (find_handle == INVALID_HANDLE_VALUE)
 	{
 		ustrncpy(machine_name, network_game_get_random_player_name(), MAXIMUM_NETWORK_GAME_MACHINE_NAME_LENGTH);
-		machine_name[MAXIMUM_NETWORK_GAME_MACHINE_NAME_LENGTH - 1] = 0;
+		machine_name[MAXIMUM_NETWORK_GAME_MACHINE_NAME_LENGTH - 1] = '\0';
 
 		if (XSetNicknameW(machine_name, TRUE))
 		{
@@ -487,7 +486,7 @@ void network_game_generate_local_machine_name(
 		XFindClose(find_handle);
 	}
 
-	machine_name[MAXIMUM_NETWORK_GAME_MACHINE_NAME_LENGTH - 1] = 0;
+	machine_name[MAXIMUM_NETWORK_GAME_MACHINE_NAME_LENGTH - 1] = '\0';
 
 	return;
 }
@@ -570,14 +569,9 @@ void network_game_assign_players_to_team(
 boolean network_player_is_valid(
 	struct network_player *player)
 {
-	if (player &&
+	return (boolean)(player &&
 		player->controller_index >= 0 && player->controller_index < MAXIMUM_NUMBER_OF_LOCAL_PLAYERS &&
-		player->machine_index >= 0 && player->machine_index < MAXIMUM_NETWORK_MACHINE_COUNT)
-	{
-		return TRUE;
-	}
-
-	return FALSE;
+		player->machine_index >= 0 && player->machine_index < MAXIMUM_NETWORK_MACHINE_COUNT);
 }
 
 /* ---------- private code */

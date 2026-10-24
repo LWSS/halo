@@ -50,6 +50,7 @@ enum
 #define GET_MESSAGE_FLAGS(message) ((message)&MESSAGE_FLAG_BITS_MASK) /* fake name */
 #define GET_MESSAGE_TYPE(message) (((message)>>MESSAGE_TYPE_SHIFT)&MESSAGE_TYPE_BITS_MASK)
 #define GET_MESSAGE_SIZE(message) ((message)>>MESSAGE_SIZE_SHIFT)
+#define GET_MESSAGE_PACKET_TYPE(message, message_size) (((byte *)(message))[(message_size) - 1]) /* fake name */
 #define SET_MESSAGE_FLAGS(message, flags) ((message) = ((message)&~MESSAGE_FLAG_BITS_MASK)|(flags)) /* fake name */
 #define SET_MESSAGE_TYPE(message, type) ((message) = ((message)&(word)~(MESSAGE_TYPE_BITS_MASK<<MESSAGE_TYPE_SHIFT))|(((type)&MESSAGE_TYPE_BITS_MASK)<<MESSAGE_TYPE_SHIFT)) /* fake name */
 #define SET_MESSAGE_SIZE(message, size) ((message) = ((message)&(FLAG(MESSAGE_SIZE_SHIFT)-1))|((size)<<MESSAGE_SIZE_SHIFT)) /* fake name */

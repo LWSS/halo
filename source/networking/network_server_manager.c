@@ -434,7 +434,7 @@ boolean network_game_server_set_game_name(
 	match_assert("c:\\halo\\SOURCE\\networking\\network_server_manager.c", 478, name);
 
 	ustrncpy(server->game.name, name, MAXIMUM_NETWORK_GAME_NAME_LENGTH - 1);
-	server->game.name[MAXIMUM_NETWORK_GAME_NAME_LENGTH - 1] = 0;
+	server->game.name[MAXIMUM_NETWORK_GAME_NAME_LENGTH - 1] = '\0';
 
 	return FALSE;
 }
@@ -1043,7 +1043,7 @@ void get_unique_random_name(
 	while (duplicate_count);
 
 	ustrncpy(player->name, name, MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH - 1);
-	player->name[MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH - 1] = 0;
+	player->name[MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH - 1] = '\0';
 
 	return;
 }
@@ -1216,11 +1216,7 @@ void network_game_server_all_machines_have_loaded(
 	server->game.local_data.game_objects_loaded = global_network_game_client_get() ?
 		network_game_client_get_game(global_network_game_client_get())->local_data.game_objects_loaded :
 		FALSE;
-	match_vassert(
-		"c:\\halo\\SOURCE\\networking\\network_server_manager.c",
-		1248,
-		server->game.local_data.game_objects_loaded,
-		"local game data not loaded");
+	match_vassert("c:\\halo\\SOURCE\\networking\\network_server_manager.c", 1248, server->game.local_data.game_objects_loaded, "local game data not loaded");
 
 	return;
 }
@@ -1368,7 +1364,7 @@ void network_game_server_update_ticks(
 			memcpy(
 				game_update.action_update,
 				update.actions,
-				update.number_of_actions * sizeof(struct player_action));
+				update.number_of_actions * sizeof(*update.actions));
 			message = create_network_game_message(
 				_message_type_server_game_update,
 				&game_update,
@@ -1905,7 +1901,7 @@ void network_game_server_change_map_name(
 	}
 
 	strncpy(server->game.map.name, map_name, MAXIMUM_NETWORK_MAP_NAME_LENGTH - 1);
-	server->game.map.name[MAXIMUM_NETWORK_MAP_NAME_LENGTH - 1] = 0;
+	server->game.map.name[MAXIMUM_NETWORK_MAP_NAME_LENGTH - 1] = '\0';
 
 	if (!network_game_server_send_game_data_pregame(server))
 	{
@@ -2368,7 +2364,7 @@ static boolean network_game_server_setup_game_from_playlist(
 
 		network_game_generate_local_machine_name(machine_name);
 		ustrncpy(server->game.name, machine_name, MAXIMUM_NETWORK_GAME_NAME_LENGTH - 1);
-		server->game.name[MAXIMUM_NETWORK_GAME_NAME_LENGTH - 1] = 0;
+		server->game.name[MAXIMUM_NETWORK_GAME_NAME_LENGTH - 1] = '\0';
 		server->game.map.version = 0;
 		server->game.minimum_players = MINIMUM_NETWORK_GAME_PLAYER_COUNT;
 		server->game.maximum_players = NETWORK_GAME_MAXIMUM_PLAYER_COUNT;

@@ -169,7 +169,7 @@ void telnet_console_process(
 						else
 						{
 							telnet_console_globals.clients[client_index].endpoint = endpoint;
-							telnet_console_globals.clients[client_index].buffer[0] = 0;
+							telnet_console_globals.clients[client_index].buffer[0] = '\0';
 						}
 
 						break;
@@ -244,7 +244,7 @@ static boolean process_telnet_client_buffer(
 				{
 					long written;
 
-					client->buffer[0] = 0;
+					client->buffer[0] = '\0';
 					written = write_endpoint(
 						client->endpoint,
 						"\r\noverflowed client buffer; resetting buffer\r\n",
@@ -260,7 +260,7 @@ static boolean process_telnet_client_buffer(
 				}
 
 				client->buffer[buffer_length - 1] = *character;
-				client->buffer[buffer_length] = 0;
+				client->buffer[buffer_length] = '\0';
 			}
 			else
 			{
@@ -273,8 +273,8 @@ static boolean process_telnet_client_buffer(
 						char expression[TELNET_CLIENT_BUFFER_SIZE];
 
 						strncpy(expression, client->buffer, TELNET_CLIENT_BUFFER_SIZE - 1);
-						expression[TELNET_CLIENT_BUFFER_SIZE - 1] = 0;
-						client->buffer[0] = 0;
+						expression[TELNET_CLIENT_BUFFER_SIZE - 1] = '\0';
+						client->buffer[0] = '\0';
 
 						if (hs_compile_and_evaluate(expression) && write_endpoint(client->endpoint, "\r\n", 2) <= 0)
 						{
@@ -291,7 +291,7 @@ static boolean process_telnet_client_buffer(
 
 						if (buffer_length > 0)
 						{
-							client->buffer[buffer_length - 1] = 0;
+							client->buffer[buffer_length - 1] = '\0';
 						}
 					}
 					break;

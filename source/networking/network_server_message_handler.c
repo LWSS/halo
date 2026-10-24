@@ -62,10 +62,7 @@ boolean network_game_server_handle_datagram(
 {
 	word message_type;
 
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_server_message_handler.c",
-		64,
-		server && message && source_address && (datagram_size > sizeof(message_header)) && (datagram_size == GET_MESSAGE_SIZE(*message)));
+	match_assert("c:\\halo\\SOURCE\\networking\\network_server_message_handler.c", 64, server && message && source_address && (datagram_size > sizeof(message_header)) && (datagram_size == GET_MESSAGE_SIZE(*message)));
 
 	message_type = (byte)GET_MESSAGE_TYPE(*message);
 
@@ -82,7 +79,7 @@ boolean network_game_server_handle_datagram(
 		case _message_type_packet:
 		{
 			short packet_version = NETWORK_GAME_MESSAGE_VERSION;
-			short packet_type = ((byte *)message)[datagram_size - 1];
+			short packet_type = GET_MESSAGE_PACKET_TYPE(message, datagram_size);
 
 			datagram_size -= sizeof(message_header);
 
@@ -235,10 +232,7 @@ boolean network_game_server_handle_client_message(
 	word message_type;
 	boolean result = TRUE;
 
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_server_message_handler.c",
-		207,
-		server && machine && message && (message_buffer_size == GET_MESSAGE_SIZE(*message)));
+	match_assert("c:\\halo\\SOURCE\\networking\\network_server_message_handler.c", 207, server && machine && message && (message_buffer_size == GET_MESSAGE_SIZE(*message)));
 
 	message_type = (byte)GET_MESSAGE_TYPE(*message);
 
@@ -252,7 +246,7 @@ boolean network_game_server_handle_client_message(
 		{
 		case _message_type_packet:
 		{
-			byte packet_type = ((byte *)message)[message_buffer_size - 1];
+			byte packet_type = GET_MESSAGE_PACKET_TYPE(message, message_buffer_size);
 
 			if (network_game_server_client_machine_is_joined_to_game(server, machine) ||
 				packet_type == _message_type_client_join_game_request)
@@ -517,10 +511,7 @@ boolean network_game_server_send_message_to_all_machines(
 
 			if (connection && network_connection_active(connection))
 			{
-				match_assert(
-					"c:\\halo\\SOURCE\\networking\\network_server_message_handler.c",
-					410,
-					message_length<=sizeof(message_buffer));
+				match_assert("c:\\halo\\SOURCE\\networking\\network_server_message_handler.c", 410, message_length<=sizeof(message_buffer));
 
 				memcpy(message_buffer, message, message_length);
 
@@ -627,10 +618,7 @@ static boolean handle_message_client_broadcast_game_search(
 {
 	boolean result = TRUE;
 
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_server_message_handler.c",
-		543,
-		server && source_address && client_message);
+	match_assert("c:\\halo\\SOURCE\\networking\\network_server_message_handler.c", 543, server && source_address && client_message);
 
 	if (client_message->version == NETWORK_GAME_MESSAGE_VERSION)
 	{
@@ -667,18 +655,18 @@ static boolean handle_message_client_broadcast_game_search(
 
 			if (game->variant.universal_variant.teams == TRUE)
 			{
-				advertisement.flags = FLAG(_game_advertise_teams_enabled_bit);
+				SET_FLAG(advertisement.flags, _game_advertise_teams_enabled_bit, TRUE);
 			}
 
 			if (game->variant.game_engine_index == _game_engine_oddball &&
 				game->variant.game_engine_variant.oddball.oddball_ball_type == _oddball_terminator)
 			{
-				advertisement.flags |= FLAG(_game_advertise_terminator_bit);
+				SET_FLAG(advertisement.flags, _game_advertise_terminator_bit, TRUE);
 			}
 
 			if (network_game_server_game_is_open(server))
 			{
-				advertisement.flags |= FLAG(_game_advertise_open_bit);
+				SET_FLAG(advertisement.flags, _game_advertise_open_bit, TRUE);
 			}
 
 			network_game_generate_join_game_token(advertisement.join_token);
@@ -720,10 +708,7 @@ static boolean handle_message_client_ping(
 	message_header *message;
 	boolean result = FALSE;
 
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_server_message_handler.c",
-		618,
-		server && source_address && client_message);
+	match_assert("c:\\halo\\SOURCE\\networking\\network_server_message_handler.c", 618, server && source_address && client_message);
 
 	pong.timestamp = client_message->timestamp;
 	message = create_network_game_message(_message_type_server_pong, &pong, sizeof(pong));
@@ -869,10 +854,7 @@ static boolean network_game_server_handle_message_client_join_game_request(
 								machine,
 								&machine_index);
 							network_game_server_get_game(server);
-							match_assert(
-								"c:\\halo\\SOURCE\\networking\\network_server_message_handler.c",
-								718,
-								network_machine_is_valid(client_machine));
+							match_assert("c:\\halo\\SOURCE\\networking\\network_server_message_handler.c", 718, network_machine_is_valid(client_machine));
 
 							acceptance.machine_index = (short)machine_index;
 							acceptance.server_random_seed = network_game_get_random_seed();

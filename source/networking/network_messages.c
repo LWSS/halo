@@ -20,6 +20,8 @@ enum
 
 /* ---------- macros */
 
+#define CASE_MESSAGE_TYPE(type, line) case _message_type_##type: match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", line, message_struct_size==sizeof(message_##type)); break /* fake name */
+
 /* ---------- structures */
 
 /* ---------- prototypes */
@@ -699,117 +701,43 @@ message_header *create_network_game_message(
 	byte encoded_message[MAXIMUM_DECODED_NETWORK_GAME_MESSAGE_SIZE];
 	short encoded_message_size = sizeof(encoded_message);
 
-    // the asserts show only 1 line diff per case here
-	// should be cleaned up with a macro (but it breaks the match_assert line#) - something like:
-	// #define CASE_MESSAGE_TYPE(type) case type:  assert(size == sizeof(type)); break;
-
 	switch (message_type)
 	{
-	case _message_type_client_broadcast_game_search:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 160, message_struct_size==sizeof(message_client_broadcast_game_search));
-		break;
-	case _message_type_client_ping:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 161, message_struct_size==sizeof(message_client_ping));
-		break;
-	case _message_type_server_game_advertise:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 164, message_struct_size==sizeof(message_server_game_advertise));
-		break;
-	case _message_type_server_pong:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 165, message_struct_size==sizeof(message_server_pong));
-		break;
-	case _message_type_server_machine_accepted:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 168, message_struct_size==sizeof(message_server_machine_accepted));
-		break;
-	case _message_type_server_machine_rejected:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 169, message_struct_size==sizeof(message_server_machine_rejected));
-		break;
-	case _message_type_server_game_settings_update:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 170, message_struct_size==sizeof(message_server_game_settings_update));
-		break;
-	case _message_type_server_pregame_countdown:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 171, message_struct_size==sizeof(message_server_pregame_countdown));
-		break;
-	case _message_type_server_pregame_keep_alive:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 172, message_struct_size==sizeof(message_server_pregame_keep_alive));
-		break;
-	case _message_type_server_begin_game:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 173, message_struct_size==sizeof(message_server_begin_game));
-		break;
-	case _message_type_server_graceful_game_exit_pregame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 174, message_struct_size==sizeof(message_server_graceful_game_exit_pregame));
-		break;
-	case _message_type_server_postgame_keep_alive:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 177, message_struct_size==sizeof(message_server_postgame_keep_alive));
-		break;
-	case _message_type_client_join_game_request:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 180, message_struct_size==sizeof(message_client_join_game_request));
-		break;
-	case _message_type_client_add_player_request_pregame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 181, message_struct_size==sizeof(message_client_add_player_request_pregame));
-		break;
-	case _message_type_client_remove_player_request_pregame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 182, message_struct_size==sizeof(message_client_remove_player_request_pregame));
-		break;
-	case _message_type_client_settings_request:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 183, message_struct_size==sizeof(message_client_settings_request));
-		break;
-	case _message_type_client_player_settings_request:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 184, message_struct_size==sizeof(message_client_player_settings_request));
-		break;
-	case _message_type_client_game_start_request:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 185, message_struct_size==sizeof(message_client_game_start_request));
-		break;
-	case _message_type_client_graceful_game_exit_pregame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 186, message_struct_size==sizeof(message_client_graceful_game_exit_pregame));
-		break;
-	case _message_type_client_map_is_precached_pregame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 187, message_struct_size==sizeof(message_client_map_is_precached_pregame));
-		break;
-	case _message_type_server_game_update:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 190, message_struct_size==sizeof(message_server_game_update));
-		break;
-	case _message_type_server_add_player_ingame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 191, message_struct_size==sizeof(message_server_add_player_ingame));
-		break;
-	case _message_type_server_remove_player_ingame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 192, message_struct_size==sizeof(message_server_remove_player_ingame));
-		break;
-	case _message_type_server_game_over:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 193, message_struct_size==sizeof(message_server_game_over));
-		break;
-	case _message_type_client_loaded:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 196, message_struct_size==sizeof(message_client_loaded));
-		break;
-	case _message_type_client_game_update:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 197, message_struct_size==sizeof(message_client_game_update));
-		break;
-	case _message_type_client_add_player_request_ingame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 198, message_struct_size==sizeof(message_client_add_player_request_ingame));
-		break;
-	case _message_type_client_remove_player_request_ingame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 199, message_struct_size==sizeof(message_client_remove_player_request_ingame));
-		break;
-	case _message_type_client_host_crashed_cry_for_help:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 201, message_struct_size==sizeof(message_client_host_crashed_cry_for_help));
-		break;
-	case _message_type_client_join_new_host:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 202, message_struct_size==sizeof(message_client_join_new_host));
-		break;
-	case _message_type_server_switch_to_pregame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 205, message_struct_size==sizeof(message_server_switch_to_pregame));
-		break;
-	case _message_type_server_graceful_game_exit_postgame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 206, message_struct_size==sizeof(message_server_graceful_game_exit_postgame));
-		break;
-	case _message_type_client_remove_player_request_postgame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 209, message_struct_size==sizeof(message_client_remove_player_request_postgame));
-		break;
-	case _message_type_client_switch_to_pregame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 210, message_struct_size==sizeof(message_client_switch_to_pregame));
-		break;
-	case _message_type_client_graceful_game_exit_postgame:
-		match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 211, message_struct_size==sizeof(message_client_graceful_game_exit_postgame));
-		break;
+	CASE_MESSAGE_TYPE(client_broadcast_game_search, 160);
+	CASE_MESSAGE_TYPE(client_ping, 161);
+	CASE_MESSAGE_TYPE(server_game_advertise, 164);
+	CASE_MESSAGE_TYPE(server_pong, 165);
+	CASE_MESSAGE_TYPE(server_machine_accepted, 168);
+	CASE_MESSAGE_TYPE(server_machine_rejected, 169);
+	CASE_MESSAGE_TYPE(server_game_settings_update, 170);
+	CASE_MESSAGE_TYPE(server_pregame_countdown, 171);
+	CASE_MESSAGE_TYPE(server_pregame_keep_alive, 172);
+	CASE_MESSAGE_TYPE(server_begin_game, 173);
+	CASE_MESSAGE_TYPE(server_graceful_game_exit_pregame, 174);
+	CASE_MESSAGE_TYPE(server_postgame_keep_alive, 177);
+	CASE_MESSAGE_TYPE(client_join_game_request, 180);
+	CASE_MESSAGE_TYPE(client_add_player_request_pregame, 181);
+	CASE_MESSAGE_TYPE(client_remove_player_request_pregame, 182);
+	CASE_MESSAGE_TYPE(client_settings_request, 183);
+	CASE_MESSAGE_TYPE(client_player_settings_request, 184);
+	CASE_MESSAGE_TYPE(client_game_start_request, 185);
+	CASE_MESSAGE_TYPE(client_graceful_game_exit_pregame, 186);
+	CASE_MESSAGE_TYPE(client_map_is_precached_pregame, 187);
+	CASE_MESSAGE_TYPE(server_game_update, 190);
+	CASE_MESSAGE_TYPE(server_add_player_ingame, 191);
+	CASE_MESSAGE_TYPE(server_remove_player_ingame, 192);
+	CASE_MESSAGE_TYPE(server_game_over, 193);
+	CASE_MESSAGE_TYPE(client_loaded, 196);
+	CASE_MESSAGE_TYPE(client_game_update, 197);
+	CASE_MESSAGE_TYPE(client_add_player_request_ingame, 198);
+	CASE_MESSAGE_TYPE(client_remove_player_request_ingame, 199);
+	CASE_MESSAGE_TYPE(client_host_crashed_cry_for_help, 201);
+	CASE_MESSAGE_TYPE(client_join_new_host, 202);
+	CASE_MESSAGE_TYPE(server_switch_to_pregame, 205);
+	CASE_MESSAGE_TYPE(server_graceful_game_exit_postgame, 206);
+	CASE_MESSAGE_TYPE(client_remove_player_request_postgame, 209);
+	CASE_MESSAGE_TYPE(client_switch_to_pregame, 210);
+	CASE_MESSAGE_TYPE(client_graceful_game_exit_postgame, 211);
 	default:
 		match_vhalt("c:\\halo\\SOURCE\\networking\\network_messages.c", 213, "unknown network game message structure type");
 		break;
@@ -848,10 +776,7 @@ boolean decode_network_game_message(
 {
 	boolean success;
 
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_messages.c",
-		313,
-		message_struct && encoded_message && encoded_message_size && (*encoded_message_size>0) && packet_type && (*packet_type>=0) && packet_version && (*packet_version>0));
+	match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 313, message_struct && encoded_message && encoded_message_size && (*encoded_message_size>0) && packet_type && (*packet_type>=0) && packet_version && (*packet_version>0));
 
 	success = data_packet_group_decode_packet(
 		&network_game_messages_group,
@@ -894,10 +819,7 @@ static boolean encode_network_game_message(
 	short packet_type,
 	short packet_version)
 {
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_messages.c",
-		353,
-		message_struct && encoded_message && encoded_message_size && (*encoded_message_size>0));
+	match_assert("c:\\halo\\SOURCE\\networking\\network_messages.c", 353, message_struct && encoded_message && encoded_message_size && (*encoded_message_size>0));
 
 	return data_packet_group_encode_packet(
 		&network_game_messages_group,

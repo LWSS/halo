@@ -47,10 +47,7 @@ boolean network_game_client_handle_message(
 	word message_type;
 	boolean success = TRUE;
 
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_client_message_handler.c",
-		47,
-		client && message && (message_size == GET_MESSAGE_SIZE(*message)) && source_address);
+	match_assert("c:\\halo\\SOURCE\\networking\\network_client_message_handler.c", 47, client && message && (message_size == GET_MESSAGE_SIZE(*message)) && source_address);
 
 	message_type = (byte)GET_MESSAGE_TYPE(*message);
 
@@ -82,7 +79,7 @@ boolean network_game_client_handle_message(
 			network_event("client received a bad message type (_message_type_data)");
 			break;
 		case _message_type_packet:
-			switch (((byte *)message)[message_size - 1])
+			switch (GET_MESSAGE_PACKET_TYPE(message, message_size))
 			{
 			case _message_type_server_game_advertise:
 				success = network_game_client_handle_message_server_game_advertise(client, message, message_size, source_address);

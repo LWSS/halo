@@ -220,10 +220,7 @@ boolean network_game_client_initiate_join_game(
 {
 	boolean success;
 
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_client_manager.c",
-		343,
-		client && (client->state == _network_game_client_state_searching) && game && join_parameters && client->connection && !network_connection_connected(client->connection) && (game->platform == network_game_get_local_platform()));
+	match_assert("c:\\halo\\SOURCE\\networking\\network_client_manager.c", 343, client && (client->state == _network_game_client_state_searching) && game && join_parameters && client->connection && !network_connection_connected(client->connection) && (game->platform == network_game_get_local_platform()));
 
 	client->packet_sequence_number = NETWORK_GAME_CLIENT_INITIAL_PACKET_SEQUENCE_NUMBER;
 	client->connect_process = NULL;
@@ -371,10 +368,7 @@ boolean network_game_client_set_machine(
 	struct network_game_client *client,
 	struct network_machine *machine)
 {
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_client_manager.c",
-		481,
-		client && (client->machine_index<MAXIMUM_NETWORK_MACHINE_COUNT) && network_machine_is_valid(machine));
+	match_assert("c:\\halo\\SOURCE\\networking\\network_client_manager.c", 481, client && (client->machine_index<MAXIMUM_NETWORK_MACHINE_COUNT) && network_machine_is_valid(machine));
 
 	memcpy(&client->game.machines[client->machine_index], machine, sizeof(*machine));
 
@@ -413,11 +407,8 @@ boolean network_game_client_request_remove_player(
 	boolean success = TRUE;
 
 	match_assert("c:\\halo\\SOURCE\\networking\\network_client_manager.c", 520, client && network_player_is_valid(player));
-	match_vassert(
-		"c:\\halo\\SOURCE\\networking\\network_client_manager.c",
-		521,
-		client->game.machines[client->machine_index].machine_index == player->machine_index,
-		"client's can only remove players from their own machines");
+
+	match_vassert("c:\\halo\\SOURCE\\networking\\network_client_manager.c", 521, client->game.machines[client->machine_index].machine_index == player->machine_index, "client's can only remove players from their own machines");
 
 	network_event(
 		"requesting a player removal (controller index #%d)",
@@ -708,10 +699,7 @@ void network_game_client_accepted_into_game(
 	struct transport_address *source_address,
 	struct message_server_machine_accepted *message_packet)
 {
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_client_manager.c",
-		807,
-		client && source_address && message_packet && (client->state == _network_game_client_state_joining));
+	match_assert("c:\\halo\\SOURCE\\networking\\network_client_manager.c", 807, client && source_address && message_packet && (client->state == _network_game_client_state_joining));
 
 	if (message_packet->machine_index >= 0 && message_packet->machine_index < MAXIMUM_NETWORK_MACHINE_COUNT)
 	{
@@ -1004,7 +992,7 @@ boolean network_game_client_handle_game_update(
 	}
 
 	update.number_of_actions = message_packet->player_count;
-	memcpy(update.actions, message_packet->action_update, update.number_of_actions * sizeof(struct player_action));
+	memcpy(update.actions, message_packet->action_update, update.number_of_actions * sizeof(*update.actions));
 	update_client_handle_server_update(&update, message_packet->update_number);
 	client->next_update_number++;
 	client->last_update_time = system_milliseconds();
@@ -1193,16 +1181,13 @@ boolean network_game_client_add_player(
 	struct network_player player;
 	boolean success = TRUE;
 
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_client_manager.c",
-		1328,
-		client && (local_player_index>=0) && (local_player_index<MAXIMUM_NUMBER_OF_LOCAL_PLAYERS));
+	match_assert("c:\\halo\\SOURCE\\networking\\network_client_manager.c", 1328, client && (local_player_index>=0) && (local_player_index<MAXIMUM_NUMBER_OF_LOCAL_PLAYERS));
 
 	player_ui_get_active_player_profile(local_player_index, &profile);
 	player.controller_index = local_player_index;
 	player.machine_index = client->machine_index;
 	ustrncpy(player.name, profile.player_name, MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH - 1);
-	player.name[MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH - 1] = 0;
+	player.name[MAXIMUM_NETWORK_GAME_PLAYER_NAME_LENGTH - 1] = '\0';
 	player.primary_color_index = profile.primary_color_index;
 	player.icon_index = NONE;
 	player.team_index = NONE;
@@ -1453,7 +1438,7 @@ static boolean add_advertised_game(
 			ustrncpy(game->name, L"???", MAXIMUM_NETWORK_GAME_NAME_LENGTH - 1);
 		}
 
-		game->name[MAXIMUM_NETWORK_GAME_NAME_LENGTH - 1] = 0;
+		game->name[MAXIMUM_NETWORK_GAME_NAME_LENGTH - 1] = '\0';
 		game->game_engine = message_packet->game_engine;
 		memcpy(&game->map, &message_packet->map, sizeof(game->map));
 		game->current_number_of_machines = message_packet->current_number_of_machines;
@@ -1521,7 +1506,7 @@ static boolean network_game_client_idle_searching(
 			server_address.address_length = IPV4_ADDRESS_LENGTH;
 			game.platform = network_game_get_local_platform();
 			transport_get_nonce(game.server_nonce, NETWORK_GAME_NONCE_BYTES);
-			join_parameters.password[0] = 0;
+			join_parameters.password[0] = '\0';
 			network_game_generate_join_game_token(join_parameters.join_token);
 
 			if (!network_game_client_initiate_join_game(client, &game, &join_parameters, &server_address))

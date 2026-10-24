@@ -115,10 +115,7 @@ struct network_connection *network_connection_new(
 	long unreliable_queue_size;
 	struct network_connection *connection = NULL;
 
-	match_assert(
-		"c:\\halo\\SOURCE\\networking\\network_connection.c",
-		157,
-		(flags&FLAG(_connection_create_server_bit))|| (flags&FLAG(_connection_create_clientside_client_bit)));
+	match_assert("c:\\halo\\SOURCE\\networking\\network_connection.c", 157, (flags&FLAG(_connection_create_server_bit)) || (flags&FLAG(_connection_create_clientside_client_bit)));
 
 	if (TEST_FLAG(flags, _connection_create_server_bit))
 	{
@@ -354,11 +351,8 @@ boolean network_connection_write(
 	match_assert("c:\\halo\\SOURCE\\networking\\network_connection.c", 368, message);
 	match_assert("c:\\halo\\SOURCE\\networking\\network_connection.c", 369, buffer_size);
 	match_assert("c:\\halo\\SOURCE\\networking\\network_connection.c", 370, connection);
-	match_vassert(
-		"c:\\halo\\SOURCE\\networking\\network_connection.c",
-		372,
-		GET_MESSAGE_SIZE(*(message_header *)message) == buffer_size,
-		"bad message or buffer_size parameter");
+
+	match_vassert("c:\\halo\\SOURCE\\networking\\network_connection.c", 372, GET_MESSAGE_SIZE(*(message_header *)message) == buffer_size, "bad message or buffer_size parameter");
 
 	byte_swap_message_header(message, _byte_order_network);
 
@@ -380,15 +374,9 @@ boolean network_connection_write(
 	{
 		long bytes_written;
 
-		match_vassert(
-			"c:\\halo\\SOURCE\\networking\\network_connection.c",
-			398,
-			buffer_size <= RELIABLE_MESSAGE_MAXIMUM_SIZE,
-			"message size exceeds maximum allowed size");
-		match_assert(
-			"c:\\halo\\SOURCE\\networking\\network_connection.c",
-			400,
-			(connection->flags&FLAG(_connection_create_clientside_client_bit)) || (connection->flags&FLAG(_connection_create_serverside_client_bit)));
+		match_vassert("c:\\halo\\SOURCE\\networking\\network_connection.c", 398, buffer_size <= RELIABLE_MESSAGE_MAXIMUM_SIZE, "message size exceeds maximum allowed size");
+
+		match_assert("c:\\halo\\SOURCE\\networking\\network_connection.c", 400, (connection->flags&FLAG(_connection_create_clientside_client_bit)) || (connection->flags&FLAG(_connection_create_serverside_client_bit)));
 
 		do
 		{
@@ -416,11 +404,7 @@ boolean network_connection_write(
 	}
 	else if (connection->unreliable_endpoint)
 	{
-		match_vassert(
-			"c:\\halo\\SOURCE\\networking\\network_connection.c",
-			432,
-			buffer_size <= DATAGRAM_MAXIMUM_SIZE,
-			"message size exceeds maximum allowed size");
+		match_vassert("c:\\halo\\SOURCE\\networking\\network_connection.c", 432, buffer_size <= DATAGRAM_MAXIMUM_SIZE, "message size exceeds maximum allowed size");
 
 		if (!dest_address)
 		{
@@ -466,10 +450,7 @@ boolean network_connection_read(
 	}
 	else
 	{
-		match_assert(
-			"c:\\halo\\SOURCE\\networking\\network_connection.c",
-			480,
-			connection->flags&FLAG(_connection_create_clientside_client_bit) || connection->flags&FLAG(_connection_create_serverside_client_bit));
+		match_assert("c:\\halo\\SOURCE\\networking\\network_connection.c", 480, connection->flags&FLAG(_connection_create_clientside_client_bit) || connection->flags&FLAG(_connection_create_serverside_client_bit));
 
 		success = network_client_reliable_connection_read(connection, message, buffer_size, source_address);
 
@@ -623,11 +604,7 @@ boolean network_connection_idle(
 				}
 			}
 
-			match_vassert(
-				"c:\\halo\\SOURCE\\networking\\network_connection.c",
-				621,
-				bytes_read <= DATAGRAM_MAXIMUM_SIZE,
-				"endpoint read buffer overflowed");
+			match_vassert("c:\\halo\\SOURCE\\networking\\network_connection.c", 621, bytes_read <= DATAGRAM_MAXIMUM_SIZE, "endpoint read buffer overflowed");
 
 			if (bytes_read <= 0)
 			{
@@ -643,11 +620,7 @@ boolean network_connection_idle(
 					connection->unreliable_incoming_queue,
 					buffer,
 					bytes_read + sizeof(ipv4_address));
-				match_vassert(
-					"c:\\halo\\SOURCE\\networking\\network_connection.c",
-					633,
-					success,
-					"circular_queue_queue_data() failed though it should have had enough room");
+				match_vassert("c:\\halo\\SOURCE\\networking\\network_connection.c", 633, success, "circular_queue_queue_data() failed though it should have had enough room");
 			}
 			else
 			{
@@ -938,11 +911,7 @@ static boolean network_client_reliable_connection_read(
 			circular_queue_dequeue_data(connection->reliable_incoming_queue, message, message_size, TRUE))
 		{
 			*(message_header *)message = header;
-			match_vassert(
-				"c:\\halo\\SOURCE\\networking\\network_connection.c",
-				916,
-				!TEST_FLAG(header, _message_flag_encrypted_bit),
-				"encryption should not be active");
+			match_vassert("c:\\halo\\SOURCE\\networking\\network_connection.c", 916, !TEST_FLAG(header, _message_flag_encrypted_bit), "encryption should not be active");
 
 			if (source_address &&
 				get_endpoint_address(connection->reliable_endpoint, source_address) != _transport_error_none)
@@ -1004,11 +973,7 @@ static boolean network_client_unreliable_connection_read(
 			circular_queue_dequeue_data(connection->unreliable_incoming_queue, &ipv4_address, sizeof(ipv4_address), TRUE))
 		{
 			*(message_header *)message = header;
-			match_vassert(
-				"c:\\halo\\SOURCE\\networking\\network_connection.c",
-				991,
-				!TEST_FLAG(header, _message_flag_encrypted_bit),
-				"encryption should not be active");
+			match_vassert("c:\\halo\\SOURCE\\networking\\network_connection.c", 991, !TEST_FLAG(header, _message_flag_encrypted_bit), "encryption should not be active");
 
 			if (source_address)
 			{
@@ -1142,11 +1107,7 @@ static boolean network_connection_idle_server_reliable_endpoint(
 						}
 					}
 
-					match_vassert(
-						"c:\\halo\\SOURCE\\networking\\network_connection.c",
-						1129,
-						client_index < MAXIMUM_SERVER_CLIENT_CONNECTIONS,
-						"rogue endpoint connected to the server");
+					match_vassert("c:\\halo\\SOURCE\\networking\\network_connection.c", 1129, client_index < MAXIMUM_SERVER_CLIENT_CONNECTIONS, "rogue endpoint connected to the server");
 				}
 			}
 		}
@@ -1268,7 +1229,7 @@ static void network_connection_log_traffic_event(
 				{
 					if (traffic_log_name[index] == ':')
 					{
-						traffic_log_name[index] = 0;
+						traffic_log_name[index] = '\0';
 						break;
 					}
 				}
