@@ -284,34 +284,42 @@ void structure_cluster_marker_begin(
 boolean structure_cluster_unmarked(
 	short cluster_index)
 {
+	boolean result;
+
 	match_assert("c:\\halo\\SOURCE\\structures\\structures.c", 270, structure_globals.cluster_marker_initialized);
 	match_assert("c:\\halo\\SOURCE\\structures\\structures.c", 271, cluster_index>=0 && cluster_index<MAXIMUM_CLUSTERS_PER_STRUCTURE);
 
 	if (structure_globals.cluster_magic_numbers[cluster_index] != structure_globals.cluster_marker)
 	{
-		return TRUE;
+		result = TRUE;
 	}
 	else
 	{
-		return FALSE;
+		result = FALSE;
 	}
+
+	return result;
 }
 
 boolean structure_cluster_mark(
 	short cluster_index)
 {
+	boolean result;
+
 	match_assert("c:\\halo\\SOURCE\\structures\\structures.c", 286, structure_globals.cluster_marker_initialized);
 	match_assert("c:\\halo\\SOURCE\\structures\\structures.c", 287, cluster_index>=0 && cluster_index<MAXIMUM_CLUSTERS_PER_STRUCTURE);
 
 	if (structure_globals.cluster_magic_numbers[cluster_index] != structure_globals.cluster_marker)
 	{
 		structure_globals.cluster_magic_numbers[cluster_index] = structure_globals.cluster_marker;
-		return TRUE;
+		result = TRUE;
 	}
 	else
 	{
-		return FALSE;
+		result = FALSE;
 	}
+
+	return result;
 }
 
 void structure_cluster_marker_end(

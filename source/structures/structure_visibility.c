@@ -238,7 +238,7 @@ boolean structure_visibility_find_mirror(
 
 								if (shader->base.type == _shader_type_environment)
 								{
-									struct shader_environment *environment = shader_get_and_verify_type(shader, _shader_type_environment);
+									struct shader_environment *environment = shader_environment_get(shader);
 
 									result->index_of_refraction = environment->environment.reflection.mirror_index_of_refraction;
 									result->depth = environment->environment.reflection.mirror_depth;
@@ -561,6 +561,7 @@ short structure_visibility_build_surfaces(
 	struct location location;
 	short temporary_cluster_indices[MAXIMUM_CLUSTERS_PER_STRUCTURE];
 	short temporary_cluster_count;
+	short surface_count;
 	struct structure_bsp *structure_bsp = global_structure_bsp_get();
 
 	match_assert("c:\\halo\\SOURCE\\structures\\structure_visibility.c", 613, bounding_sphere_center);
@@ -580,7 +581,7 @@ short structure_visibility_build_surfaces(
 
 	if (bounding_sphere_radius < structure_sphere_threshold)
 	{
-		return structure_visibility_build_surfaces_traverse_node(
+		surface_count = structure_visibility_build_surfaces_traverse_node(
 			0,
 			&structure_bsp->world_bounds,
 			surface_flags,
@@ -593,10 +594,9 @@ short structure_visibility_build_surfaces(
 			bounding_surfaces,
 			_intersection_partial);
 	}
-
-	if (cluster_indices)
+	else if (cluster_indices)
 	{
-		return structure_visibility_build_surfaces_traverse_clusters(
+		surface_count = structure_visibility_build_surfaces_traverse_clusters(
 			surface_indices,
 			maximum_count,
 			bounding_sphere_center,
@@ -608,43 +608,49 @@ short structure_visibility_build_surfaces(
 			cluster_count,
 			cluster_indices);
 	}
-
-	scenario_location_from_point(&location, bounding_sphere_center);
-
-	if (location.cluster_index != NONE)
+	else
 	{
-		temporary_cluster_count = structure_clusters_in_sphere(
-			location.cluster_index,
-			bounding_sphere_center,
-			bounding_sphere_radius,
-			MAXIMUM_CLUSTERS_PER_STRUCTURE,
-			temporary_cluster_indices);
+		scenario_location_from_point(&location, bounding_sphere_center);
 
-		return structure_visibility_build_surfaces_traverse_clusters(
-			surface_indices,
-			maximum_count,
-			bounding_sphere_center,
-			bounding_sphere_radius,
-			bounding_box,
-			bounding_surface_count,
-			bounding_surfaces,
-			surface_flags,
-			temporary_cluster_count,
-			temporary_cluster_indices);
+		if (location.cluster_index != NONE)
+		{
+			temporary_cluster_count = structure_clusters_in_sphere(
+				location.cluster_index,
+				bounding_sphere_center,
+				bounding_sphere_radius,
+				MAXIMUM_CLUSTERS_PER_STRUCTURE,
+				temporary_cluster_indices);
+
+			surface_count = structure_visibility_build_surfaces_traverse_clusters(
+				surface_indices,
+				maximum_count,
+				bounding_sphere_center,
+				bounding_sphere_radius,
+				bounding_box,
+				bounding_surface_count,
+				bounding_surfaces,
+				surface_flags,
+				temporary_cluster_count,
+				temporary_cluster_indices);
+		}
+		else
+		{
+			surface_count = structure_visibility_build_surfaces_traverse_node(
+				0,
+				&structure_bsp->world_bounds,
+				surface_flags,
+				surface_indices,
+				maximum_count,
+				bounding_sphere_center,
+				bounding_sphere_radius,
+				bounding_box,
+				bounding_surface_count,
+				bounding_surfaces,
+				_intersection_partial);
+		}
 	}
 
-	return structure_visibility_build_surfaces_traverse_node(
-		0,
-		&structure_bsp->world_bounds,
-		surface_flags,
-		surface_indices,
-		maximum_count,
-		bounding_sphere_center,
-		bounding_sphere_radius,
-		bounding_box,
-		bounding_surface_count,
-		bounding_surfaces,
-		_intersection_partial);
+	return surface_count;
 }
 
 static short structure_visibility_build_surfaces_traverse_node(
@@ -788,7 +794,7 @@ static short structure_visibility_build_surfaces_traverse_leaf(
 			{
 				if (surface_count >= maximum_count)
 				{
-					return surface_count;
+					break;
 				}
 
 				BIT_VECTOR_SET_FLAG(surface_flags, surface_index, TRUE);
@@ -849,42 +855,42 @@ static short planes_intersect_rectangle(
 
 		if (plane.n.i * local_bounds.x0 + plane.n.j * local_bounds.y0 + plane.n.k * local_bounds.z0 - plane.d < 0.f)
 		{
-			corners_outside |= FLAG(0);
+			SET_FLAG(corners_outside, 0, TRUE);
 		}
 
 		if (plane.n.i * local_bounds.x1 + plane.n.j * local_bounds.y0 + plane.n.k * local_bounds.z0 - plane.d < 0.f)
 		{
-			corners_outside |= FLAG(1);
+			SET_FLAG(corners_outside, 1, TRUE);
 		}
 
 		if (plane.n.i * local_bounds.x0 + plane.n.j * local_bounds.y1 + plane.n.k * local_bounds.z0 - plane.d < 0.f)
 		{
-			corners_outside |= FLAG(2);
+			SET_FLAG(corners_outside, 2, TRUE);
 		}
 
 		if (plane.n.i * local_bounds.x1 + plane.n.j * local_bounds.y1 + plane.n.k * local_bounds.z0 - plane.d < 0.f)
 		{
-			corners_outside |= FLAG(3);
+			SET_FLAG(corners_outside, 3, TRUE);
 		}
 
 		if (plane.n.i * local_bounds.x0 + plane.n.j * local_bounds.y0 + plane.n.k * local_bounds.z1 - plane.d < 0.f)
 		{
-			corners_outside |= FLAG(4);
+			SET_FLAG(corners_outside, 4, TRUE);
 		}
 
 		if (plane.n.i * local_bounds.x1 + plane.n.j * local_bounds.y0 + plane.n.k * local_bounds.z1 - plane.d < 0.f)
 		{
-			corners_outside |= FLAG(5);
+			SET_FLAG(corners_outside, 5, TRUE);
 		}
 
 		if (plane.n.i * local_bounds.x0 + plane.n.j * local_bounds.y1 + plane.n.k * local_bounds.z1 - plane.d < 0.f)
 		{
-			corners_outside |= FLAG(6);
+			SET_FLAG(corners_outside, 6, TRUE);
 		}
 
 		if (plane.n.i * local_bounds.x1 + plane.n.j * local_bounds.y1 + plane.n.k * local_bounds.z1 - plane.d < 0.f)
 		{
-			corners_outside |= FLAG(7);
+			SET_FLAG(corners_outside, 7, TRUE);
 		}
 
 		if (corners_outside == MASK(NUMBER_OF_VERTICES_PER_CUBE))

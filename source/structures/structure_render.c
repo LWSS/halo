@@ -96,18 +96,22 @@ static boolean compare_surface_indices(
 	long surface_index0,
 	long surface_index1)
 {
+	boolean result;
+
 	if (surface_index0 < surface_index1)
 	{
-		return FALSE;
+		result = FALSE;
 	}
 	else if (surface_index1 < surface_index0)
 	{
-		return TRUE;
+		result = TRUE;
 	}
 	else
 	{
-		return FALSE;
+		result = FALSE;
 	}
+
+	return result;
 }
 
 static void structure_render_dynamic_triangles_from_bitvector(

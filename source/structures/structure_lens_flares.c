@@ -114,16 +114,16 @@ boolean build_structure_lens_flares(
 						switch (shader->base.type)
 						{
 						case _shader_type_environment:
-							lens_flare = &((struct shader_environment *)shader_get_and_verify_type(shader, _shader_type_environment))->environment.lens_flare;
-							lens_flare_spacing = ((struct shader_environment *)shader_get_and_verify_type(shader, _shader_type_environment))->environment.lens_flare_spacing;
+							lens_flare = &shader_environment_get(shader)->environment.lens_flare;
+							lens_flare_spacing = shader_environment_get(shader)->environment.lens_flare_spacing;
 							break;
 						case _shader_type_transparent_generic:
-							lens_flare = &((struct shader_transparent_generic *)shader_get_and_verify_type(shader, _shader_type_transparent_generic))->generic.lens_flare;
-							lens_flare_spacing = ((struct shader_transparent_generic *)shader_get_and_verify_type(shader, _shader_type_transparent_generic))->generic.lens_flare_spacing;
+							lens_flare = &shader_transparent_generic_get(shader)->generic.lens_flare;
+							lens_flare_spacing = shader_transparent_generic_get(shader)->generic.lens_flare_spacing;
 							break;
 						case _shader_type_transparent_chicago:
-							lens_flare = &((struct shader_transparent_chicago *)shader_get_and_verify_type(shader, _shader_type_transparent_chicago))->chicago.lens_flare;
-							lens_flare_spacing = ((struct shader_transparent_chicago *)shader_get_and_verify_type(shader, _shader_type_transparent_chicago))->chicago.lens_flare_spacing;
+							lens_flare = &shader_transparent_chicago_get(shader)->chicago.lens_flare;
+							lens_flare_spacing = shader_transparent_chicago_get(shader)->chicago.lens_flare_spacing;
 							break;
 						}
 
