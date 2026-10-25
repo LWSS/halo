@@ -297,7 +297,7 @@ real linear_to_non_linear_alpha(
 void game_engine_initialize(
 	struct game_variant *variant)
 {
-	csmemset(&game_engine_globals, 0, sizeof(game_engine_globals));
+	memset(&game_engine_globals, 0, sizeof(game_engine_globals));
 	game_engine_globals.mode = game_engine_mode_active;
 
 	if (variant && variant->game_engine_index)
@@ -306,6 +306,8 @@ void game_engine_initialize(
 		game_engine_variant_cleanup(&global_variant);
 		game_engine = game_engines[variant->game_engine_index];
 	}
+
+	return;
 }
 
 void game_engine_dispose(
@@ -320,6 +322,8 @@ void game_engine_dispose(
 
 		game_engine = NULL;
 	}
+
+	return;
 }
 
 static void initialize_player_multiplayer_data(
@@ -332,7 +336,9 @@ static void initialize_player_multiplayer_data(
 	player->multiplayer.speed_multiplier = 1.f;
 	player->multiplayer.teleporter_index = NONE;
 	player->multiplayer.player_display_index = NONE;
-	csmemset(&player->statistics.multiplayer_statistics, 0, sizeof(long));
+	memset(&player->statistics.multiplayer_statistics, 0, sizeof(long));
+
+	return;
 }
 
 static void game_engine_build_lighting(
@@ -356,8 +362,8 @@ static void game_engine_build_lighting(
 	{
 		if (global_variant.game_engine_index == _game_engine_race)
 		{
-			struct scenario *scenario = global_scenario_get();
 			short flag_index;
+			struct scenario *scenario = global_scenario_get();
 
 			for (flag_index = 0; flag_index < scenario->netgame_flags.count; flag_index++)
 			{
@@ -406,6 +412,8 @@ static void game_engine_build_lighting(
 	{
 		SET_FLAG(game_engine_globals.flags, _game_engine_9_or_more_players_bit, TRUE);
 	}
+
+	return;
 }
 
 void game_engine_initialize_for_new_map(
@@ -415,7 +423,7 @@ void game_engine_initialize_for_new_map(
 	{
 		game_engine_verify_current_map();
 		game_engine_intialize_queued_sounds();
-		csmemset(global_goal, 0, sizeof(global_goal));
+		memset(global_goal, 0, sizeof(global_goal));
 		game_engine_globals.current_team_to_add = 0;
 		timeout_for_endgame_sound = 0;
 
@@ -427,6 +435,8 @@ void game_engine_initialize_for_new_map(
 
 		game_engine_predict_resources();
 	}
+
+	return;
 }
 
 void game_engine_dispose_from_old_map(
@@ -436,6 +446,8 @@ void game_engine_dispose_from_old_map(
 	{
 		game_engine->dispose_from_old_map();
 	}
+
+	return;
 }
 
 void game_engine_player_added(
@@ -474,6 +486,8 @@ void game_engine_player_added(
 			game_engine->player_added(player_index);
 		}
 	}
+
+	return;
 }
 
 void game_engine_game_ending(
@@ -483,6 +497,8 @@ void game_engine_game_ending(
 	{
 		game_engine->game_ending();
 	}
+
+	return;
 }
 
 void game_engine_game_starting(
@@ -497,6 +513,8 @@ void game_engine_game_starting(
 
 		game_engine_build_lighting();
 	}
+
+	return;
 }
 
 long players_in_game(
@@ -638,6 +656,8 @@ void game_engine_statistics_append(
 	{
 		game_engine->statistics_append(permanent_statistics, game_statistics);
 	}
+
+	return;
 }
 
 void game_engine_handle_client_message(
@@ -649,6 +669,8 @@ void game_engine_handle_client_message(
 	{
 		game_engine->handle_client_message(player_index, encoded_message, encoded_message_size);
 	}
+
+	return;
 }
 
 void game_engine_handle_server_message(
@@ -659,6 +681,8 @@ void game_engine_handle_server_message(
 	{
 		game_engine->handle_server_message(encoded_message, encoded_message_size);
 	}
+
+	return;
 }
 
 int sort_statistic_buffer(
@@ -822,11 +846,11 @@ long populate_statistic_buffer(
 
 	if (statistic == _postgame_statistic_ranking)
 	{
-		qsort(statistic_buffer, player_count, sizeof(struct statistic_buffer), (int (__cdecl *)(void const *, void const *))sort_statistic_buffer_ranking);
+		qsort(statistic_buffer, player_count, sizeof(*statistic_buffer), (int (__cdecl *)(void const *, void const *))sort_statistic_buffer_ranking);
 	}
 	else
 	{
-		qsort(statistic_buffer, player_count, sizeof(struct statistic_buffer), (int (__cdecl *)(void const *, void const *))sort_statistic_buffer);
+		qsort(statistic_buffer, player_count, sizeof(*statistic_buffer), (int (__cdecl *)(void const *, void const *))sort_statistic_buffer);
 	}
 
 	for (index = 0; index < player_count; index++)
@@ -1011,6 +1035,8 @@ static void game_engine_generate_title_string(
 	}
 
 	title_string[MAXIMUM_TITLE_STRING_LENGTH - 1] = 0;
+
+	return;
 }
 
 long postgame_statistic_get_rating(
@@ -1104,7 +1130,7 @@ static long select_players_to_display(
 					memmove(
 						&statistic_buffer[index],
 						&statistic_buffer[index + 1],
-						sizeof(struct statistic_buffer) * (maximum_count - (index + 1)));
+						sizeof(*statistic_buffer) * (maximum_count - (index + 1)));
 					statistic_buffer[maximum_count - 1] = outside_range[outside_index];
 					break;
 				}
@@ -1115,7 +1141,7 @@ static long select_players_to_display(
 	memcpy(
 		out_statistic_buffer,
 		statistic_buffer,
-		sizeof(struct statistic_buffer) * MIN(maximum_count, player_count));
+		sizeof(*statistic_buffer) * MIN(maximum_count, player_count));
 
 	return MIN(maximum_count, player_count);
 }
@@ -1135,6 +1161,8 @@ static void drawline(
 	bounds.y1 = (line + 1) * line_height + line_spacing;
 	draw_string_set_format(NONE, justification, 0);
 	rasterizer_draw_unicode_string(&bounds, NULL, NULL, 0, text);
+
+	return;
 }
 
 static void get_selected_color(
@@ -1144,6 +1172,8 @@ static void get_selected_color(
 	selected_color->green = 0.96f;
 	selected_color->blue = 0.96f;
 	selected_color->alpha = 1.f;
+
+	return;
 }
 
 void get_postgame_hilite_colors(
@@ -1160,6 +1190,8 @@ void get_postgame_hilite_colors(
 	column_hilite->blue = 0.f;
 	column_hilite->alpha = 1.f;
 	get_selected_color(winner);
+
+	return;
 }
 
 void game_engine_post_rasterize_post_game(
@@ -1365,6 +1397,8 @@ void game_engine_post_rasterize_post_game(
 			}
 		}
 	}
+
+	return;
 }
 
 static boolean find_closest_player_callback(
@@ -1500,6 +1534,8 @@ static void internal_rasterize_target_name(
 		buffer[11] = 0;
 		game_engine_rasterize_message(buffer, linear_to_non_linear_alpha(display_count * 0.1f) * 0.5f);
 	}
+
+	return;
 }
 
 static boolean internal_rasterize_score(
@@ -1735,6 +1771,8 @@ static void game_engine_post_rasterize_in_game(
 	}
 
 	game_engine_globals.score_alpha[local_player_index] = alpha;
+
+	return;
 }
 
 void game_engine_post_rasterize_objects(
@@ -1744,6 +1782,8 @@ void game_engine_post_rasterize_objects(
 	{
 		game_engine->post_rasterize();
 	}
+
+	return;
 }
 
 void game_engine_post_rasterize(
@@ -1766,6 +1806,8 @@ void game_engine_post_rasterize(
 			break;
 		}
 	}
+
+	return;
 }
 
 static boolean can_delete_item(
@@ -1819,6 +1861,8 @@ static void game_engine_update_purge(
 			}
 		}
 	}
+
+	return;
 }
 
 static void update_weapon_inventory(
@@ -1843,6 +1887,8 @@ static void update_weapon_inventory(
 			}
 		}
 	}
+
+	return;
 }
 
 static void game_engine_update_weapons(
@@ -1881,15 +1927,17 @@ static void game_engine_update_weapons(
 			}
 		}
 	}
+
+	return;
 }
 
 static long item_collection_get_total(
 	struct item_collection_definition *item_collection)
 {
+	long permutation_index;
 	struct item_permutation_definition *permutations = (struct item_permutation_definition *)item_collection->permutations.address;
 	long permutation_count = item_collection->permutations.count;
 	long total = 0;
-	long permutation_index;
 
 	for (permutation_index = 0; permutation_index < permutation_count; permutation_index++)
 	{
@@ -1902,11 +1950,11 @@ static long item_collection_get_total(
 static long random_item(
 	long item_collection_index)
 {
+	long permutation_index;
 	struct item_collection_definition *item_collection = item_collection_definition_get(item_collection_index);
 	long permutation_count = item_collection->permutations.count;
 	long random_value = random_range(0, (short)item_collection_get_total(item_collection));
 	struct item_permutation_definition *permutations = (struct item_permutation_definition *)item_collection->permutations.address;
-	long permutation_index;
 
 	for (permutation_index = 0; permutation_index < permutation_count; permutation_index++)
 	{
@@ -1982,8 +2030,8 @@ boolean match_game_type(
 static void game_engine_update_item_spawn(
 	void)
 {
-	struct scenario *scenario = global_scenario_get();
 	short equipment_index;
+	struct scenario *scenario = global_scenario_get();
 
 	for (equipment_index = 0; equipment_index < scenario->netgame_equipment.count; equipment_index++)
 	{
@@ -2030,6 +2078,8 @@ static void game_engine_update_item_spawn(
 			}
 		}
 	}
+
+	return;
 }
 
 void game_engine_load_stage(
@@ -2046,6 +2096,8 @@ void game_engine_load_stage(
 	{
 		main_reset_map();
 	}
+
+	return;
 }
 
 void game_engine_playlist_begin(
@@ -2058,6 +2110,8 @@ void game_engine_playlist_begin(
 	{
 		main_reset_map();
 	}
+
+	return;
 }
 
 boolean game_engine_get_current_stage(
@@ -2066,7 +2120,7 @@ boolean game_engine_get_current_stage(
 {
 	match_assert("c:\\halo\\SOURCE\\game\\game_engine.c", 2328, variant && map_name);
 
-	csmemcpy(variant, &global_stage.game_variant, sizeof(struct game_variant));
+	memcpy(variant, &global_stage.game_variant, sizeof(*variant));
 	csstrncpy(map_name, global_stage.map_name, sizeof(global_stage.map_name) - 1);
 	map_name[sizeof(global_stage.map_name) - 1] = 0;
 
@@ -2088,6 +2142,8 @@ static void game_engine_update_player_no_shield(
 			unit->object.maximum_shield_vitality = 0.f;
 		}
 	}
+
+	return;
 }
 
 void game_engine_update_player_always_invis(
@@ -2114,6 +2170,8 @@ void game_engine_update_player_always_invis(
 			}
 		}
 	}
+
+	return;
 }
 
 void game_engine_end_game(
@@ -2126,6 +2184,8 @@ void game_engine_end_game(
 		game_engine_play_multiplayer_sound(_multiplayer_sound_game_over);
 		ui_widgets_close_all();
 	}
+
+	return;
 }
 
 void game_engine_update_non_deterministic(
@@ -2167,6 +2227,8 @@ void game_engine_update_non_deterministic(
 			break;
 		}
 	}
+
+	return;
 }
 
 void game_engine_update(
@@ -2272,6 +2334,8 @@ void game_engine_update(
 			match_unreachable("c:\\halo\\SOURCE\\game\\game_engine.c", 2563);
 		}
 	}
+
+	return;
 }
 
 boolean game_engine_allow_pick_up(
@@ -2299,6 +2363,8 @@ void game_engine_player_damaged_player(
 	{
 		game_engine->player_damaged_player(killing_player_index, dead_player_index, friendly_fire);
 	}
+
+	return;
 }
 
 void game_engine_player_killed(
@@ -2402,8 +2468,8 @@ void game_engine_player_killed(
 			}
 			else if (message == game_engine_message_killed_by_player)
 			{
-				struct player_datum *killing_player = player_get(killing_player_index);
 				long killing_message;
+				struct player_datum *killing_player = player_get(killing_player_index);
 
 				if (killing_player->statistics.multiple_kills >= 4)
 				{
@@ -2429,12 +2495,12 @@ void game_engine_player_killed(
 				game_show_score_extended(killing_player_index, killing_message, dead_player_index);
 			}
 
-			// This match is a bit suspect, but the code here is weird.
-			// The 2 above `game_show_score_extended()` calls need to be inlined
-			// The only way it can be inlined, with some pretty heavy investigation by the AI, is with a loop that contains the calls
+			// the loop is what gets both game_show_score_extended() calls above inlined
 			message = NONE;
 		} while (message != NONE);
 	}
+
+	return;
 }
 
 static boolean multiplayer_message_internal(
@@ -2476,6 +2542,8 @@ static void multiplayer_message(
 			hud_print_message(player->local_player_index, buffer);
 		}
 	}
+
+	return;
 }
 
 static void game_show_score_one_player(
@@ -2487,6 +2555,8 @@ static void game_show_score_one_player(
 	{
 		multiplayer_message(player_index, message, message_data);
 	}
+
+	return;
 }
 
 void game_show_score_team(
@@ -2505,6 +2575,8 @@ void game_show_score_team(
 			game_show_score_one_player(iterator.index, message, NONE);
 		}
 	}
+
+	return;
 }
 
 void game_show_score_you_ally_enemy(
@@ -2514,9 +2586,9 @@ void game_show_score_you_ally_enemy(
 	long enemy_message,
 	long message_data)
 {
-	struct player_datum *player = player_get(player_index);
 	struct data_iterator iterator;
 	struct player_datum *other_player;
+	struct player_datum *player = player_get(player_index);
 
 	match_assert("c:\\halo\\SOURCE\\game\\game_engine.c", 2842, NONE != player_index);
 
@@ -2533,6 +2605,8 @@ void game_show_score_you_ally_enemy(
 			game_show_score_one_player(iterator.index, game_team_is_enemy((short)player->team_index, (short)other_player->team_index) ? enemy_message : ally_message, message_data);
 		}
 	}
+
+	return;
 }
 
 void game_show_score_extended(
@@ -2555,6 +2629,8 @@ void game_show_score_extended(
 			game_show_score_one_player(iterator.index, message, message_data);
 		}
 	}
+
+	return;
 }
 
 void game_show_score(
@@ -2562,6 +2638,8 @@ void game_show_score(
 	long message)
 {
 	game_show_score_extended(player_index, message, NONE);
+
+	return;
 }
 
 static boolean game_engine_player_is_odd_man_out(
@@ -2707,10 +2785,10 @@ long find_netgame_flags(
 	long max,
 	long *flags)
 {
+	short flag_index;
 	real distance_squared = distance * distance;
 	long count = 0;
 	struct scenario *scenario = global_scenario_get();
-	short flag_index;
 
 	for (flag_index = 0; flag_index < scenario->netgame_flags.count; flag_index++)
 	{
@@ -2764,6 +2842,8 @@ void game_engine_prespawn_player_update(
 			player->team_index = player->local_player_index % 2;
 		}
 	}
+
+	return;
 }
 
 boolean game_engine_running(
@@ -2779,9 +2859,9 @@ static void handle_custom_starting_equipment(
 	long *frag_count,
 	long *plasma_count)
 {
-	struct scenario *scenario = global_scenario_get();
 	struct scenario_starting_equipment *starting_equipment;
 	long equipment_index;
+	struct scenario *scenario = global_scenario_get();
 
 	for (equipment_index = 0; equipment_index < scenario->scenario_starting_equipment.count; equipment_index++)
 	{
@@ -2789,8 +2869,8 @@ static void handle_custom_starting_equipment(
 
 		if (match_game_type(game_engine_get_type(), NUMBEROF(starting_equipment->game_type), starting_equipment->game_type))
 		{
-			boolean first_weapon = TRUE;
 			long item_collection_index;
+			boolean first_weapon = TRUE;
 
 			for (item_collection_index = 0; item_collection_index < NUMBEROF(starting_equipment->item_collection); item_collection_index++)
 			{
@@ -2835,6 +2915,8 @@ static void handle_custom_starting_equipment(
 			break;
 		}
 	}
+
+	return;
 }
 
 void game_engine_postspawn_player_update(
@@ -2848,13 +2930,13 @@ void game_engine_postspawn_player_update(
 		}
 		else
 		{
+			long frag_count;
+			long plasma_count;
 			long unit_index = player_get(player_index)->unit_index;
 			struct game_globals_grenade *frag_grenade = TAG_BLOCK_GET_ELEMENT(&scenario_get_game_globals()->grenades, _unit_grenade_human_fragmentation, struct game_globals_grenade);
 			struct game_globals_grenade *plasma_grenade = TAG_BLOCK_GET_ELEMENT(&scenario_get_game_globals()->grenades, _unit_grenade_covenant_plasma, struct game_globals_grenade);
 			long frag_maximum = frag_grenade->maximum_count;
 			long plasma_maximum = plasma_grenade->maximum_count;
-			long frag_count;
-			long plasma_count;
 
 			if (TEST_FLAG(game_engine_globals.flags, _game_engine_9_or_more_players_bit))
 			{
@@ -2919,6 +3001,8 @@ void game_engine_postspawn_player_update(
 			}
 		}
 	}
+
+	return;
 }
 
 real game_engine_get_damage_multiplier(
@@ -2995,8 +3079,8 @@ static void game_engine_update_teleporter(
 
 	if (player->unit_index != NONE)
 	{
-		struct unit_datum *unit = unit_get(player->unit_index);
 		long source_flag_index;
+		struct unit_datum *unit = unit_get(player->unit_index);
 
 		if (player->multiplayer.teleporter_index != NONE)
 		{
@@ -3117,17 +3201,20 @@ static void game_engine_update_teleporter(
 			}
 		}
 	}
+
+	return;
 }
 
 real get_blink_alpha(
 	void)
 {
-	return (real)sin((long)(system_milliseconds() % 2700) * (3.14159265358979 / 2700));
+	return sine((real)((long)(system_milliseconds() % 2700) * (3.14159265358979 / 2700)));
 }
 
 static void game_engine_press_start_to_begin(
 	void)
 {
+	return;
 }
 
 void game_engine_nonplayer_post_rasterize(
@@ -3165,17 +3252,19 @@ void game_engine_nonplayer_post_rasterize(
 			break;
 		}
 	}
+
+	return;
 }
 
 real game_engine_get_distance_rating_for_spawn(
 	long player_index,
 	struct scenario_player *starting_location)
 {
+	struct data_iterator iterator;
+	struct player_datum *other_player;
 	boolean teams = game_engine ? global_variant.universal_variant.teams : FALSE;
 	struct player_datum *player = player_get(player_index);
 	real rating = 1.f;
-	struct data_iterator iterator;
-	struct player_datum *other_player;
 
 	data_iterator_new(&iterator, player_data);
 
@@ -3222,10 +3311,10 @@ static real game_engine_get_friendly_bonus(
 	long player_index,
 	struct scenario_player *starting_location)
 {
-	struct player_datum *player = player_get(player_index);
-	real bonus = 0.f;
 	struct data_iterator iterator;
 	struct player_datum *other_player;
+	struct player_datum *player = player_get(player_index);
+	real bonus = 0.f;
 
 	data_iterator_new(&iterator, player_data);
 
@@ -3258,8 +3347,8 @@ static real default_starting_location_rate_function(
 	long player_index,
 	struct scenario_player *starting_location)
 {
-	struct player_datum *player = player_get(player_index);
 	real rating;
+	struct player_datum *player = player_get(player_index);
 
 	if (game_engine_test_flag(_game_engine_spawn_point_obeys_teams_bit) && player->team_index != starting_location->team_index)
 	{
@@ -3287,12 +3376,12 @@ static boolean nearby_vehicle(
 	long player_index,
 	struct scenario_player *starting_location)
 {
-	struct player_datum *player = player_get(player_index);
-	unsigned long object_mask = _object_mask_unit | _object_mask_item | _object_mask_control;
 	long object_indices[16];
 	struct location location;
 	short object_count;
 	short object_index;
+	struct player_datum *player = player_get(player_index);
+	unsigned long object_mask = _object_mask_unit | _object_mask_item | _object_mask_control;
 
 	scenario_location_from_point(&location, &starting_location->position);
 	object_count = objects_in_sphere(0, object_mask, &location, &starting_location->position, 0.1f, object_indices, NUMBEROF(object_indices));
@@ -3347,8 +3436,8 @@ void game_engine_rasterize_message(
 	wchar_t const *string,
 	real alpha)
 {
-	long font_index = local_player_count() ? hud_globals->messaging.multi_player_font.index : hud_globals->messaging.single_player_font.index;
 	real_argb_color color;
+	long font_index = local_player_count() ? hud_globals->messaging.multi_player_font.index : hud_globals->messaging.single_player_font.index;
 	rectangle2d bounds = render.camera.window_bounds;
 	long terminal_font_index = interface_get_tag_index(_interface_font_terminal);
 
@@ -3365,6 +3454,8 @@ void game_engine_rasterize_message(
 	rasterizer_draw_unicode_string(&bounds, NULL, NULL, 0, string);
 	draw_string_set_format(NONE, 0, 0);
 	draw_string_set_tab_stops(NULL, 0);
+
+	return;
 }
 
 boolean game_engine_picking_up(
@@ -3447,8 +3538,8 @@ short game_engine_player_get_custom_motion_sensor_positions(
 
 	if (game_engine && global_variant.universal_variant.goal_radar == _radar_motion_tracker && player_index != NONE)
 	{
-		struct player_datum *player = player_get(player_index);
 		long goal_index;
+		struct player_datum *player = player_get(player_index);
 
 		for (goal_index = 0; goal_index < MAXIMUM_NETGAME_GOALS; goal_index++)
 		{
@@ -3499,6 +3590,8 @@ void game_engine_switch_to_postgame(
 			game_engine_globals.mode = game_engine_mode_postgame_rasterize;
 		}
 	}
+
+	return;
 }
 
 struct game_variant *game_engine_get_variant(
@@ -3537,12 +3630,16 @@ void game_engine_set_goal_position(
 	global_goal[index].position.z = vertical_offset + global_goal[index].position.z + 0.63f;
 	global_goal[index].team_index = team_index;
 	global_goal[index].player_index = player_index;
+
+	return;
 }
 
 void game_engine_clear_goal_position(
 	short index)
 {
-	csmemset(&global_goal[index], 0, sizeof(struct netgame_goal));
+	memset(&global_goal[index], 0, sizeof(global_goal[index]));
+
+	return;
 }
 
 struct game_variant *global_autogenerate_list = NULL;
@@ -3553,7 +3650,7 @@ struct game_variant game_engine_get_variant_by_name(
 {
 	struct game_variant result;
 
-	csmemset(&result, 0, sizeof(result));
+	memset(&result, 0, sizeof(result));
 
 	if (!csstrcmp(name, "race"))
 	{
@@ -3649,6 +3746,8 @@ void game_engine_render_nav_points(
 			}
 		}
 	}
+
+	return;
 }
 
 static boolean game_engine_infinite_grenades_internal(
@@ -3719,10 +3818,10 @@ boolean game_engine_has_shield(
 long weapon_definition_index_to_list_index(
 	long definition_index)
 {
+	long list_index;
 	struct game_globals *game_globals = scenario_get_game_globals();
 	struct tag_reference *weapons = game_globals->weapon_list.count ? TAG_BLOCK_GET_ELEMENT(&game_globals->weapon_list, 0, struct tag_reference) : NULL;
 	long result = NONE;
-	long list_index;
 
 	for (list_index = 0; list_index < game_globals->weapon_list.count; list_index++)
 	{
@@ -3756,12 +3855,12 @@ long game_engine_remap_vehicle(
 
 	if (game_engine)
 	{
+		struct tag_reference *vehicle;
 		struct game_globals *game_globals = scenario_get_game_globals();
 		struct game_globals_multiplayer_information *multiplayer_information = TAG_BLOCK_GET_ELEMENT(&game_globals->multiplayer_information, 0, struct game_globals_multiplayer_information);
 		struct tag_reference *warthog = TAG_BLOCK_GET_ELEMENT(&multiplayer_information->vehicles, _multiplayer_vehicle_warthog, struct tag_reference);
 		struct tag_reference *ghost = TAG_BLOCK_GET_ELEMENT(&multiplayer_information->vehicles, _multiplayer_vehicle_ghost, struct tag_reference);
 		struct tag_reference *scorpion = TAG_BLOCK_GET_ELEMENT(&multiplayer_information->vehicles, _multiplayer_vehicle_scorpion, struct tag_reference);
-		struct tag_reference *vehicle;
 
 		if (vehicle_definition_index != warthog->index && vehicle_definition_index != ghost->index && vehicle_definition_index != scorpion->index)
 		{
@@ -3775,6 +3874,7 @@ long game_engine_remap_vehicle(
 			break;
 		case _game_engine_vehicles_warthog:
 			vehicle = TAG_BLOCK_GET_ELEMENT(&multiplayer_information->vehicles, _multiplayer_vehicle_warthog, struct tag_reference);
+
 			if (vehicle->index != result)
 			{
 				result = NONE;
@@ -3782,6 +3882,7 @@ long game_engine_remap_vehicle(
 			break;
 		case _game_engine_vehicles_ghost:
 			vehicle = TAG_BLOCK_GET_ELEMENT(&multiplayer_information->vehicles, _multiplayer_vehicle_ghost, struct tag_reference);
+
 			if (vehicle->index != result)
 			{
 				result = NONE;
@@ -3789,6 +3890,7 @@ long game_engine_remap_vehicle(
 			break;
 		case _game_engine_vehicles_tank:
 			vehicle = TAG_BLOCK_GET_ELEMENT(&multiplayer_information->vehicles, _multiplayer_vehicle_scorpion, struct tag_reference);
+
 			if (vehicle->index != result)
 			{
 				result = NONE;
@@ -3803,9 +3905,9 @@ long game_engine_remap_vehicle(
 long game_engine_remap_equipment(
 	long equipment_definition_index)
 {
+	long result;
 	struct equipment_definition *definition = equipment_definition_index == NONE ? NULL : equipment_definition_get(equipment_definition_index);
 	long list_index = weapon_definition_index_to_list_index(equipment_definition_index);
-	long result;
 
 	if (list_index == _weapon_list_frag_grenade || list_index == _weapon_list_plasma_grenade)
 	{
@@ -3873,8 +3975,8 @@ long game_engine_remap_equipment(
 long game_engine_remap_weapon(
 	long weapon_definition_index)
 {
-	long list_index = weapon_definition_index_to_list_index(weapon_definition_index);
 	long result;
+	long list_index = weapon_definition_index_to_list_index(weapon_definition_index);
 
 	if (list_index == _weapon_list_ball || list_index == _weapon_list_flag || list_index == NONE)
 	{
@@ -4087,13 +4189,15 @@ void game_engine_state_message(
 
 	player->multiplayer.state_message = message;
 	player->multiplayer.state_message_data = message_data;
+
+	return;
 }
 
 real_rgb_color game_engine_player_get_change_color(
 	long player_index)
 {
-	struct player_datum *player = player_get(player_index);
 	real_rgb_color color;
+	struct player_datum *player = player_get(player_index);
 
 	if (global_variant.universal_variant.teams)
 	{
@@ -4132,8 +4236,8 @@ boolean game_engine_player_has_flag(
 
 		if (player->unit_index != NONE)
 		{
-			struct unit_datum *unit = unit_get(player->unit_index);
 			long weapon_index;
+			struct unit_datum *unit = unit_get(player->unit_index);
 
 			for (weapon_index = 0; weapon_index < MAXIMUM_WEAPONS_PER_UNIT; weapon_index++)
 			{
@@ -4166,6 +4270,8 @@ void game_engine_player_depower_active_camo(
 			}
 		}
 	}
+
+	return;
 }
 
 wchar_t *get_place_name(
@@ -4222,8 +4328,8 @@ struct game_engine_place game_engine_get_place(
 	long player_index,
 	enum get_score_type get_score_type)
 {
-	struct player_datum *player = player_get(player_index);
 	struct game_engine_place place;
+	struct player_datum *player = player_get(player_index);
 	boolean all_tied = TRUE;
 	boolean tied = FALSE;
 	long group_count = 1;
@@ -4356,10 +4462,10 @@ long game_engine_did_player_win_default(
 
 	if (global_variant.universal_variant.teams)
 	{
+		long winning_team_index;
 		long red_score = game_engine_get_team_score(0);
 		long blue_score = game_engine_get_team_score(1);
 		struct player_datum *player = player_get(player_index);
-		long winning_team_index;
 
 		if (multiple_teams_alive())
 		{
@@ -4453,14 +4559,16 @@ static void netgame_flag_verify_team_exists(
 	{
 		error(_error_silent, string, team);
 	}
+
+	return;
 }
 
 static void netgame_flag_verify_no_team_duplicates(
 	short type,
 	char *string)
 {
-	struct scenario *scenario = global_scenario_get();
 	short flag_index;
+	struct scenario *scenario = global_scenario_get();
 
 	for (flag_index = 0; flag_index < scenario->netgame_flags.count; flag_index++)
 	{
@@ -4481,6 +4589,8 @@ static void netgame_flag_verify_no_team_duplicates(
 			}
 		}
 	}
+
+	return;
 }
 
 static void netgame_flag_verify_team_range(
@@ -4489,8 +4599,8 @@ static void netgame_flag_verify_team_range(
 	short max,
 	char *string)
 {
-	struct scenario *scenario = global_scenario_get();
 	short flag_index;
+	struct scenario *scenario = global_scenario_get();
 
 	for (flag_index = 0; flag_index < scenario->netgame_flags.count; flag_index++)
 	{
@@ -4501,6 +4611,8 @@ static void netgame_flag_verify_team_range(
 			error(_error_silent, string, flag->team_index);
 		}
 	}
+
+	return;
 }
 
 static void netgame_verify_spawn_points(
@@ -4509,9 +4621,9 @@ static void netgame_verify_spawn_points(
 	short count,
 	char *string)
 {
+	short starting_location_index;
 	short starting_location_count = player_get_starting_location_count();
 	long found_count = 0;
-	short starting_location_index;
 
 	for (starting_location_index = 0; starting_location_index < starting_location_count; starting_location_index++)
 	{
@@ -4527,15 +4639,17 @@ static void netgame_verify_spawn_points(
 	{
 		error(_error_silent, string, found_count, count);
 	}
+
+	return;
 }
 
 static void netgame_verify_equipment(
 	short game_type,
 	char *string)
 {
+	short equipment_index;
 	long found_count = 0;
 	struct scenario *scenario = global_scenario_get();
-	short equipment_index;
 
 	for (equipment_index = 0; equipment_index < scenario->netgame_equipment.count; equipment_index++)
 	{
@@ -4551,6 +4665,8 @@ static void netgame_verify_equipment(
 	{
 		error(_error_silent, string);
 	}
+
+	return;
 }
 
 static void game_engine_verify_current_map(
@@ -4578,12 +4694,16 @@ static void game_engine_verify_current_map(
 	netgame_verify_equipment(_game_engine_oddball, "NETGAME MAP FAILURE: failed to find any equipment for oddball");
 	netgame_verify_equipment(_game_engine_king, "NETGAME MAP FAILURE: failed to find any equipment for king");
 	netgame_verify_equipment(_game_engine_race, "NETGAME MAP FAILURE: failed to find any equipment for race");
+
+	return;
 }
 
 void game_engine_playlist_initialize(
 	void)
 {
 	game_engine_playlist_next(0, 0, 2);
+
+	return;
 }
 
 void game_engine_playlist_next(
@@ -4607,6 +4727,8 @@ void game_engine_playlist_next(
 	{
 		memcpy(&global_stage.game_variant, &user_selected_variant, sizeof(global_stage.game_variant));
 	}
+
+	return;
 }
 
 struct game_variant build_game_variant_slayer(
@@ -5440,6 +5562,8 @@ void game_engine_override_map_name(
 	{
 		strncpy(global_stage.map_name, map_name, NUMBEROF(global_stage.map_name) - 1);
 	}
+
+	return;
 }
 
 void game_engine_override_game_variant(
@@ -5449,6 +5573,8 @@ void game_engine_override_game_variant(
 	{
 		memcpy(&global_stage.game_variant, variant, sizeof(global_stage.game_variant));
 	}
+
+	return;
 }
 
 static void rasterize_in_game_score_draw_line(
@@ -5485,8 +5611,8 @@ static void rasterize_in_game_score_draw_line(
 
 	if (font_index != NONE)
 	{
-		struct font_header const *font = font_definition_get(font_index);
 		long line_height;
+		struct font_header const *font = font_definition_get(font_index);
 		long first_line = split_screen ? 4 : 8;
 
 		if (split_screen)
@@ -5528,6 +5654,8 @@ static void rasterize_in_game_score_draw_line(
 	}
 
 	draw_string_set_tab_stops(NULL, 0);
+
+	return;
 }
 
 static void game_engine_rasterize_in_game_score(
@@ -5626,6 +5754,8 @@ static void game_engine_rasterize_in_game_score(
 			rasterize_in_game_score_draw_line(buffer, hilite, line_color, statistic_index + 2);
 		}
 	}
+
+	return;
 }
 
 boolean game_engine_hud_draw_messages(
@@ -5721,13 +5851,15 @@ void game_engine_weapon_fired(
 			}
 		}
 	}
+
+	return;
 }
 
 static boolean test_any_gamepad_button(
 	long button_index)
 {
-	boolean result = FALSE;
 	long gamepad_index;
+	boolean result = FALSE;
 
 	for (gamepad_index = 0; gamepad_index < MAXIMUM_GAMEPADS; gamepad_index++)
 	{
@@ -5773,6 +5905,8 @@ void ticks_to_unicode_time_string(
 	}
 
 	usnprintf(buffer, count, L"%s:%s", minutes_buffer, seconds_buffer);
+
+	return;
 }
 
 void game_engine_flag_reset(
@@ -5789,6 +5923,8 @@ void game_engine_flag_reset(
 		weapon->item.last_owned_time = game_time_get();
 		weapon->item.ignore_object_index = NONE;
 	}
+
+	return;
 }
 
 void game_engine_variant_cleanup(
@@ -5833,6 +5969,8 @@ void game_engine_variant_cleanup(
 		memcpy(&test, variant, sizeof(test));
 		error(_error_silent, "NETGAME CODE FAILURE: game_engine_variant_cleanup changed the variant");
 	}
+
+	return;
 }
 
 boolean game_engine_allow_pause(
@@ -5895,6 +6033,8 @@ static void game_engine_predict_resources(
 	{
 		object_definition_predict(game_engine_remap_weapon(weapon_definitions[weapon_index]));
 	}
+
+	return;
 }
 
 boolean game_engine_draw_object_in_motion_sensor(
