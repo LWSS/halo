@@ -162,6 +162,7 @@ void effects_initialize(
 
 	if (effect_data && effect_location_data)
 	{
+		// matches unoptimized builds
 	}
 	else
 	{

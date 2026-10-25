@@ -109,6 +109,7 @@ struct decal_wrap_parameters const decal_wrap_parameters[NUMBER_OF_DECAL_TYPES] 
 
 static struct decal_geometry decal_geometry;
 static struct decal_globals *decal_globals;
+static real const SECONDS_PER_TICK = 1.f / TICKS_PER_SECOND;
 
 /* ---------- private code */
 

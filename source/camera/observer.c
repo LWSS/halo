@@ -49,7 +49,7 @@ static short observer_parameter_real_counts[NUMBER_OF_OBSERVER_PARAMETERS] = {3,
 static short observer_parameter_derivative_real_counts[NUMBER_OF_OBSERVER_PARAMETERS] = {3, 3, 1, 1, 3};
 
 static real const observer_maximum_accelerations[NUMBER_OF_OBSERVER_PARAMETERS] = {1500.f, 1500.f, 100000.f, 100000.f, 100000.f};
-static real const seconds_per_tick = SECONDS_PER_TICK;
+static real const seconds_per_tick = 1.f / TICKS_PER_SECOND;
 
 /* ---------- public code */
 

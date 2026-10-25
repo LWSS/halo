@@ -85,6 +85,7 @@ void particles_initialize(
 
 	if (particle_data)
 	{
+		// matches unoptimized builds
 	}
 	else
 	{

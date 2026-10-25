@@ -14435,7 +14435,7 @@
 { "file_offset": 2463912, "flags": 0, "name": "??_C@_0BD@GHNECCAG@object_index?$CB?$DNNONE?$AA@" },
 { "file_offset": 2463936, "flags": 0, "name": "??_C@_0HA@NOKFPIOB@contrail?9?$DOcontrail_point_counts?$FL@" },
 { "file_offset": 2464048, "flags": 0, "name": "_decal_wrap_parameters" },
-{ "file_offset": 2464112, "flags": 0, "name": "__real@3d088889" },
+{ "file_offset": 2464112, "flags": 0, "name": "_SECONDS_PER_TICK", "static": true },
 { "file_offset": 2464116, "flags": 0, "name": "??_C@_0CE@PKGKLMN@?$CBlayer_check?5?$HM?$HM?5layer?$DN?$DNdecal?9?$DOla@" },
 { "file_offset": 2464152, "flags": 0, "name": "??_C@_0CE@PMCDPOFC@cluster_index?$DN?$DNdecal?9?$DOcluster_in@" },
 { "file_offset": 2464188, "flags": 0, "name": "??_C@_0CA@FFOMHEBD@c?3?2halo?2SOURCE?2effects?2decals?4c?$AA@" },

@@ -27,6 +27,8 @@ enum
 
 /* ---------- macros */
 
+#define SECONDS_PER_TICK (1.f/TICKS_PER_SECOND) /* fake name */
+
 #define antenna_get(index) ((struct antenna_datum *)datum_get(antenna_data, (index))) /* fake name */
 #define antenna_try_and_get(index) ((struct antenna_datum *)datum_try_and_get(antenna_data, (index))) /* fake name */
 

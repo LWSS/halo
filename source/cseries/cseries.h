@@ -101,7 +101,6 @@ enum
 
 /* ---------- macros */
 
-#define SECONDS_PER_TICK (1.f/TICKS_PER_SECOND) /* fake name */
 #define METERS_PER_UNIT 3.048f /* fake name */
 
 #define STRINGIFY_DETAIL(x) #x

@@ -42,6 +42,7 @@ void contrails_initialize(
 
 	if (contrail_data && contrail_point_data)
 	{
+		// matches unoptimized builds
 	}
 	else
 	{

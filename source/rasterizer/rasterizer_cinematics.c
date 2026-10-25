@@ -27,6 +27,10 @@ enum
 	NUMBER_OF_SCRIPT_SCREEN_EFFECT_VALUES = 4, /* fake name */
 };
 
+/* ---------- macros */
+
+#define SECONDS_PER_TICK (1.f/TICKS_PER_SECOND) /* fake name */
+
 /* ---------- structures */
 
 struct cinematic_screen_effect_globals
