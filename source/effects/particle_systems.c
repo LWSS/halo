@@ -28,7 +28,7 @@ PARTICLE_SYSTEMS.C
 /* ---------- structures */
 
 typedef void (*particle_system_update_proc)(struct particle_system_datum *system, real dtime);
-typedef void (*particle_system_particle_creation_proc)(struct particle_system_datum const *system, short type_index, struct ps_particle_datum *particle, struct object_marker const *marker);
+typedef void (*particle_system_particle_creation_proc)(struct particle_system_datum const *system, short type_index, struct ps_particle_datum *particle, struct object_marker *marker);
 typedef void (*particle_system_particle_update_proc)(struct particle_system_datum const *system, short type_index, real dtime, struct ps_particle_datum *particle);
 
 /* ---------- prototypes */
@@ -36,17 +36,17 @@ typedef void (*particle_system_particle_update_proc)(struct particle_system_datu
 static boolean particle_system_initialize(long new_system_index);
 static void particle_system_new_particles(struct particle_system_datum *system, short type_index, real dt);
 static void particle_system_delete(long system_index);
-static void randomize_particle_variables(struct particle_system_type const *type_definition, struct particle_system_type_particle_state_interpolated_randomized_variables *variables, short state_index);
-static void particle_system_next_type_state_index(struct particle_system_datum const *system, struct particle_type *type, struct particle_system_type const *type_definition);
-static void particle_system_next_particle_state_index(struct ps_particle_datum *particle, struct particle_system_type const *type_definition);
+static void randomize_particle_variables(struct particle_system_type *type_definition, struct particle_system_type_particle_state_interpolated_randomized_variables *variables, short state_index);
+static void particle_system_next_type_state_index(struct particle_system_datum *system, struct particle_type *type, struct particle_system_type *type_definition);
+static void particle_system_next_particle_state_index(struct ps_particle_datum *particle, struct particle_system_type *type_definition);
 static void particle_system_update(real dtime, long system_index);
 static void particle_system_render(long system_index);
 static void particle_system_update_default(struct particle_system_datum *system, real dtime);
-static void particle_system_new_particle_default(struct particle_system_datum const *system, short type_index, struct ps_particle_datum *particle, struct object_marker const *marker);
+static void particle_system_new_particle_default(struct particle_system_datum const *system, short type_index, struct ps_particle_datum *particle, struct object_marker *marker);
 static void particle_system_update_particle_default(struct particle_system_datum const *system, short type_index, real dtime, struct ps_particle_datum *particle);
 static void particle_system_update_explosion(struct particle_system_datum *system, real dtime);
-static void particle_system_new_particle_explosion(struct particle_system_datum const *system, short type_index, struct ps_particle_datum *particle, struct object_marker const *marker);
-static void particle_system_new_particle_jet(struct particle_system_datum const *system, short type_index, struct ps_particle_datum *particle, struct object_marker const *marker);
+static void particle_system_new_particle_explosion(struct particle_system_datum const *system, short type_index, struct ps_particle_datum *particle, struct object_marker *marker);
+static void particle_system_new_particle_jet(struct particle_system_datum const *system, short type_index, struct ps_particle_datum *particle, struct object_marker *marker);
 
 /* ---------- globals */
 
@@ -315,55 +315,43 @@ static void particle_system_new_particles(
 
 		if (system->location.cluster_index != NONE)
 		{
-			short attempt_count = 0;
+			short attempt_count;
 
-			while (type->particle_count < desired_particle_count)
+			for (attempt_count = 0; type->particle_count < desired_particle_count && marker_count && attempt_count < MAXIMUM_NUMBER_OF_PARTICLE_SYSTEM_CREATION_ATTEMPTS; attempt_count++)
 			{
-				long particle_index;
-				struct ps_particle_datum *particle;
-				short creation_function_index;
-				short marker_index;
-				real rotation;
+				long particle_index = datum_new(system_particles);
 
-				if (!marker_count || attempt_count >= MAXIMUM_NUMBER_OF_PARTICLE_SYSTEM_CREATION_ATTEMPTS)
+				if (particle_index != NONE)
 				{
-					break;
-				}
+					struct ps_particle_datum *particle = system_particle_get(particle_index);
+					short creation_function_index = initializing ? type_definition->initial_particle_creation_physics : state_definition->particle_creation_physics;
 
-				particle_index = datum_new(system_particles);
+					match_assert("c:\\halo\\SOURCE\\effects\\particle_systems.c", 476, particle);
+					particle->valid = TRUE;
+					particle->state_index = NONE;
+					particle->transition_state_index = NONE;
+					particle->states_moving_forward = TRUE;
+					particle->sprite_index = -1.f;
+					particle->rotation = real_local_random_range(0.f, _pi * 2.f);
+					match_assert("c:\\halo\\SOURCE\\effects\\particle_systems.c", 488, creation_function_index>=0 && creation_function_index<NUMBER_OF_PARTICLE_SYSTEM_TYPE_CREATION_PHYSICS);
+					particle_creation_functions[creation_function_index](system, type_index, particle, &markers[local_random_range(0, marker_count)]);
+					scenario_location_from_point(&particle->location, &particle->position);
 
-				if (particle_index == NONE)
-				{
-					break;
-				}
-
-				particle = system_particle_get(particle_index);
-				creation_function_index = initializing ? type_definition->initial_particle_creation_physics : state_definition->particle_creation_physics;
-				match_assert("c:\\halo\\SOURCE\\effects\\particle_systems.c", 476, particle);
-				particle->valid = TRUE;
-				particle->state_index = NONE;
-				particle->transition_state_index = NONE;
-				particle->states_moving_forward = TRUE;
-				particle->sprite_index = -1.f;
-				rotation = real_local_random_range(0.f, _pi * 2.f);
-				particle->rotation = rotation;
-				match_assert("c:\\halo\\SOURCE\\effects\\particle_systems.c", 488, creation_function_index>=0 && creation_function_index<NUMBER_OF_PARTICLE_SYSTEM_TYPE_CREATION_PHYSICS);
-				marker_index = local_random_range(0, marker_count);
-				particle_creation_functions[creation_function_index](system, type_index, particle, &markers[marker_index]);
-				scenario_location_from_point(&particle->location, &particle->position);
-
-				if (particle->location.cluster_index != NONE)
-				{
-					type->particle_count++;
-					particle->next_particle_index = type->first_particle_index;
-					type->first_particle_index = particle_index;
+					if (particle->location.cluster_index != NONE)
+					{
+						type->particle_count++;
+						particle->next_particle_index = type->first_particle_index;
+						type->first_particle_index = particle_index;
+					}
+					else
+					{
+						datum_delete(system_particles, particle_index);
+					}
 				}
 				else
 				{
-					datum_delete(system_particles, particle_index);
+					break;
 				}
-
-				attempt_count++;
 			}
 		}
 	}
@@ -482,7 +470,7 @@ void particle_systems_reconnect_to_structure_bsp(
 }
 
 static void randomize_particle_variables(
-	struct particle_system_type const *type_definition,
+	struct particle_system_type *type_definition,
 	struct particle_system_type_particle_state_interpolated_randomized_variables *variables,
 	short state_index)
 {
@@ -509,9 +497,9 @@ static void randomize_particle_variables(
 }
 
 static void particle_system_next_type_state_index(
-	struct particle_system_datum const *system,
+	struct particle_system_datum *system,
 	struct particle_type *type,
-	struct particle_system_type const *type_definition)
+	struct particle_system_type *type_definition)
 {
 	short direction = type->states_moving_forward ? 1 : -1;
 
@@ -545,7 +533,7 @@ static void particle_system_next_type_state_index(
 
 static void particle_system_next_particle_state_index(
 	struct ps_particle_datum *particle,
-	struct particle_system_type const *type_definition)
+	struct particle_system_type *type_definition)
 {
 	short direction = particle->states_moving_forward ? 1 : -1;
 
@@ -610,7 +598,7 @@ static void particle_system_update(
 
 	for (type_index = 0; type_index < system_definition->types.count; type_index++)
 	{
-		struct particle_system_type const *type_definition = TAG_BLOCK_GET_ELEMENT(&system_definition->types, type_index, struct particle_system_type);
+		struct particle_system_type *type_definition = TAG_BLOCK_GET_ELEMENT(&system_definition->types, type_index, struct particle_system_type);
 		struct particle_type *type = &system->types[type_index];
 
 		if (!TEST_FLAG(type_definition->flags, _particle_system_type_disabled_bit))
@@ -654,6 +642,7 @@ static void particle_system_update(
 					else
 					{
 						short variable_index;
+						real inverse_t;
 						struct particle_system_type_state const *transition_state_definition = TAG_BLOCK_GET_ELEMENT(&type_definition->type_states, type->transition_state_index, struct particle_system_type_state);
 						real *variable = (real *)&type->variables;
 						real const *state_variable = (real const *)&state_definition->variables;
@@ -661,10 +650,11 @@ static void particle_system_update(
 						real t = type->time_left_in_state / type->state_length;
 
 						t = PIN(t, 0.f, 1.f);
+						inverse_t = 1.f - t;
 
-						for (variable_index = 0; variable_index < sizeof(type->variables) / sizeof(real); variable_index++)
+						for (variable_index = 0; variable_index < (short)(sizeof(type->variables) / sizeof(real)); variable_index++)
 						{
-							*variable++ = t * *state_variable++ + (1.f - t) * *transition_state_variable++;
+							*variable++ = t * *state_variable++ + inverse_t * *transition_state_variable++;
 						}
 					}
 
@@ -1121,7 +1111,7 @@ static void particle_system_new_particle_default(
 	struct particle_system_datum const *system,
 	short type_index,
 	struct ps_particle_datum *particle,
-	struct object_marker const *marker)
+	struct object_marker *marker)
 {
 	particle->position = marker->matrix.position;
 	particle->velocity = system->velocity;
@@ -1150,14 +1140,11 @@ static void particle_system_update_particle_default(
 
 	if (particle->transition_state_index == NONE)
 	{
-		variable = (real *)&variables;
-		type_variable = (real const *)&type_definition->variables;
-		multiplier = (real const *)&type->variables.particle_state_multipliers;
-		state_variable = (real const *)&state_definition->variables;
-
-		while (variable < (real *)(&variables + 1))
+		for (variable = (real *)&variables, type_variable = (real const *)&type_definition->variables, multiplier = (real const *)&type->variables.particle_state_multipliers, state_variable = (real const *)&state_definition->variables;
+			variable < (real *)(&variables + 1);
+			variable++, type_variable++, multiplier++, state_variable++)
 		{
-			*variable++ = *type_variable++ * *multiplier++ * *state_variable++;
+			*variable = *type_variable * *multiplier * *state_variable;
 		}
 
 		physics = point_physics_definition_get(state_definition->point_physics.index);
@@ -1171,15 +1158,11 @@ static void particle_system_update_particle_default(
 
 		t = PIN(t, 0.f, 1.f);
 		inverse_t = 1.f - t;
-		variable = (real *)&variables;
-		type_variable = (real const *)&type_definition->variables;
-		multiplier = (real const *)&type->variables.particle_state_multipliers;
-		state_variable = (real const *)&state_definition->variables;
-		transition_state_variable = (real const *)&transition_state_definition->variables;
-
-		while (variable < (real *)(&variables + 1))
+		for (variable = (real *)&variables, type_variable = (real const *)&type_definition->variables, multiplier = (real const *)&type->variables.particle_state_multipliers, state_variable = (real const *)&state_definition->variables, transition_state_variable = (real const *)&transition_state_definition->variables;
+			variable < (real *)(&variables + 1);
+			variable++, type_variable++, multiplier++, state_variable++, transition_state_variable++)
 		{
-			*variable++ = *type_variable++ * *multiplier++ * (t * *state_variable++ + inverse_t * *transition_state_variable++);
+			*variable = *type_variable * *multiplier * (t * *state_variable + inverse_t * *transition_state_variable);
 		}
 
 		physics = point_physics_definition_interpolate(
@@ -1227,7 +1210,7 @@ static void particle_system_new_particle_explosion(
 	struct particle_system_datum const *system,
 	short type_index,
 	struct ps_particle_datum *particle,
-	struct object_marker const *marker)
+	struct object_marker *marker)
 {
 	struct particle_system_definition const *definition = particle_system_definition_get(system->definition_index);
 	struct particle_system_type const *type_definition = TAG_BLOCK_GET_ELEMENT(&definition->types, type_index, struct particle_system_type);
@@ -1263,7 +1246,7 @@ static void particle_system_new_particle_jet(
 	struct particle_system_datum const *system,
 	short type_index,
 	struct ps_particle_datum *particle,
-	struct object_marker const *marker)
+	struct object_marker *marker)
 {
 	real spread_velocity;
 	real forward_velocity;

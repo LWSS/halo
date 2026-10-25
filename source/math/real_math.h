@@ -1155,15 +1155,15 @@ __inline real_plane2d *plane2d_from_points(
 	plane->n.i = point1->y - point0->y;
 	plane->n.j = point0->x - point1->x;
 
-	if (normalize2d(&plane->n) == 0.0f)
+	if (normalize2d(&plane->n) != 0.0f)
 	{
-		plane->d = 0.0f;
-		return NULL;
+		plane->d = dot_product2d((real_vector2d const *)point0, &plane->n);
+		return plane;
 	}
 	else
 	{
-		plane->d = dot_product2d(&plane->n, (real_vector2d const *)point0);
-		return plane;
+		plane->d = 0.0f;
+		return NULL;
 	}
 }
 

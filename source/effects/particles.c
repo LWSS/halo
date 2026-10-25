@@ -57,7 +57,7 @@ static boolean particle_next_frame(long particle_index);
 static boolean particle_update_frame_time(long particle_index, real dt);
 static boolean particle_update_physics(long particle_index, real dt);
 static void particle_die(long particle_index);
-static void particle_effect_new(struct particle_datum const *particle, unsigned long group_tag, long effect_index, real scale);
+static void particle_effect_new(struct particle_datum *particle, unsigned long group_tag, long effect_index, real scale);
 
 /* ---------- globals */
 
@@ -74,9 +74,6 @@ static char const *particle_effect_marker_names[NUMBER_OF_PARTICLE_EFFECT_MARKER
 	"gravity"
 };
 
-static real const maximum_particle_velocity = 1.5f;
-static real const minimum_particle_velocity = 0.5f;
-
 struct data_array *particle_data;
 
 /* ---------- public code */
@@ -86,7 +83,10 @@ void particles_initialize(
 {
 	particle_data = game_state_data_new("particle", MAXIMUM_PARTICLES_PER_MAP, sizeof(struct particle_datum));
 
-	if (!particle_data)
+	if (particle_data)
+	{
+	}
+	else
 	{
 		error(_error_immediate, "couldn't allocate particle globals");
 	}
@@ -301,19 +301,25 @@ void particles_update(
 		if (render.frame_index - particle->last_rendered_frame_index > MAXIMUM_PARTICLE_UNRENDERED_FRAMES)
 		{
 			particle_delete(particle_index);
+			continue;
 		}
-		else
-		{
-			particle->life_time += dt;
 
-			if (particle->life_time >= particle->life_span && !first_update && !definition->final_sequence_count)
-			{
-				particle_die(particle_index);
-			}
-			else if (particle_update_frame_time(particle_index, dt))
-			{
-				particle_update_physics(particle_index, dt);
-			}
+		particle->life_time += dt;
+
+		if (particle->life_time >= particle->life_span && !first_update && !definition->final_sequence_count)
+		{
+			particle_die(particle_index);
+			continue;
+		}
+
+		if (!particle_update_frame_time(particle_index, dt))
+		{
+			continue;
+		}
+
+		if (!particle_update_physics(particle_index, dt))
+		{
+			continue;
 		}
 	}
 
@@ -557,6 +563,8 @@ static boolean particle_update_physics(
 	long particle_index,
 	real dt)
 {
+	static real const maximum_particle_velocity = 1.5f;
+	static real const minimum_particle_velocity = 0.5f;
 	struct particle_datum *particle = particle_get(particle_index);
 	struct particle_definition const *definition = particle_definition_get(particle->definition_index);
 
@@ -649,12 +657,7 @@ static boolean particle_update_physics(
 				particle->frame_span += definition->frames_per_second_contact_deterioration;
 			}
 		}
-		else if (!TEST_FLAG(particle->flags, _particle_attached_to_local_player_bit) && !object_try_and_get(particle->object_index))
-		{
-			particle_delete(particle_index);
-			return FALSE;
-		}
-		else
+		else if (TEST_FLAG(particle->flags, _particle_attached_to_local_player_bit) || object_try_and_get(particle->object_index))
 		{
 			real scale;
 			real radius = particle_get_radius(particle_index);
@@ -678,6 +681,11 @@ static boolean particle_update_physics(
 			particle->position.y += particle->translational_velocity.j * dt;
 			particle->position.z += particle->translational_velocity.k * dt;
 			at_rest = TRUE;
+		}
+		else
+		{
+			particle_delete(particle_index);
+			return FALSE;
 		}
 
 		if (magnitude_squared3d(&particle->translational_velocity) < PARTICLE_AT_REST_VELOCITY_SQUARED)
@@ -726,7 +734,7 @@ static void particle_die(
 }
 
 static void particle_effect_new(
-	struct particle_datum const *particle,
+	struct particle_datum *particle,
 	unsigned long group_tag,
 	long effect_index,
 	real scale)

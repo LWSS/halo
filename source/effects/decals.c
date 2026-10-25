@@ -66,7 +66,7 @@ struct decal_geometry
 	short decal_vertex_count;
 	short decal_surface_vertex_counts[MAXIMUM_DECAL_SURFACE_QUEUE_SIZE];
 	short decal_surface_count;
-	long decal_surface_indices[MAXIMUM_DECAL_SURFACE_QUEUE_SIZE];
+	long decal_surface_indices[MAXIMUM_DECAL_SURFACE_QUEUE_SIZE]; /* fake name */
 };
 
 struct decal_projection
@@ -86,12 +86,12 @@ struct decal_projection
 
 static void decal_check(long decal_index, boolean layer_check);
 static void decal_set_first_decal_index(short cluster_index, short layer, long decal_index);
-static real_rectangle2d *decal_sprite_get_bounds(struct decal_definition const *definition, short sequence_index, short sprite_index, real scale, real_rectangle2d *sprite_bounds, real_rectangle2d *extent);
+static real_rectangle2d *decal_sprite_get_bounds(struct decal_definition const *definition, short sequence_index, short sprite_index, real radius, real_rectangle2d *sprite_bounds, real_rectangle2d *extent);
 static void decal_update(long decal_index);
 static void decal_reinsert(long decal_index, short cluster_index, short layer);
-static long decal_insert(long decal_index, short cluster_index, short layer, long next_decal_index, boolean permanent);
+static long decal_insert(long cache_index, short cluster_index, short layer, long next_decal_index, boolean permanent);
 static void decal_projection_create(real_matrix4x3 const *basis, real_rectangle2d const *extent, struct decal_projection *projection);
-static void decal_clip_to_surface(struct decal_projection const *projection, struct decal_geometry *geometry, long surface_index, boolean wrap, real radius, short type, long *surface_queue, short *surface_queue_write_index, long *deviant_surface_list, short *deviant_surface_count);
+static void decal_clip_to_surface(struct decal_projection const *projection, struct decal_geometry *geometry, long surface_index, boolean update_queue, real radius, short type, long *surface_queue, short *surface_queue_write_index, long *deviant_surface_list, short *deviant_surface_count);
 
 /* ---------- globals */
 
@@ -109,7 +109,6 @@ struct decal_wrap_parameters const decal_wrap_parameters[NUMBER_OF_DECAL_TYPES] 
 
 static struct decal_geometry decal_geometry;
 static struct decal_globals *decal_globals;
-static real_point2d decal_points2d_temp[2][MAXIMUM_POINTS_PER_DECAL_SURFACE];
 
 /* ---------- private code */
 
@@ -157,7 +156,7 @@ static real_rectangle2d *decal_sprite_get_bounds(
 	struct decal_definition const *definition,
 	short sequence_index,
 	short sprite_index,
-	real scale,
+	real radius,
 	real_rectangle2d *sprite_bounds,
 	real_rectangle2d *extent)
 {
@@ -182,10 +181,11 @@ static real_rectangle2d *decal_sprite_get_bounds(
 
 	if (TEST_FLAG(definition->flags, _decal_definition_preserve_aspect_bit))
 	{
-		aspect_ratio = ((real)bitmap->height / (real)bitmap->width) * ((sprite->bounds.x1 - sprite->bounds.x0) / (sprite->bounds.y1 - sprite->bounds.y0));
+		aspect_ratio = (sprite->bounds.x1 - sprite->bounds.x0) / (sprite->bounds.y1 - sprite->bounds.y0);
+		aspect_ratio *= (real)bitmap->height / (real)bitmap->width;
 	}
 
-	extent_scale = scale / definition->runtime_maximum_sprite_extent;
+	extent_scale = radius / definition->runtime_maximum_sprite_extent;
 	width_scale = (real)bitmap->width * extent_scale;
 	height_scale = (real)bitmap->height * extent_scale * aspect_ratio;
 	extent->x0 = (0.f - sprite->registration_point.x) * width_scale;
@@ -267,14 +267,14 @@ static void decal_reinsert(
 }
 
 static long decal_insert(
-	long decal_index,
+	long cache_index,
 	short cluster_index,
 	short layer,
 	long next_decal_index,
 	boolean permanent)
 {
 	static boolean locked_count_warning_issued = FALSE;
-	long new_decal_index = datum_new_at_index(global_decal_data, decal_index);
+	long new_decal_index = datum_new_at_index(global_decal_data, cache_index);
 
 	match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 479, cluster_index>=0 && cluster_index<MAXIMUM_CLUSTERS_PER_STRUCTURE);
 	match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 480, layer>=0 && layer<NUMBER_OF_DECAL_LAYERS);
@@ -648,12 +648,14 @@ void decals_delete_permanent_from_cluster(
 
 			if (cluster_index == NONE)
 			{
-				if (layer)
+				if (!layer)
 				{
-					continue;
+					decal_index = decal_globals->first_disconnected_decal_index;
 				}
-
-				decal_index = decal_globals->first_disconnected_decal_index;
+				else
+				{
+					decal_index = NONE;
+				}
 			}
 			else
 			{
@@ -790,7 +792,7 @@ static void decal_clip_to_surface(
 	struct decal_projection const *projection,
 	struct decal_geometry *geometry,
 	long surface_index,
-	boolean wrap,
+	boolean update_queue,
 	real radius,
 	short type,
 	long *surface_queue,
@@ -812,7 +814,7 @@ static void decal_clip_to_surface(
 		match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 1160, projection);
 		match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 1161, geometry);
 
-		if (wrap)
+		if (update_queue)
 		{
 			match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 1165, surface_queue);
 			match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 1166, surface_queue_write_index && *surface_queue_write_index>=0 && *surface_queue_write_index<=MAXIMUM_DECAL_SURFACE_QUEUE_SIZE);
@@ -826,10 +828,11 @@ static void decal_clip_to_surface(
 		bsp3d_get_plane_from_designator(&bsp->bsp3d, surface->plane_designator, &surface_plane);
 		surface_angle = angle_between_normals3d(&surface_plane.n, &projection->plane.n);
 
-		if (!wrap || (_pi / 180.f) * decal_wrap_parameters[type].minimum_wrap_angle >= surface_angle)
+		if (!update_queue || (_pi / 180.f) * decal_wrap_parameters[type].minimum_wrap_angle >= surface_angle)
 		{
 			real_point2d surface_point2d_previous;
 			real_point2d surface_point2d;
+			static real_point2d decal_points2d_temp[2][MAXIMUM_POINTS_PER_DECAL_SURFACE];
 			real_plane2d surface_edge_plane;
 			real_point2d *clipped_points;
 			long edge_index = surface->first_edge_index;
@@ -872,11 +875,12 @@ static void decal_clip_to_surface(
 						&clipped,
 						0.f);
 
-					if (wrap && clipped && working_surface_queue_write_index < MAXIMUM_DECAL_SURFACE_QUEUE_SIZE)
+					if (update_queue && clipped && working_surface_queue_write_index < MAXIMUM_DECAL_SURFACE_QUEUE_SIZE)
 					{
 						real_vector3d surface_edge_vector;
+						struct collision_vertex const *next_vertex = TAG_BLOCK_GET_ELEMENT(&bsp->vertices, edge->vertex_indices[forward], struct collision_vertex);
 
-						vector_from_points3d(&vertex->point, &TAG_BLOCK_GET_ELEMENT(&bsp->vertices, edge->vertex_indices[forward], struct collision_vertex)->point, &surface_edge_vector);
+						vector_from_points3d(&vertex->point, &next_vertex->point, &surface_edge_vector);
 
 						if (fast_vector_intersects_sphere(&vertex->point, &surface_edge_vector, &projection->basis.position, radius * decal_wrap_parameters[type].radius_exclusion_multiplier))
 						{
@@ -954,7 +958,7 @@ static void decal_clip_to_surface(
 				}
 			}
 		}
-		else
+		else if (update_queue)
 		{
 			long edge_index = surface->first_edge_index;
 
@@ -1001,7 +1005,7 @@ static void decal_clip_to_surface(
 			}
 		}
 
-		if (wrap)
+		if (update_queue)
 		{
 			*surface_queue_write_index = working_surface_queue_write_index;
 			*deviant_surface_count = working_deviant_surface_count;
@@ -1043,7 +1047,14 @@ void decal_new(
 		{
 			if (collision.type == _collision_result_media)
 			{
-				decal_new_from_media_collision();
+				decal_new_from_media_collision(
+					definition_index,
+					&collision,
+					velocity,
+					radius_modifier,
+					permanent,
+					forced_sequence_index,
+					editor_geometry);
 			}
 			else if (collision.type == _collision_result_structure && !TEST_FLAG(decal_definition_get(definition_index)->flags, _decal_definition_water_effect_bit))
 			{
@@ -1071,13 +1082,19 @@ void decal_new(
 }
 
 void decal_new_from_media_collision(
-	void)
+	long decal_definition_index,
+	struct collision_result const *collision,
+	real_vector3d const *velocity,
+	real radius_modifier,
+	boolean permanent,
+	short forced_sequence_index,
+	struct decal_editor_geometry *editor_geometry)
 {
 	return;
 }
 
 void decal_new_from_collision(
-	long definition_index,
+	long decal_definition_index,
 	struct collision_result const *collision,
 	real_vector3d const *velocity,
 	real radius_modifier,
@@ -1109,12 +1126,12 @@ void decal_new_from_collision(
 	match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 2035, decals_enabled);
 	match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 2037, !editor_geometry);
 
-	while (definition_index != NONE)
+	while (decal_definition_index != NONE)
 	{
 		surface_queue_read_index = 0;
 		surface_queue_write_index = 0;
 		deviant_surface_count = 0;
-		definition = decal_definition_get(definition_index);
+		definition = decal_definition_get(decal_definition_index);
 		bitmap_group = bitmap_group_get(definition->shader.decal.map.index);
 
 		if (!geometry_inherited)
@@ -1345,19 +1362,19 @@ void decal_new_from_collision(
 
 					if (surface_index != NONE)
 					{
-						real_plane3d surface_plane;
+						real_plane3d surface_plane1;
 						short other_deviant_surface_index;
 						long other_surface_index;
 						struct collision_surface const *other_surface;
-						real_plane3d other_surface_plane;
+						real_plane3d surface_plane2;
 						real angle;
-						real_point3d closest_edge_point0;
-						real_point3d closest_edge_point1;
-						real closest_distance0;
+						real_point3d closest_vertex1;
+						real_point3d closest_vertex2;
 						real closest_distance1;
-						real_plane3d closest_surface_plane;
+						real closest_distance2;
+						real_plane3d closest_plane;
 						long closest_surface_index;
-						struct decal_projection wrapped_projection;
+						struct decal_projection wrap_projection;
 						short bunch_index;
 						long bunch_surface_index;
 						struct collision_surface const *bunch_surface;
@@ -1371,12 +1388,12 @@ void decal_new_from_collision(
 						real temporary;
 						real_vector3d axis;
 						real_matrix4x3 rotation;
-						real_matrix4x3 wrapped_basis;
+						real_matrix4x3 wrap_basis;
 						real sign;
 						real wrap_angle;
 						struct collision_surface const *surface = TAG_BLOCK_GET_ELEMENT(&bsp->surfaces, surface_index, struct collision_surface);
 
-						bsp3d_get_plane_from_designator(&bsp->bsp3d, surface->plane_designator, &surface_plane);
+						bsp3d_get_plane_from_designator(&bsp->bsp3d, surface->plane_designator, &surface_plane1);
 						match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 2399, deviant_surface_bunch_size<MAXIMUM_DECAL_SURFACE_QUEUE_SIZE);
 						deviant_surface_bunch[deviant_surface_bunch_size++] = surface_index;
 						deviant_surface_list[deviant_surface_index] = NONE;
@@ -1391,8 +1408,8 @@ void decal_new_from_collision(
 								bsp3d_get_plane_from_designator(
 									&bsp->bsp3d,
 									other_surface->plane_designator,
-									&other_surface_plane);
-								angle = angle_between_normals3d(&surface_plane.n, &other_surface_plane.n);
+									&surface_plane2);
+								angle = angle_between_normals3d(&surface_plane1.n, &surface_plane2.n);
 
 								if (angle <= (_pi / 180.f) * decal_wrap_parameters[definition->type].minimum_wrap_angle)
 								{
@@ -1427,16 +1444,16 @@ void decal_new_from_collision(
 									distance1 = temporary;
 								}
 
-								if (closest_surface_index == NONE || distance0 <= closest_distance0 && distance1 <= closest_distance1)
+								if (closest_surface_index == NONE || distance0 <= closest_distance1 && distance1 <= closest_distance2)
 								{
 									bsp3d_get_plane_from_designator(
 										&bsp->bsp3d,
 										bunch_surface->plane_designator,
-										&closest_surface_plane);
-									closest_distance0 = distance0;
-									closest_distance1 = distance1;
-									closest_edge_point0 = vertex0->point;
-									closest_edge_point1 = vertex1->point;
+										&closest_plane);
+									closest_distance1 = distance0;
+									closest_distance2 = distance1;
+									closest_vertex1 = vertex0->point;
+									closest_vertex2 = vertex1->point;
 									closest_surface_index = bunch_surface_index;
 								}
 
@@ -1446,42 +1463,42 @@ void decal_new_from_collision(
 						}
 
 						match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 2493, closest_surface_index!=NONE);
-						vector_from_points3d(&closest_edge_point0, &closest_edge_point1, &axis);
+						vector_from_points3d(&closest_vertex1, &closest_vertex2, &axis);
 
 						if (normalize3d(&axis) > 0.f)
 						{
-							sign = triple_product3d(&closest_surface_plane.n, &projection.plane.n, &axis) < 0.f ? 1.f : -1.f;
-							wrap_angle = angle_between_normals3d(&closest_surface_plane.n, &projection.plane.n) * sign;
+							sign = triple_product3d(&closest_plane.n, &projection.plane.n, &axis) < 0.f ? 1.f : -1.f;
+							wrap_angle = angle_between_normals3d(&closest_plane.n, &projection.plane.n) * sign;
 							matrix4x3_rotation_from_axis_and_angle(
 								&rotation,
 								&axis,
 								sine(wrap_angle),
 								cosine(wrap_angle));
-							wrapped_basis.position.x = basis.position.x - closest_edge_point0.x;
-							wrapped_basis.position.y = basis.position.y - closest_edge_point0.y;
-							wrapped_basis.position.z = basis.position.z - closest_edge_point0.z;
-							matrix4x3_transform_point(&rotation, &wrapped_basis.position, &wrapped_basis.position);
-							matrix4x3_transform_normal(&rotation, &basis.forward, &wrapped_basis.forward);
-							matrix4x3_transform_normal(&rotation, &basis.left, &wrapped_basis.left);
-							matrix4x3_transform_normal(&rotation, &basis.up, &wrapped_basis.up);
-							wrapped_basis.position.x += closest_edge_point0.x;
-							wrapped_basis.position.y += closest_edge_point0.y;
-							wrapped_basis.position.z += closest_edge_point0.z;
-							wrapped_basis.scale = 1.f;
-							decal_projection_create(&wrapped_basis, &extent, &wrapped_projection);
-							up_bounds.x0 = MIN(wrapped_basis.up.i, up_bounds.x0);
-							up_bounds.x1 = MAX(wrapped_basis.up.i, up_bounds.x1);
-							up_bounds.y0 = MIN(wrapped_basis.up.j, up_bounds.y0);
-							up_bounds.y1 = MAX(wrapped_basis.up.j, up_bounds.y1);
-							up_bounds.z0 = MIN(wrapped_basis.up.k, up_bounds.z0);
-							up_bounds.z1 = MAX(wrapped_basis.up.k, up_bounds.z1);
+							wrap_basis.position.x = basis.position.x - closest_vertex1.x;
+							wrap_basis.position.y = basis.position.y - closest_vertex1.y;
+							wrap_basis.position.z = basis.position.z - closest_vertex1.z;
+							matrix4x3_transform_point(&rotation, &wrap_basis.position, &wrap_basis.position);
+							matrix4x3_transform_normal(&rotation, &basis.forward, &wrap_basis.forward);
+							matrix4x3_transform_normal(&rotation, &basis.left, &wrap_basis.left);
+							matrix4x3_transform_normal(&rotation, &basis.up, &wrap_basis.up);
+							wrap_basis.position.x += closest_vertex1.x;
+							wrap_basis.position.y += closest_vertex1.y;
+							wrap_basis.position.z += closest_vertex1.z;
+							wrap_basis.scale = 1.f;
+							decal_projection_create(&wrap_basis, &extent, &wrap_projection);
+							up_bounds.x0 = MIN(wrap_basis.up.i, up_bounds.x0);
+							up_bounds.x1 = MAX(wrap_basis.up.i, up_bounds.x1);
+							up_bounds.y0 = MIN(wrap_basis.up.j, up_bounds.y0);
+							up_bounds.y1 = MAX(wrap_basis.up.j, up_bounds.y1);
+							up_bounds.z0 = MIN(wrap_basis.up.k, up_bounds.z0);
+							up_bounds.z1 = MAX(wrap_basis.up.k, up_bounds.z1);
 						}
 						else
 						{
 							error(
 								_error_silent,
 								"### ERROR: decals: failed to wrap decal around edge -- tell Bernie!!");
-							wrapped_projection = projection;
+							wrap_projection = projection;
 						}
 
 						for (bunch_index = 0; bunch_index < deviant_surface_bunch_size; bunch_index++)
@@ -1489,7 +1506,7 @@ void decal_new_from_collision(
 							long bunch_clip_surface_index = deviant_surface_bunch[bunch_index];
 
 							decal_clip_to_surface(
-								&wrapped_projection,
+								&wrap_projection,
 								&decal_geometry,
 								bunch_clip_surface_index,
 								FALSE,
@@ -1512,7 +1529,7 @@ void decal_new_from_collision(
 			short decal_surface_index;
 			long cache_size;
 			long cache_index;
-			real_vector3d offset = { 0.f, 0.f, 0.f };
+			real_vector3d decal_offset = { 0.f, 0.f, 0.f };
 			short decal_quad_count = 0;
 
 			if (up_bounds.x1 - up_bounds.x0 <= DECAL_WRAP_BOUNDS_TOLERANCE &&
@@ -1520,12 +1537,12 @@ void decal_new_from_collision(
 				up_bounds.z1 - up_bounds.z0 <= DECAL_WRAP_BOUNDS_TOLERANCE)
 			{
 				set_real_vector3d(
-					&offset,
+					&decal_offset,
 					up_bounds.x1 + up_bounds.x0,
 					up_bounds.y1 + up_bounds.y0,
 					up_bounds.z1 + up_bounds.z0);
-				normalize3d(&offset);
-				scale_vector3d(&offset, rasterizer_debug_options.zoffset, &offset);
+				normalize3d(&decal_offset);
+				scale_vector3d(&decal_offset, rasterizer_debug_options.zoffset, &decal_offset);
 			}
 
 			for (decal_surface_index = 0; decal_surface_index < decal_geometry.decal_surface_count; decal_surface_index++)
@@ -1548,7 +1565,7 @@ void decal_new_from_collision(
 
 					if (decal_vertices)
 					{
-						struct decal_vertex vertices[MAXIMUM_TOTAL_VERTICES_PER_DECAL];
+						struct decal_vertex decal_vertex_temp_cache[MAXIMUM_TOTAL_VERTICES_PER_DECAL];
 						short vertex_index;
 						short quad_index;
 						struct decal_vertex_internal const *vertex;
@@ -1564,16 +1581,16 @@ void decal_new_from_collision(
 							u = (short)fast_ftol((real)floor(PIN(texcoord.x * DECAL_TEXCOORD_SCALE, 0.f, DECAL_TEXCOORD_MAXIMUM) + 0.5f));
 							v = (short)fast_ftol((real)floor(PIN(texcoord.y * DECAL_TEXCOORD_SCALE, 0.f, DECAL_TEXCOORD_MAXIMUM) + 0.5f));
 							match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 2696, (u&0x8000)==0 && (v&0x8000)==0);
-							vertices[vertex_index].texcoord_u = u;
-							vertices[vertex_index].texcoord_v = v;
-							vertices[vertex_index].position.x = vertex->position.x + offset.i;
-							vertices[vertex_index].position.y = vertex->position.y + offset.j;
-							vertices[vertex_index].position.z = vertex->position.z + offset.k;
+							decal_vertex_temp_cache[vertex_index].texcoord_u = u;
+							decal_vertex_temp_cache[vertex_index].texcoord_v = v;
+							decal_vertex_temp_cache[vertex_index].position.x = vertex->position.x + decal_offset.i;
+							decal_vertex_temp_cache[vertex_index].position.y = vertex->position.y + decal_offset.j;
+							decal_vertex_temp_cache[vertex_index].position.z = vertex->position.z + decal_offset.k;
 						}
 
 						{
 							real intensity;
-							real_rgb_color color;
+							real_rgb_color decal_color;
 							short decal_surface_vertex_count;
 							short decal_surface_vertex_index;
 
@@ -1589,17 +1606,17 @@ void decal_new_from_collision(
 								definition->decay_time_lower_bounds,
 								definition->decay_time_upper_bounds);
 							decal->quad_count = decal_quad_count;
-							decal->definition_index = definition_index;
+							decal->definition_index = decal_definition_index;
 							intensity = real_local_random_range(
 								definition->intensity_lower_bounds,
 								definition->intensity_upper_bounds);
 							rgb_colors_interpolate(
-								&color,
+								&decal_color,
 								(definition->flags >> 1) & 3,
 								&definition->color_lower_bounds,
 								&definition->color_upper_bounds,
 								real_local_random_range(0.f, 1.f));
-							decal->color = real_a_rgb_color_to_pixel32(intensity, &color);
+							decal->color = real_a_rgb_color_to_pixel32(intensity, &decal_color);
 							decal->intensity = UNSIGNED_CHAR_MAX;
 							quad_index = 0;
 							vertex_index = 0;
@@ -1612,10 +1629,10 @@ void decal_new_from_collision(
 								for (decal_surface_vertex_index = 1; decal_surface_vertex_index + 1 < decal_surface_vertex_count; decal_surface_vertex_index += 2)
 								{
 									match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 2748, decal_surface_vertex_index+1<decal_surface_vertex_count);
-									decal_vertices[0] = vertices[vertex_index];
-									decal_vertices[1] = vertices[vertex_index + decal_surface_vertex_index];
-									decal_vertices[2] = vertices[vertex_index + decal_surface_vertex_index + 1];
-									decal_vertices[3] = vertices[decal_surface_vertex_index + 2 >= decal_surface_vertex_count ? vertex_index : vertex_index + decal_surface_vertex_index + 2];
+									decal_vertices[0] = decal_vertex_temp_cache[vertex_index];
+									decal_vertices[1] = decal_vertex_temp_cache[vertex_index + decal_surface_vertex_index];
+									decal_vertices[2] = decal_vertex_temp_cache[vertex_index + decal_surface_vertex_index + 1];
+									decal_vertices[3] = decal_vertex_temp_cache[decal_surface_vertex_index + 2 >= decal_surface_vertex_count ? vertex_index : vertex_index + decal_surface_vertex_index + 2];
 									decal_vertices += DECAL_VERTICES_PER_QUAD;
 									quad_index++;
 								}
@@ -1626,13 +1643,13 @@ void decal_new_from_collision(
 							match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 2764, quad_index==decal_quad_count);
 							rasterizer_decal_vertices_unlock();
 							geometry_inherited = TEST_FLAG(definition->flags, _decal_definition_geometry_inherited_by_next_decal_in_chain_bit);
-							definition_index = definition->next_decal_in_chain.index;
+							decal_definition_index = definition->next_decal_in_chain.index;
 						}
 					}
 					else
 					{
 						rasterizer_decal_vertices_delete(cache_index);
-						definition_index = NONE;
+						decal_definition_index = NONE;
 
 						if (debug_decals)
 						{
@@ -1643,7 +1660,7 @@ void decal_new_from_collision(
 				else
 				{
 					rasterizer_decal_vertices_delete(cache_index);
-					definition_index = NONE;
+					decal_definition_index = NONE;
 
 					if (debug_decals)
 					{
@@ -1657,7 +1674,7 @@ void decal_new_from_collision(
 			}
 			else
 			{
-				definition_index = NONE;
+				decal_definition_index = NONE;
 
 				if (debug_decals)
 				{
@@ -1671,7 +1688,7 @@ void decal_new_from_collision(
 		}
 		else
 		{
-			definition_index = NONE;
+			decal_definition_index = NONE;
 		}
 	}
 
@@ -1725,16 +1742,16 @@ void render_debug_decals(
 
 			for (layer = 0; layer < NUMBER_OF_DECAL_LAYERS; layer++)
 			{
-				struct decal_datum const *decal;
-				long decal_index;
+				long decal_index = decal_get_first_decal_index(cluster_index, layer);
 
-				for (decal_index = decal_get_first_decal_index(cluster_index, layer); decal_index != NONE; decal_index = decal->next_decal_index)
+				while (decal_index != NONE)
 				{
 					char decal_string[64];
+					struct decal_datum const *decal = decal_get(decal_index);
 
-					decal = decal_get(decal_index);
 					sprintf(decal_string, "%d", DECAL_VERTICES_PER_QUAD * decal->quad_count);
 					render_debug_string_at_point(FALSE, &decal->position, decal_string, global_real_argb_red);
+					decal_index = decal->next_decal_index;
 				}
 			}
 		}

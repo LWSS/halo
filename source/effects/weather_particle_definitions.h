@@ -27,9 +27,7 @@ enum
 
 enum
 {
-	_weather_particle_type_interpolate_colors_in_hsv_bit = 0,
-	_weather_particle_type_along_long_hue_path_bit,
-	_weather_particle_type_random_rotation_bit,
+	_weather_particle_type_random_rotation_bit = 2,
 	NUMBER_OF_WEATHER_PARTICLE_TYPE_FLAGS
 };
 
@@ -42,7 +40,7 @@ enum
 
 /* ---------- macros */
 
-#define weather_particle_system_definition_get(index) ((struct weather_particle_system_definition *)tag_get(WEATHER_PARTICLE_SYSTEM_DEFINITION_TAG, (index)))	/* fake name */
+#define weather_particle_system_definition_get(index) ((struct weather_particle_system_definition *)tag_get(WEATHER_PARTICLE_SYSTEM_DEFINITION_TAG, (index)))
 
 /* ---------- structures */
 

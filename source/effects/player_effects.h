@@ -34,13 +34,13 @@ void player_effect_update(void);
 void player_effect_add_continuous_effect(short local_player_index, long effect_index, real distance);
 void player_effect_continuous_refresh(long effect_index, real_point3d const *origin);
 
-void scripted_player_effect_set_translation(real i, real j, real k);
+void scripted_player_effect_set_translation(real x, real y, real z);
 void scripted_player_effect_set_rotation(real yaw, real pitch, real roll);
 void scripted_player_effect_set_rumble(real left, real right);
 void scripted_player_effect_start(real max_intensity, real attack);
 void scripted_player_effect_stop(real decay);
 
-void player_effect_screen_flash(long player_index, struct screen_flash_definition const *screen_flash, real scale);
+void player_effect_screen_flash(long player_index, struct screen_flash_definition *screen_flash, real scale);
 void player_telefrag_effect_start(long player_index, real scale);
 void player_telefrag_effect_stop(long player_index);
 void player_effect_start(long player_index, struct damage_data const *damage, real_vector3d const *direction, real scale, real damage_amount);

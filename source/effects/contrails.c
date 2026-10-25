@@ -23,7 +23,7 @@ CONTRAILS.C
 
 static void contrail_next_frame(struct contrail_datum *contrail);
 static short contrail_compute_new_point_count(long contrail_index, real dt);
-static void contrail_add_points(long contrail_index, short point_count, boolean force);
+static void contrail_add_points(long contrail_index, short contrail_point_count, boolean force);
 static void contrail_update_points(long contrail_index, real dt);
 static void contrail_verify(long contrail_index);
 
@@ -40,7 +40,10 @@ void contrails_initialize(
 	contrail_data = game_state_data_new("contrail", MAXIMUM_CONTRAILS_PER_MAP, sizeof(struct contrail_datum));
 	contrail_point_data = game_state_data_new("contrail point", MAXIMUM_CONTRAIL_POINTS_PER_MAP, sizeof(struct contrail_point_datum));
 
-	if (!contrail_data || !contrail_point_data)
+	if (contrail_data && contrail_point_data)
+	{
+	}
+	else
 	{
 		contrails_dispose();
 		error(_error_immediate, "couldn't allocate contrail globals");
@@ -297,17 +300,18 @@ void contrails_reconnect_to_structure_bsp(
 
 		for (instance_index = 0; instance_index < MAXIMUM_INSTANCES_PER_CONTRAIL; instance_index++)
 		{
-			struct contrail_point_datum *point;
-			long contrail_point_index;
+			long contrail_point_index = contrail->first_contrail_point_indices[instance_index];
 
-			for (contrail_point_index = contrail->first_contrail_point_indices[instance_index]; contrail_point_index != NONE; contrail_point_index = point->next_contrail_point_index)
+			while (contrail_point_index != NONE)
 			{
-				point = contrail_point_get(contrail_point_index);
+				struct contrail_point_datum *point = contrail_point_get(contrail_point_index);
 
 				if (point->location.cluster_index != NONE)
 				{
 					scenario_location_from_point(&point->location, &point->position);
 				}
+
+				contrail_point_index = point->next_contrail_point_index;
 			}
 		}
 	}
@@ -373,13 +377,13 @@ static short contrail_compute_new_point_count(
 
 static void contrail_add_points(
 	long contrail_index,
-	short point_count,
+	short contrail_point_count,
 	boolean force)
 {
 	struct contrail_datum *contrail = contrail_get(contrail_index);
 	struct contrail_definition const *definition = contrail_definition_get(contrail->definition_index);
 
-	if (point_count)
+	if (contrail_point_count)
 	{
 		struct object_marker markers[MAXIMUM_INSTANCES_PER_CONTRAIL];
 		struct object_datum const *object = object_get(contrail->object_index);
@@ -421,7 +425,7 @@ static void contrail_add_points(
 				if (contrail->first_contrail_point_indices[instance_index] != NONE)
 				{
 					previous_point = contrail_point_get(contrail->first_contrail_point_indices[instance_index]);
-					new_point_count = point_count;
+					new_point_count = contrail_point_count;
 				}
 				else
 				{
@@ -502,13 +506,13 @@ static void contrail_update_points(
 	for (instance_index = 0; instance_index < MAXIMUM_INSTANCES_PER_CONTRAIL; instance_index++)
 	{
 		long point_indices[MAXIMUM_CONTRAIL_POINTS_PER_MAP];
-		struct contrail_point_datum *point;
-		long contrail_point_index;
+		struct contrail_point_datum *final_point = NULL;
 		short point_count = 0;
+		long contrail_point_index = contrail->first_contrail_point_indices[instance_index];
 
-		for (contrail_point_index = contrail->first_contrail_point_indices[instance_index]; contrail_point_index != NONE; contrail_point_index = point->next_contrail_point_index)
+		while (contrail_point_index != NONE)
 		{
-			point = contrail_point_get(contrail_point_index);
+			struct contrail_point_datum *point = contrail_point_get(contrail_point_index);
 
 			if (!TEST_FLAG(point->flags, _contrail_point_living_dead_bit))
 			{
@@ -536,17 +540,10 @@ static void contrail_update_points(
 
 						SET_FLAG(point->flags, _contrail_point_transitioning_bit, FALSE);
 					}
-					else
+					else if (point->state_index + 1 < definition->states.count)
 					{
-						struct contrail_point_state const *state;
+						struct contrail_point_state const *state = TAG_BLOCK_GET_ELEMENT(&definition->states, point->state_index, struct contrail_point_state);
 
-						if (point->state_index + 1 >= definition->states.count)
-						{
-							SET_FLAG(point->flags, _contrail_point_living_dead_bit, TRUE);
-							break;
-						}
-
-						state = TAG_BLOCK_GET_ELEMENT(&definition->states, point->state_index, struct contrail_point_state);
 						point->time = 0.f;
 						point->delta = contrail_scale_random_value(
 							point->density,
@@ -561,6 +558,11 @@ static void contrail_update_points(
 						}
 
 						SET_FLAG(point->flags, _contrail_point_transitioning_bit, TRUE);
+					}
+					else
+					{
+						SET_FLAG(point->flags, _contrail_point_living_dead_bit, TRUE);
+						break;
 					}
 				}
 			}
@@ -590,7 +592,9 @@ static void contrail_update_points(
 				}
 			}
 
+			final_point = point;
 			point_indices[point_count++] = contrail_point_index;
+			contrail_point_index = point->next_contrail_point_index;
 		}
 
 		while (point_count-- > 1)
@@ -598,16 +602,18 @@ static void contrail_update_points(
 			struct contrail_point_datum const *last_point = contrail_point_get(point_indices[point_count]);
 			struct contrail_point_datum *previous_point = contrail_point_get(point_indices[point_count - 1]);
 
-			if (!TEST_FLAG(last_point->flags, _contrail_point_living_dead_bit) ||
-				!TEST_FLAG(previous_point->flags, _contrail_point_living_dead_bit) ||
-				last_point->next_contrail_point_index != NONE)
+			if (TEST_FLAG(last_point->flags, _contrail_point_living_dead_bit) &&
+				TEST_FLAG(previous_point->flags, _contrail_point_living_dead_bit) &&
+				last_point->next_contrail_point_index == NONE)
+			{
+				previous_point->next_contrail_point_index = NONE;
+				contrail->contrail_point_counts[instance_index]--;
+				datum_delete(contrail_point_data, point_indices[point_count]);
+			}
+			else
 			{
 				break;
 			}
-
-			previous_point->next_contrail_point_index = NONE;
-			contrail->contrail_point_counts[instance_index]--;
-			datum_delete(contrail_point_data, point_indices[point_count]);
 		}
 
 		if (contrail->contrail_point_counts[instance_index] == 1 &&

@@ -40,7 +40,7 @@ enum
 
 /* ---------- macros */
 
-#define weather_particle_get(index) ((struct weather_particle_datum *)datum_get(weather_particle_data, (index)))	/* fake name */
+#define weather_particle_get(index) ((struct weather_particle_datum *)datum_get(weather_particle_data, (index)))
 
 /* ---------- structures */
 
@@ -91,7 +91,7 @@ static struct weather_particle_type_datum *weather_particle_system_get_type(stru
 static void weather_particle_system_update_particle_count(short system_index, short type_index, real scale);
 static long weather_particle_system_new_particle(short system_index, short type_index);
 static void weather_particle_system_type_delete_particle(struct weather_particle_type_datum *type);
-static void weather_particle_system_box_offset_from_point3d(real box_width, real_point3d const *point, real_point3d *box_offset);
+static void weather_particle_system_box_offset_from_point3d(real box_width, real_point3d const *point, real_point3d *result);
 static void weather_particle_system_update(short system_index);
 static void weather_particle_update_physics(short system_index, short type_index, short particle_index);
 static void weather_particle_system_wrap_point(real box_width, real_point3d const *point, real_point3d *result);
@@ -361,12 +361,12 @@ static void weather_particle_system_type_delete_particle(
 static void weather_particle_system_box_offset_from_point3d(
 	real box_width,
 	real_point3d const *point,
-	real_point3d *box_offset)
+	real_point3d *result)
 {
-	weather_particle_system_wrap_point(box_width, point, box_offset);
-	box_offset->x = point->x - box_offset->x;
-	box_offset->y = point->y - box_offset->y;
-	box_offset->z = point->z - box_offset->z;
+	weather_particle_system_wrap_point(box_width, point, result);
+	result->x = point->x - result->x;
+	result->y = point->y - result->y;
+	result->z = point->z - result->z;
 
 	return;
 }
@@ -499,12 +499,12 @@ static void weather_particle_system_build_clipping_planes(
 	real_plane3d *clip_planes,
 	real far_clip_distance)
 {
-	real_point3d far_point;
+	real_point3d far_view_point;
 
-	far_point.x = render.camera.forward.i*far_clip_distance + render.camera.position.x;
-	far_point.y = render.camera.forward.j*far_clip_distance + render.camera.position.y;
-	far_point.z = render.camera.forward.k*far_clip_distance + render.camera.position.z;
-	plane3d_from_point_and_normal(&clip_planes[_clip_far], &far_point, &render.camera.forward);
+	far_view_point.x = render.camera.forward.i*far_clip_distance + render.camera.position.x;
+	far_view_point.y = render.camera.forward.j*far_clip_distance + render.camera.position.y;
+	far_view_point.z = render.camera.forward.k*far_clip_distance + render.camera.position.z;
+	plane3d_from_point_and_normal(&clip_planes[_clip_far], &far_view_point, &render.camera.forward);
 	clip_planes[_clip_left] = render.frustum.world_planes[0];
 	clip_planes[_clip_right] = render.frustum.world_planes[1];
 	clip_planes[_clip_top] = render.frustum.world_planes[2];
@@ -616,8 +616,8 @@ static void weather_particle_system_render(
 {
 	short type_index;
 	struct weather_particle_system_datum *system = weather_particle_system_get(system_index);
-	struct weather_particle_system_definition const *definition = weather_particle_system_definition_get(system->definition_index);
-	struct structure_bsp const *structure_bsp = global_structure_bsp_get();
+	struct weather_particle_system_definition *definition = weather_particle_system_definition_get(system->definition_index);
+	struct structure_bsp *structure = global_structure_bsp_get();
 
 	weather_particle_system_update(system_index);
 
@@ -780,7 +780,7 @@ static void weather_particle_system_render(
 						{
 							short polyhedron_plane_index;
 							struct structure_weather_polyhedron const *polyhedron = TAG_BLOCK_GET_ELEMENT(
-								&structure_bsp->weather_polyhedra,
+								&structure->weather_polyhedra,
 								weather_polyhedra_indices[polyhedron_index],
 								struct structure_weather_polyhedron);
 

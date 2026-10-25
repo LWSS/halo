@@ -61,9 +61,9 @@ enum
 
 /* ---------- macros */
 
-#define effect_get(index) ((struct effect_datum *)datum_get(effect_data, (index)))	/* fake name */
+#define effect_get(index) ((struct effect_datum *)datum_get(effect_data, (index)))
 #define effect_try_and_get(index) ((struct effect_datum *)datum_try_and_get(effect_data, (index)))
-#define effect_location_get(index) ((struct effect_location_datum *)datum_get(effect_location_data, (index)))	/* fake name */
+#define effect_location_get(index) ((struct effect_location_datum *)datum_get(effect_location_data, (index)))
 
 /* ---------- structures */
 
@@ -130,9 +130,9 @@ static void effect_marker_list_get_marker(struct object_marker *result, struct e
 static void effect_update(long effect_index, real dt);
 static void effect_generate_particles(struct effect_datum *effect);
 static void effect_generate_parts(struct effect_datum *effect);
-static void effect_generate_part(struct effect_datum const *effect, struct effect_part_definition const *part_definition, struct effect_location_datum const *location, real_point3d const *world_point, real_vector3d const *world_forward, real_vector3d const *world_up, real scale);
+static void effect_generate_part(struct effect_datum const *effect, struct effect_part_definition const *part_definition, struct effect_location_datum *location, real_point3d const *world_point, real_vector3d const *world_forward, real_vector3d const *world_up, real scale);
 static struct effect_location_datum *effect_location_get_next_instance(struct effect_datum const *effect, long *location_datum_index, short camera_mode);
-static real_matrix4x3 *effect_get_node_matrix(struct effect_datum const *effect, short node_designator);
+static real_matrix4x3 *effect_get_node_matrix(struct effect_datum *effect, short node_designator);
 static real effect_evaluate_function_integral(short function, real fraction);
 
 /* ---------- globals */
@@ -160,7 +160,10 @@ void effects_initialize(
 	effect_data = game_state_data_new("effect", MAXIMUM_EFFECTS_PER_MAP, sizeof(struct effect_datum));
 	effect_location_data = game_state_data_new("effect location", MAXIMUM_EFFECT_LOCATIONS_PER_MAP, sizeof(struct effect_location_datum));
 
-	if (!effect_data || !effect_location_data)
+	if (effect_data && effect_location_data)
+	{
+	}
+	else
 	{
 		error(_error_immediate, "couldn't allocate effect globals");
 	}
@@ -464,14 +467,14 @@ void effect_stop(
 		{
 			SET_FLAG(effect->flags, _effect_delete_on_stop_bit, and_delete);
 
-			if (definition->loop_stop_index < 0 || definition->loop_stop_index + 1 >= definition->events.count)
-			{
-				SET_FLAG(effect->flags, _effect_stopped_bit, TRUE);
-			}
-			else
+			if (definition->loop_stop_index >= 0 && definition->loop_stop_index + 1 < definition->events.count)
 			{
 				effect_set_event(effect_index, definition->loop_stop_index + 1);
 				SET_FLAG(effect->flags, _effect_stopping_bit, TRUE);
+			}
+			else
+			{
+				SET_FLAG(effect->flags, _effect_stopped_bit, TRUE);
 			}
 		}
 		else
@@ -638,7 +641,7 @@ boolean dangerous_effects_near_player(
 
 	for (effect_index = data_next_index(effect_data, NONE); effect_index != NONE; effect_index = data_next_index(effect_data, effect_index))
 	{
-		struct effect_datum const *effect = effect_get(effect_index);
+		struct effect_datum *effect = effect_get(effect_index);
 		struct effect_definition const *definition = effect_definition_get(effect->definition_index);
 
 		if (!TEST_FLAG(effect->flags, _effect_stopped_bit) && definition->runtime_danger_radius != 0.f)
@@ -750,18 +753,20 @@ static void effect_random_translational_velocity(
 	unsigned long b_scale_flags)
 {
 	real magnitude = effect_real_random_range(seed, effect, lower_bound, upper_bound, a_scale_flags, b_scale_flags, _effect_velocity_bit);
-	real angle = real_seed_random(seed) * effect_scale(effect, cone_angle, a_scale_flags, b_scale_flags, _effect_velocity_cone_bit);
 
+	cone_angle = effect_scale(effect, cone_angle, a_scale_flags, b_scale_flags, _effect_velocity_cone_bit) * real_seed_random(seed);
 	*direction = *forward;
 
-	if (angle != 0.f)
+	if (cone_angle != 0.f)
 	{
-		real_vector3d axis;
+		real_vector3d random_axis;
 
-		rotate_vector_about_axis(direction, seed_random_direction3d(seed, &axis), sine(angle), cosine(angle));
+		rotate_vector_about_axis(direction, seed_random_direction3d(seed, &random_axis), sine(cone_angle), cosine(cone_angle));
 	}
 
-	scale_vector3d(direction, magnitude, velocity);
+	velocity->i = magnitude * direction->i;
+	velocity->j = magnitude * direction->j;
+	velocity->k = magnitude * direction->k;
 
 	return;
 }
@@ -780,7 +785,9 @@ static void effect_random_angular_velocity(
 	if (magnitude != 0.f)
 	{
 		seed_random_direction3d(seed, result);
-		scale_vector3d(result, magnitude, result);
+		result->i = magnitude * result->i;
+		result->j = magnitude * result->j;
+		result->k = magnitude * result->k;
 	}
 	else
 	{
@@ -844,40 +851,43 @@ static long effect_allocate(
 	{
 		struct effect_definition const *definition = effect_definition_get(definition_index);
 
-		if (!can_be_deterministic && TEST_FLAG(definition->flags, _effect_must_be_deterministic_bit))
+		if (can_be_deterministic || !TEST_FLAG(definition->flags, _effect_must_be_deterministic_bit))
 		{
-			error(_error_silent, "cannot create objects, lights, or damage from an effect created by particles.");
-		}
-		else if (definition->events.count > 0)
-		{
-			effect_index = datum_new(effect_data);
-
-			if (effect_index == NONE && TEST_FLAG(definition->flags, _effect_must_be_deterministic_bit))
+			if (definition->events.count > 0)
 			{
-				for (effect_index = data_next_index(effect_data, NONE); effect_index != NONE; effect_index = data_next_index(effect_data, effect_index))
-				{
-					struct effect_datum const *effect = effect_get(effect_index);
+				effect_index = datum_new(effect_data);
 
-					if (!TEST_FLAG(effect_definition_get(effect->definition_index)->flags, _effect_must_be_deterministic_bit))
+				if (effect_index == NONE && TEST_FLAG(definition->flags, _effect_must_be_deterministic_bit))
+				{
+					for (effect_index = data_next_index(effect_data, NONE); effect_index != NONE; effect_index = data_next_index(effect_data, effect_index))
 					{
-						datum_delete(effect_data, effect_index);
-						effect_index = datum_new(effect_data);
-						match_assert("c:\\halo\\SOURCE\\effects\\effects.c", 941, effect_index!=NONE);
-						break;
+						struct effect_datum const *effect = effect_get(effect_index);
+
+						if (!TEST_FLAG(effect_definition_get(effect->definition_index)->flags, _effect_must_be_deterministic_bit))
+						{
+							datum_delete(effect_data, effect_index);
+							effect_index = datum_new(effect_data);
+							match_assert("c:\\halo\\SOURCE\\effects\\effects.c", 941, effect_index!=NONE);
+							break;
+						}
 					}
 				}
-			}
 
-			if (effect_index != NONE)
-			{
-				struct effect_datum *effect = effect_get(effect_index);
+				if (effect_index != NONE)
+				{
+					struct effect_datum *effect = effect_get(effect_index);
 
-				effect->definition_index = definition_index;
-				effect->owner_object_index = owner_object_index;
-				effect->local_player_index = NONE;
-				effect->flags = 0;
-				effect_set_event(effect_index, 0);
+					effect->definition_index = definition_index;
+					effect->owner_object_index = owner_object_index;
+					effect->local_player_index = NONE;
+					effect->flags = 0;
+					effect_set_event(effect_index, 0);
+				}
 			}
+		}
+		else
+		{
+			error(_error_silent, "cannot create objects, lights, or damage from an effect created by particles.");
 		}
 	}
 
@@ -891,9 +901,12 @@ static void impulse_effect_initialize(
 	real_rgb_color const *color,
 	struct effect_vector_field const *impulse_field)
 {
+	real_rgb_color const *effect_color;
+
 	effect->scale_a = scale_a;
 	effect->scale_b = scale_b;
-	effect->color = color ? *color : *global_real_rgb_white;
+	effect_color = color ? color : global_real_rgb_white;
+	effect->color = *effect_color;
 	match_assert_valid_real_rgb_color("c:\\halo\\SOURCE\\effects\\effects.c", 980, &effect->color);
 
 	if (impulse_field)
@@ -1079,71 +1092,73 @@ static void effect_update(
 		struct object_datum const *parent;
 		struct object_datum *object = object_try_and_get(effect->object_index);
 
-		if (!object)
+		if (object)
 		{
-			effect_delete(effect_index);
-			return;
-		}
+			parent_object_index = object_get_ultimate_parent(effect->object_index);
+			parent = object_get(parent_object_index);
 
-		parent_object_index = object_get_ultimate_parent(effect->object_index);
-		parent = object_get(parent_object_index);
+			if (TEST_FLAG(parent->object.flags, _object_connected_to_map_bit))
+			{
+				effect->location = parent->object.location;
+				effect->velocity = parent->object.translational_velocity;
+			}
+			else
+			{
+				effect->location.cluster_index = NONE;
+			}
 
-		if (TEST_FLAG(parent->object.flags, _object_connected_to_map_bit))
-		{
-			effect->location = parent->object.location;
-			effect->velocity = parent->object.translational_velocity;
+			if (TEST_FLAG(effect->flags, _effect_loop_bit))
+			{
+				if (!object_get_function_value(effect->object_index, effect->scale_a_function_index, &effect->scale_a))
+				{
+					if (TEST_FLAG(definition->flags, _effect_deleted_when_inactive_bit))
+					{
+						short attachment_index;
+						struct object_definition const *object_definition = object_definition_get(object->definition_index);
+
+						for (attachment_index = 0; attachment_index < object_definition->object.attachments.count; attachment_index++)
+						{
+							if (object->object.attachment_indices[attachment_index] == effect_index)
+							{
+								object->object.attachment_indices[attachment_index] = NONE;
+								break;
+							}
+						}
+
+						effect_delete(effect_index);
+						return;
+					}
+					else if (!TEST_FLAG(effect->flags, _effect_stopping_bit) && !TEST_FLAG(effect->flags, _effect_stopped_bit))
+					{
+						effect_stop(effect_index, FALSE);
+					}
+				}
+				else if (TEST_FLAG(effect->flags, _effect_stopped_bit))
+				{
+					if (TEST_FLAG(effect->flags, _effect_delete_on_stop_bit))
+					{
+						effect_delete(effect_index);
+					}
+					else
+					{
+						SET_FLAG(effect->flags, _effect_stopped_bit, FALSE);
+						effect_set_event(effect_index, 0);
+					}
+				}
+
+				object_get_function_value(effect->object_index, effect->scale_b_function_index, &effect->scale_b);
+
+				if (effect->change_color_index != NONE)
+				{
+					effect->color = object->object.outgoing_change_colors[effect->change_color_index];
+					match_assert_valid_real_rgb_color("c:\\halo\\SOURCE\\effects\\effects.c", 1227, &effect->color);
+				}
+			}
 		}
 		else
 		{
-			effect->location.cluster_index = NONE;
-		}
-
-		if (TEST_FLAG(effect->flags, _effect_loop_bit))
-		{
-			if (!object_get_function_value(effect->object_index, effect->scale_a_function_index, &effect->scale_a))
-			{
-				if (TEST_FLAG(definition->flags, _effect_deleted_when_inactive_bit))
-				{
-					short attachment_index;
-					struct object_definition const *object_definition = object_definition_get(object->definition_index);
-
-					for (attachment_index = 0; attachment_index < object_definition->object.attachments.count; attachment_index++)
-					{
-						if (object->object.attachment_indices[attachment_index] == effect_index)
-						{
-							object->object.attachment_indices[attachment_index] = NONE;
-							break;
-						}
-					}
-
-					effect_delete(effect_index);
-					return;
-				}
-				else if (!TEST_FLAG(effect->flags, _effect_stopping_bit) && !TEST_FLAG(effect->flags, _effect_stopped_bit))
-				{
-					effect_stop(effect_index, FALSE);
-				}
-			}
-			else if (TEST_FLAG(effect->flags, _effect_stopped_bit))
-			{
-				if (TEST_FLAG(effect->flags, _effect_delete_on_stop_bit))
-				{
-					effect_delete(effect_index);
-				}
-				else
-				{
-					SET_FLAG(effect->flags, _effect_stopped_bit, FALSE);
-					effect_set_event(effect_index, 0);
-				}
-			}
-
-			object_get_function_value(effect->object_index, effect->scale_b_function_index, &effect->scale_b);
-
-			if (effect->change_color_index != NONE)
-			{
-				effect->color = object->object.outgoing_change_colors[effect->change_color_index];
-				match_assert_valid_real_rgb_color("c:\\halo\\SOURCE\\effects\\effects.c", 1227, &effect->color);
-			}
+			effect_delete(effect_index);
+			return;
 		}
 	}
 
@@ -1151,50 +1166,49 @@ static void effect_update(
 
 	if (effect->location.cluster_index != NONE)
 	{
-		visible = TEST_FLAG(definition->flags, _effect_must_be_deterministic_bit) ?
-			scenario_location_potentially_visible(&effect->location) :
-			scenario_location_potentially_visible_local(&effect->location);
-	}
-
-	if (!visible)
-	{
-		if (!TEST_FLAG(effect->flags, _effect_invisible_bit))
+		if (TEST_FLAG(definition->flags, _effect_must_be_deterministic_bit))
 		{
-			if (TEST_FLAG(effect->flags, _effect_loop_bit))
-			{
-				SET_FLAG(effect->flags, _effect_invisible_bit, TRUE);
-			}
-			else
-			{
-				effect_delete(effect_index);
-				return;
-			}
+			visible = scenario_location_potentially_visible(&effect->location);
+		}
+		else
+		{
+			visible = scenario_location_potentially_visible_local(&effect->location);
 		}
 	}
-	else if (TEST_FLAG(effect->flags, _effect_invisible_bit))
+
+	if (!visible && !TEST_FLAG(effect->flags, _effect_invisible_bit))
+	{
+		if (TEST_FLAG(effect->flags, _effect_loop_bit))
+		{
+			SET_FLAG(effect->flags, _effect_invisible_bit, TRUE);
+		}
+		else
+		{
+			effect_delete(effect_index);
+			return;
+		}
+	}
+
+	if (visible && TEST_FLAG(effect->flags, _effect_invisible_bit))
 	{
 		SET_FLAG(effect->flags, _effect_invisible_bit, FALSE);
 	}
 
-	for (event_count = 0; dt >= 0.f; event_count++)
+	for (event_count = 0; dt >= 0.f && !TEST_FLAG(effect->flags, _effect_stopped_bit) && event_count < MAXIMUM_EFFECT_EVENTS_PER_UPDATE; event_count++)
 	{
 		boolean event_completed;
+		real event_time_remaining = effect->event_duration - effect->event_time;
 
-		if (TEST_FLAG(effect->flags, _effect_stopped_bit) || event_count >= MAXIMUM_EFFECT_EVENTS_PER_UPDATE)
+		if (event_time_remaining <= dt)
 		{
-			break;
-		}
-
-		if (effect->event_duration - effect->event_time <= dt)
-		{
-			dt -= effect->event_duration - effect->event_time;
 			event_completed = TRUE;
 			effect->event_time = effect->event_duration;
+			dt -= event_time_remaining;
 		}
 		else
 		{
-			effect->event_time += dt;
 			event_completed = FALSE;
+			effect->event_time += dt;
 			dt = -1.f;
 		}
 
@@ -1224,7 +1238,11 @@ static void effect_update(
 					next_event_index++;
 				}
 
-				if (next_event_index >= definition->events.count)
+				if (next_event_index < definition->events.count)
+				{
+					effect_set_event(effect_index, next_event_index);
+				}
+				else
 				{
 					if (TEST_FLAG(effect->flags, _effect_loop_bit))
 					{
@@ -1237,8 +1255,6 @@ static void effect_update(
 
 					return;
 				}
-
-				effect_set_event(effect_index, next_event_index);
 			}
 		}
 		else if (event_completed)
@@ -1479,7 +1495,7 @@ static void effect_generate_parts(
 			part_definition->reference.index != NONE &&
 			effect_part_allowed_by_disposition(TEST_FLAG(effect->flags, _effect_nonviolent_bit), part_definition->disposition))
 		{
-			struct effect_location_datum const *location;
+			struct effect_location_datum *location;
 			long location_datum_index = effect->location_datum_indices[part_definition->location_index];
 
 			while (location = effect_location_get_next_instance(effect, &location_datum_index, _effect_camera_mode_independent))
@@ -1530,7 +1546,7 @@ static void effect_generate_parts(
 static void effect_generate_part(
 	struct effect_datum const *effect,
 	struct effect_part_definition const *part_definition,
-	struct effect_location_datum const *location,
+	struct effect_location_datum *location,
 	real_point3d const *world_point,
 	real_vector3d const *world_forward,
 	real_vector3d const *world_up,
@@ -1558,8 +1574,65 @@ static void effect_generate_part(
 			part_definition->velocity_cone_angle,
 			part_definition->a_scales,
 			part_definition->b_scales);
-		add_vectors3d(&velocity, &effect->velocity, &velocity);
+		velocity.i += effect->velocity.i;
+		velocity.j += effect->velocity.j;
+		velocity.k += effect->velocity.k;
 		particle_system_new_unattached(part_definition->reference.index, world_point, &velocity, &tint, scale);
+		break;
+	}
+	case DAMAGE_EFFECT_DEFINITION_TAG:
+	{
+		struct damage_data damage_data;
+		struct object_datum const *owner = object_try_and_get(effect->owner_object_index);
+
+		damage_data_new(&damage_data, part_definition->reference.index);
+
+		if (owner)
+		{
+			damage_data.owner_player_index = owner->object.owner_player_index;
+			damage_data.owner_object_index = effect->owner_object_index;
+			damage_data.owner_team_index = owner->object.owner_team_index;
+		}
+
+		damage_data.scale = scale;
+		damage_data.location = effect->location;
+		damage_data.epicenter = *world_point;
+		damage_data.origin = *world_point;
+		damage_data.direction = *world_forward;
+		area_of_effect_cause_damage(&damage_data, NONE);
+		break;
+	}
+	case OBJECT_DEFINITION_TAG:
+	{
+		struct object_placement_data data;
+
+		object_placement_data_new(&data, part_definition->reference.index, effect->owner_object_index);
+		data.position = *world_point;
+		data.forward = *world_forward;
+		data.up = *world_up;
+		effect_random_translational_velocity(
+			get_global_random_seed_address(),
+			effect,
+			world_forward,
+			&direction,
+			&data.translational_velocity,
+			part_definition->velocity_lower_bound,
+			part_definition->velocity_upper_bound,
+			part_definition->velocity_cone_angle,
+			part_definition->a_scales,
+			part_definition->b_scales);
+		data.translational_velocity.i += effect->velocity.i;
+		data.translational_velocity.j += effect->velocity.j;
+		data.translational_velocity.k += effect->velocity.k;
+		effect_random_angular_velocity(
+			get_global_random_seed_address(),
+			effect,
+			&data.angular_velocity,
+			part_definition->angular_velocity_lower_bound,
+			part_definition->angular_velocity_upper_bound,
+			part_definition->a_scales,
+			part_definition->b_scales);
+		object_new(&data);
 		break;
 	}
 	case SOUND_DEFINITION_TAG:
@@ -1585,37 +1658,15 @@ static void effect_generate_part(
 		}
 
 		break;
-	case OBJECT_DEFINITION_TAG:
-	{
-		struct object_placement_data data;
-
-		object_placement_data_new(&data, part_definition->reference.index, effect->owner_object_index);
-		data.position = *world_point;
-		data.forward = *world_forward;
-		data.up = *world_up;
-		effect_random_translational_velocity(
-			get_global_random_seed_address(),
-			effect,
-			world_forward,
-			&direction,
-			&data.translational_velocity,
-			part_definition->velocity_lower_bound,
-			part_definition->velocity_upper_bound,
-			part_definition->velocity_cone_angle,
-			part_definition->a_scales,
-			part_definition->b_scales);
-		add_vectors3d(&data.translational_velocity, &effect->velocity, &data.translational_velocity);
-		effect_random_angular_velocity(
-			get_global_random_seed_address(),
-			effect,
-			&data.angular_velocity,
-			part_definition->angular_velocity_lower_bound,
-			part_definition->angular_velocity_upper_bound,
-			part_definition->a_scales,
-			part_definition->b_scales);
-		object_new(&data);
+	case LIGHT_DEFINITION_TAG:
+		light_new_unattached(
+			part_definition->reference.index,
+			effect->object_index,
+			location->node_designator == NONE ? NONE : location->node_designator & MASK(_effect_location_first_person_bit),
+			&location->matrix.position,
+			&location->matrix.forward,
+			scale);
 		break;
-	}
 	case DECAL_DEFINITION_TAG:
 	{
 		real radius_modifier;
@@ -1637,37 +1688,6 @@ static void effect_generate_part(
 		decal_new(part_definition->reference.index, world_point, &velocity, radius_modifier, FALSE, NONE, NULL);
 		break;
 	}
-	case DAMAGE_EFFECT_DEFINITION_TAG:
-	{
-		struct damage_data damage_data;
-		struct object_datum const *owner = object_try_and_get(effect->owner_object_index);
-
-		damage_data_new(&damage_data, part_definition->reference.index);
-
-		if (owner)
-		{
-			damage_data.owner_player_index = owner->object.owner_player_index;
-			damage_data.owner_object_index = effect->owner_object_index;
-			damage_data.owner_team_index = owner->object.owner_team_index;
-		}
-
-		damage_data.scale = scale;
-		damage_data.location = effect->location;
-		damage_data.epicenter = *world_point;
-		damage_data.origin = *world_point;
-		damage_data.direction = *world_forward;
-		area_of_effect_cause_damage(&damage_data, NONE);
-		break;
-	}
-	case LIGHT_DEFINITION_TAG:
-		light_new_unattached(
-			part_definition->reference.index,
-			effect->object_index,
-			location->node_designator == NONE ? NONE : location->node_designator & MASK(_effect_location_first_person_bit),
-			&location->matrix.position,
-			&location->matrix.forward,
-			scale);
-		break;
 	default:
 		match_vhalt("c:\\halo\\SOURCE\\effects\\effects.c", 1753, csprintf("effect %s has a bad part %s", tag_get_name(effect->definition_index), part_definition->reference.name));
 		break;
@@ -1708,7 +1728,7 @@ static struct effect_location_datum *effect_location_get_next_instance(
 }
 
 static real_matrix4x3 *effect_get_node_matrix(
-	struct effect_datum const *effect,
+	struct effect_datum *effect,
 	short node_designator)
 {
 	if (node_designator != NONE && TEST_FLAG((word)node_designator, _effect_location_first_person_bit))
@@ -1729,39 +1749,41 @@ static real effect_evaluate_function_integral(
 	short function,
 	real fraction)
 {
-	real integral;
+	real sum;
 
 	if (fraction == -1.f)
 	{
 		return 0.f;
 	}
-
-	switch (function)
+	else
 	{
-	case _effect_particle_distribution_function_start:
-		integral = 1.f;
-		break;
-	case _effect_particle_distribution_function_end:
-		integral = fraction < 1.f ? 0.f : 1.f;
-		break;
-	case _effect_particle_distribution_function_constant:
-		integral = fraction;
-		break;
-	case _effect_particle_distribution_function_buildup:
-		integral = fraction * fraction;
-		break;
-	case _effect_particle_distribution_function_falloff:
-		integral = (2.f - fraction) * fraction;
-		break;
-	case _effect_particle_distribution_function_quadratic:
-		integral = (3.f - (fraction + fraction)) * fraction * fraction;
-		break;
-	default:
-		match_halt("c:\\halo\\SOURCE\\effects\\effects.c", 1886);
-		break;
+		switch (function)
+		{
+		case _effect_particle_distribution_function_start:
+			sum = 1.f;
+			break;
+		case _effect_particle_distribution_function_end:
+			sum = fraction < 1.f ? 0.f : 1.f;
+			break;
+		case _effect_particle_distribution_function_constant:
+			sum = fraction;
+			break;
+		case _effect_particle_distribution_function_buildup:
+			sum = fraction * fraction;
+			break;
+		case _effect_particle_distribution_function_falloff:
+			sum = (2.f - fraction) * fraction;
+			break;
+		case _effect_particle_distribution_function_quadratic:
+			sum = (3.f - (fraction + fraction)) * fraction * fraction;
+			break;
+		default:
+			match_halt("c:\\halo\\SOURCE\\effects\\effects.c", 1886);
+			break;
+		}
 	}
 
-	return integral;
+	return sum;
 }
 
 /* ---------- private code */

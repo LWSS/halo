@@ -95,12 +95,12 @@ struct player_effect_globals_definition
 /* ---------- prototypes */
 
 struct player_effect_datum *player_effect_get(short local_player_index);
-static void get_shake_matrix(real translation, real rotation, real_matrix4x3 *matrix);
+static void get_shake_matrix(real translation_magnitude, real rotation_magnitude, real_matrix4x3 *shake_matrix);
 static real effect_scale_factor(real zero_scale_factor, real scale);
 static void player_effect_update_screen_flash(short local_player_index, struct player_effect_datum *datum, struct screen_flash_definition const *screen_flash, real scale, real time_scale);
 static void player_effect_update_camera_impulse(short local_player_index, struct player_effect_datum *datum, struct camera_impulse_definition const *camera_impulse, real_vector3d const *direction, real scale, real time_scale);
 static void player_effect_update_camera_shake(short local_player_index, struct player_effect_datum *datum, struct camera_shake_definition const *camera_shake, real scale, real time_scale);
-static real effect_scale_value(short function, real scale, real time, real duration);
+static real effect_scale_value(short transition, real scale, real dt, real duration);
 
 /* ---------- globals */
 
@@ -221,10 +221,10 @@ void player_effect_continuous_refresh(
 
 		if (unit_index != NONE)
 		{
-			real_point3d position;
+			real_point3d object_origin;
 
-			object_get_origin(unit_index, &position);
-			player_effect_add_continuous_effect(local_player_index, effect_index, distance3d(&position, origin));
+			object_get_origin(unit_index, &object_origin);
+			player_effect_add_continuous_effect(local_player_index, effect_index, distance3d(&object_origin, origin));
 		}
 	}
 
@@ -232,11 +232,11 @@ void player_effect_continuous_refresh(
 }
 
 void scripted_player_effect_set_translation(
-	real i,
-	real j,
-	real k)
+	real x,
+	real y,
+	real z)
 {
-	set_real_point3d(&player_effect_globals->scripted_effect.max_translation, i, j, k);
+	set_real_point3d(&player_effect_globals->scripted_effect.max_translation, x, y, z);
 
 	return;
 }
@@ -287,7 +287,7 @@ void scripted_player_effect_stop(
 
 void player_effect_screen_flash(
 	long player_index,
-	struct screen_flash_definition const *screen_flash,
+	struct screen_flash_definition *screen_flash,
 	real scale)
 {
 	if (player_index != NONE)
@@ -498,39 +498,8 @@ void player_effect_get_screen_flash(
 
 	if (!console_is_active())
 	{
-		if (player_effect_globals->screen_fade.ticks == NONE ||
-			(!player_effect_globals->screen_fade.fading_out && game_time_get() - player_effect_globals->screen_fade.start_time > player_effect_globals->screen_fade.ticks))
-		{
-			if (local_player_index != NONE)
-			{
-				struct player_effect_datum *datum = player_effect_get(local_player_index);
-				struct screen_flash_definition const *definition = &datum->screen_flash;
-
-				player_effect_globals->screen_fade.ticks = NONE;
-
-				if (datum->screen_flash_time_left > 0 || TEST_FLAG(datum->flags, _screen_flash_just_started_bit))
-				{
-					SET_FLAG(datum->flags, _screen_flash_just_started_bit, FALSE);
-					screen_flash->type = render_screen_flash_type_map[definition->type];
-					screen_flash->color = definition->screen_flash_color;
-
-					if (definition->duration > 0.f)
-					{
-						screen_flash->intensity = transition_function_evaluate(
-							definition->fade_function,
-							((real)datum->screen_flash_time_left / definition->duration) * definition->zero_scale_factor);
-					}
-					else
-					{
-						screen_flash->intensity = definition->zero_scale_factor;
-					}
-
-					datum->screen_flash_time_left -= game_time_get_elapsed();
-					match_assert("c:\\halo\\SOURCE\\effects\\player_effects.c", 530, screen_flash->intensity>=0.0f && screen_flash->intensity<=1.0f);
-				}
-			}
-		}
-		else
+		if (player_effect_globals->screen_fade.ticks != NONE &&
+			(player_effect_globals->screen_fade.fading_out || game_time_get() - player_effect_globals->screen_fade.start_time <= player_effect_globals->screen_fade.ticks))
 		{
 			real intensity;
 
@@ -557,6 +526,34 @@ void player_effect_get_screen_flash(
 			}
 
 			screen_flash->intensity = PIN(screen_flash->intensity, 0.f, 1.f);
+		}
+		else if (local_player_index != NONE)
+		{
+			struct player_effect_datum *datum = player_effect_get(local_player_index);
+			struct screen_flash_definition const *definition = &datum->screen_flash;
+
+			player_effect_globals->screen_fade.ticks = NONE;
+
+			if (datum->screen_flash_time_left > 0 || TEST_FLAG(datum->flags, _screen_flash_just_started_bit))
+			{
+				SET_FLAG(datum->flags, _screen_flash_just_started_bit, FALSE);
+				screen_flash->type = render_screen_flash_type_map[definition->type];
+				screen_flash->color = definition->screen_flash_color;
+
+				if (definition->duration > 0.f)
+				{
+					screen_flash->intensity = transition_function_evaluate(
+						definition->fade_function,
+						((real)datum->screen_flash_time_left / definition->duration) * definition->zero_scale_factor);
+				}
+				else
+				{
+					screen_flash->intensity = definition->zero_scale_factor;
+				}
+
+				datum->screen_flash_time_left -= game_time_get_elapsed();
+				match_assert("c:\\halo\\SOURCE\\effects\\player_effects.c", 530, screen_flash->intensity>=0.0f && screen_flash->intensity<=1.0f);
+			}
 		}
 	}
 
@@ -598,24 +595,24 @@ void player_effect_clear_damage_indicators(
 /* ---------- private code */
 
 static void get_shake_matrix(
-	real translation,
-	real rotation,
-	real_matrix4x3 *matrix)
+	real translation_magnitude,
+	real rotation_magnitude,
+	real_matrix4x3 *shake_matrix)
 {
-	if (rotation != 0.f)
+	if (rotation_magnitude != 0.f)
 	{
-		real_vector3d axis;
+		real_vector3d rotation_direction;
 
-		local_random_direction3d(&axis);
-		matrix4x3_rotation_from_axis_and_angle(matrix, &axis, sine(rotation), cosine(rotation));
+		local_random_direction3d(&rotation_direction);
+		matrix4x3_rotation_from_axis_and_angle(shake_matrix, &rotation_direction, sine(rotation_magnitude), cosine(rotation_magnitude));
 	}
 
-	if (translation != 0.f)
+	if (translation_magnitude != 0.f)
 	{
-		real_vector3d offset;
+		real_vector3d translation_direction;
 
-		local_random_direction3d(&offset);
-		scale_vector3d(&offset, translation, (real_vector3d *)&matrix->position);
+		local_random_direction3d(&translation_direction);
+		scale_vector3d(&translation_direction, translation_magnitude, (real_vector3d *)&shake_matrix->position);
 	}
 
 	return;
@@ -919,10 +916,10 @@ static void player_effect_update_camera_shake(
 }
 
 static real effect_scale_value(
-	short function,
+	short transition,
 	real scale,
-	real time,
+	real dt,
 	real duration)
 {
-	return transition_function_evaluate(function, 1.f - time / duration) * scale;
+	return transition_function_evaluate(transition, 1.f - dt / duration) * scale;
 }
