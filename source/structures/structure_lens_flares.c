@@ -197,7 +197,7 @@ boolean build_structure_lens_flares(
 
 									for (triangle_index = 0; triangle_index < geometry.triangles.count; triangle_index++)
 									{
-										struct connected_triangle *triangle = dynamic_array_get_element(&geometry.triangles, triangle_index, sizeof(struct connected_triangle));
+										struct connected_triangle *triangle = dynamic_array_get_element(&geometry.triangles, triangle_index, sizeof(*triangle));
 
 										if (triangle->group_index == coplanar_group_index)
 										{
@@ -344,7 +344,7 @@ boolean build_structure_lens_flares(
 				}
 			}
 
-			temp_markers = match_malloc("c:\\halo\\SOURCE\\structures\\structure_lens_flares.c", 363, structure_bsp->lens_flare_markers.count * sizeof(struct temporary_lens_flare_marker));
+			temp_markers = match_malloc("c:\\halo\\SOURCE\\structures\\structure_lens_flares.c", 363, structure_bsp->lens_flare_markers.count * sizeof(*temp_markers));
 
 			if (temp_markers)
 			{
@@ -364,7 +364,7 @@ boolean build_structure_lens_flares(
 					direction.j = marker->j_direction / 127.f;
 					direction.k = marker->k_direction / 127.f;
 					offset = 1.f / 65536.f;
-					memcpy(&temp_markers[marker_index].marker, marker, sizeof(struct structure_lens_flare_marker));
+					memcpy(&temp_markers[marker_index].marker, marker, sizeof(temp_markers[marker_index].marker));
 
 					do
 					{
@@ -378,7 +378,7 @@ boolean build_structure_lens_flares(
 				qsort(
 					temp_markers,
 					structure_bsp->lens_flare_markers.count,
-					sizeof(struct temporary_lens_flare_marker),
+					sizeof(*temp_markers),
 					compare_temp_markers);
 
 				for (marker_index = 0; marker_index < structure_bsp->lens_flare_markers.count; marker_index++)
@@ -398,7 +398,7 @@ boolean build_structure_lens_flares(
 						memcpy(
 							TAG_BLOCK_GET_ELEMENT(&structure_bsp->lens_flare_markers, marker_count++, struct structure_lens_flare_marker),
 							&temp_markers[marker_index].marker,
-							sizeof(struct structure_lens_flare_marker));
+							sizeof(temp_markers[marker_index].marker));
 						cluster->lens_flare_marker_count++;
 					}
 				}

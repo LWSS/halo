@@ -91,10 +91,11 @@ __inline void reference_list_remove(
 {
 	struct data_reference *reference;
 
-	while (*first_reference_index!=NONE)
+	while (*first_reference_index != NONE)
 	{
 		reference = (struct data_reference *)datum_get(array, *first_reference_index);
-		if (reference->datum_index==datum_index)
+
+		if (reference->datum_index == datum_index)
 		{
 			datum_delete(array, *first_reference_index);
 			*first_reference_index = reference->next_reference_index;

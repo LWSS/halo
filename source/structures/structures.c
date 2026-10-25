@@ -632,4 +632,3 @@ void render_debug_fog_planes(
 }
 
 /* ---------- private code */
-
