@@ -113,6 +113,8 @@ void ai_initialize(
 	ai_script_initialize();
 	ai_communication_initialize();
 	actor_move_initialize();
+
+	return;
 }
 
 void ai_dispose(
@@ -126,6 +128,8 @@ void ai_dispose(
 	paths_dispose();
 	ai_profile_dispose();
 	ai_debug_dispose();
+
+	return;
 }
 
 void ai_initialize_for_new_map(
@@ -154,6 +158,8 @@ void ai_initialize_for_new_map(
 	ai_flush_spatial_effects();
 
 	ai_globals->ai_initialized_for_map = TRUE;
+
+	return;
 }
 
 void ai_dispose_from_old_map(
@@ -169,12 +175,16 @@ void ai_dispose_from_old_map(
 	ai_debug_dispose_from_old_map();
 
 	ai_globals->ai_initialized_for_map = FALSE;
+
+	return;
 }
 
 void ai_place(
 	void)
 {
 	encounters_create_for_new_map();
+
+	return;
 }
 
 void ai_update(
@@ -211,6 +221,8 @@ void ai_update(
 	}
 
 	profile_exit(ai_update_section);
+
+	return;
 }
 
 void ai_globals_ai_active(
@@ -219,6 +231,8 @@ void ai_globals_ai_active(
 	match_assert("c:\\halo\\SOURCE\\ai\\ai.c", 314, ai_globals);
 
 	ai_globals->ai_active = enable;
+
+	return;
 }
 
 void ai_globals_dialogue_triggers_enabled(
@@ -227,6 +241,8 @@ void ai_globals_dialogue_triggers_enabled(
 	match_assert("c:\\halo\\SOURCE\\ai\\ai.c", 323, ai_globals);
 
 	ai_globals->dialogue_triggers_enabled = enable;
+
+	return;
 }
 
 void ai_globals_grenades_enabled(
@@ -235,6 +251,8 @@ void ai_globals_grenades_enabled(
 	match_assert("c:\\halo\\SOURCE\\ai\\ai.c", 332, ai_globals);
 
 	ai_globals->grenades_enabled = enable;
+
+	return;
 }
 
 void ai_get_major_upgrade_chance(
@@ -268,6 +286,8 @@ void ai_get_major_upgrade_chance(
 		*random_chance = game_difficulty_get_value(_game_difficulty_major_normal_placement);
 		break;
 	}
+
+	return;
 }
 
 boolean ai_consider_major_upgrade(
@@ -381,6 +401,8 @@ void ai_erase(
 			}
 		}
 	}
+
+	return;
 }
 
 boolean ai_release_inactive_swarms(
@@ -505,6 +527,8 @@ void ai_find_inactive_encounters(
 			sizeof(struct potentially_releasable_encounter),
 			compare_releasable_inactive_encounters);
 	}
+
+	return;
 }
 
 boolean ai_release_inactive_encounters(
@@ -573,6 +597,8 @@ static void ai_generate_line_of_fire_pill(
 	pill->prop_index = prop_index;
 	pill->unit_index = unit_index;
 	pill->hit = FALSE;
+
+	return;
 }
 
 static short ai_find_line_of_fire_friend_pills(
@@ -1114,6 +1140,8 @@ void ai_handle_death(
 		NULL);
 	ai_conversation_unit_died(unit_index, FALSE);
 	encounters_unit_died(unit_index);
+
+	return;
 }
 
 boolean ai_handle_killing_spree(
@@ -1219,6 +1247,8 @@ void ai_handle_allegiance_status_changed(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_handle_allegiance_broken_notification(
@@ -1277,6 +1307,8 @@ void ai_handle_allegiance_broken_notification(
 	}
 
 	game_allegiance_notify_change(team1_index, team2_index);
+
+	return;
 }
 
 void ai_update_team_status(
@@ -1305,6 +1337,8 @@ void ai_update_team_status(
 			prop->target_weight = actor_compute_prop_target_weight(iterator.index, prop_iterator.index);
 		}
 	}
+
+	return;
 }
 
 void ai_handle_bump(
@@ -1342,6 +1376,8 @@ void ai_handle_bump(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_handle_damage(
@@ -1400,6 +1436,8 @@ void ai_handle_damage(
 	{
 		game_allegiance_provoke(responsible_unit->object.owner_team_index, unit->object.owner_team_index);
 	}
+
+	return;
 }
 
 static void ai_place_pending_mounted_weapons(
@@ -1448,6 +1486,8 @@ static void ai_place_pending_mounted_weapons(
 	}
 
 	ai_globals->mounted_weapon_unit_count = 0;
+
+	return;
 }
 
 void ai_create_mounted_weapons_for_unit(
@@ -1468,6 +1508,8 @@ void ai_create_mounted_weapons_for_unit(
 				tag_name_strip_path(tag_get_name(unit_get(unit_index)->definition_index)));
 		}
 	}
+
+	return;
 }
 
 void ai_handle_deleted_object(
@@ -1521,6 +1563,8 @@ void ai_handle_deleted_object(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_handle_editing(
@@ -1676,6 +1720,8 @@ void ai_handle_editing(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_handle_unit_effect(
@@ -1728,6 +1774,8 @@ void ai_handle_unit_effect(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_handle_enter_vehicle(
@@ -1747,6 +1795,8 @@ void ai_handle_enter_vehicle(
 			NONE,
 			NULL);
 	}
+
+	return;
 }
 
 void ai_handle_exit_vehicle(
@@ -1773,6 +1823,8 @@ void ai_handle_exit_vehicle(
 
 		actor->emotions.last_vehicle_exit_forced = FALSE;
 	}
+
+	return;
 }
 
 static boolean ai_enemies_endanger_player(
@@ -1871,6 +1923,8 @@ static void ai_flush_spatial_effects(
 	ai_globals->spatial_effects_last_index = 0;
 	ai_globals->spatial_effects_first_index = 0;
 	memset(ai_globals->spatial_effects, 0, sizeof(ai_globals->spatial_effects));
+
+	return;
 }
 
 // Optimizations are turned OFF on this function (by Bungie!)
@@ -2000,6 +2054,8 @@ void ai_handle_spatial_effect(
 			}
 		}
 	}
+
+	return;
 }
 #pragma optimize("", on)
 
@@ -2202,6 +2258,8 @@ void ai_disconnect_from_structure_bsp(
 			actor_index = next_actor_index;
 		}
 	}
+
+	return;
 }
 
 void ai_reconnect_to_structure_bsp(
@@ -2237,6 +2295,8 @@ void ai_reconnect_to_structure_bsp(
 
 		actor_index = next_actor_index;
 	}
+
+	return;
 }
 
 short ai_get_race_from_team_index(

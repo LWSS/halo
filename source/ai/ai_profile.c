@@ -85,22 +85,28 @@ void ai_profile_initialize(
 {
 	memset(&ai_profile, 0, sizeof(ai_profile));
 	ai_profile.show = TRUE;
+
+	return;
 }
 
 void ai_profile_dispose(
 	void)
 {
+	return;
 }
 
 void ai_profile_initialize_for_new_map(
 	void)
 {
 	memset(ai_profile.meters, 0, sizeof(ai_profile.meters));
+
+	return;
 }
 
 void ai_profile_dispose_from_old_map(
 	void)
 {
+	return;
 }
 
 void ai_profile_update(
@@ -135,6 +141,8 @@ void ai_profile_update(
 		meter->history_next_index %= AI_METER_HISTORY_TICKS;
 		meter->average_count = (real)meter->average_total / (real)meter->history_max_index;
 	}
+
+	return;
 }
 
 void ai_profile_display(
@@ -153,6 +161,8 @@ void ai_profile_display(
 		ai_profile.meters[_ai_meter_unit].last_count,
 		ai_profile.meters[_ai_meter_prop].last_count,
 		MAXIMUM_NUMBER_OF_PROPS);
+
+	return;
 }
 
 static void ai_profile_string(
@@ -186,6 +196,8 @@ static void ai_profile_string(
 	rasterizer_draw_string(&bounds, NULL, &cursor, 0, string);
 	draw_string_set_tab_stops(NULL, 0);
 	global_ai_profile_string_position -= cursor.y - bounds.y0;
+
+	return;
 }
 
 short ai_profile_change_render_spray(
@@ -288,6 +300,8 @@ static void ai_profile_show_stats(
 		ai_profile.meters[_ai_meter_prop].last_count,
 		MAXIMUM_NUMBER_OF_PROPS);
 	ai_profile_string(profilestring, NUMBEROF(tabs), tabs, global_real_argb_white);
+
+	return;
 }
 
 static void ai_profile_show_actors(
@@ -305,6 +319,8 @@ static void ai_profile_show_actors(
 		ai_profile.meters[_ai_meter_unit_active].last_count,
 		ai_profile.meters[_ai_meter_unit].last_count);
 	ai_profile_string(profilestring, NUMBEROF(tabs), tabs, global_real_argb_white);
+
+	return;
 }
 
 static void ai_profile_show_swarms(
@@ -321,6 +337,8 @@ static void ai_profile_show_swarms(
 		ai_profile.meters[_ai_meter_swarm_component].last_count,
 		MAXIMUM_NUMBER_OF_SWARM_COMPONENTS);
 	ai_profile_string(profilestring, NUMBEROF(tabs), tabs, global_real_argb_white);
+
+	return;
 }
 
 static void ai_profile_show_prop_types(
@@ -341,6 +359,8 @@ static void ai_profile_show_prop_types(
 		ai_profile.meters[_ai_meter_prop_orphaned_body].last_count,
 		ai_profile.meters[_ai_meter_prop_unacknowledged_body].last_count);
 	ai_profile_string(profilestring, NUMBEROF(tabs), tabs, global_real_argb_white);
+
+	return;
 }
 
 static void ai_profile_show_line_of_sight(
@@ -356,6 +376,8 @@ static void ai_profile_show_line_of_sight(
 		ai_profile.meters[_ai_meter_line_of_fire].last_count,
 		ai_profile.meters[_ai_meter_firing_point_eval].last_count);
 	ai_profile_string(profilestring, NUMBEROF(tabs), tabs, global_real_argb_white);
+
+	return;
 }
 
 static void ai_profile_show_paths(
@@ -370,6 +392,8 @@ static void ai_profile_show_paths(
 		ai_profile.meters[_ai_meter_path_find].last_count,
 		ai_profile.meters[_ai_meter_action_change].last_count);
 	ai_profile_string(profilestring, NUMBEROF(tabs), tabs, global_real_argb_white);
+
+	return;
 }
 
 static void ai_profile_render_spray(
@@ -432,6 +456,8 @@ static void ai_profile_render_spray(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_profile_render(
@@ -472,4 +498,6 @@ void ai_profile_render(
 			ai_profile_show_stats();
 		}
 	}
+
+	return;
 }

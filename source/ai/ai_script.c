@@ -83,21 +83,25 @@ char const ai_script_squad_separator = '/';
 void ai_script_initialize(
 	void)
 {
+	return;
 }
 
 void ai_script_dispose(
 	void)
 {
+	return;
 }
 
 void ai_script_initialize_for_new_map(
 	void)
 {
+	return;
 }
 
 void ai_script_dispose_from_old_map(
 	void)
 {
+	return;
 }
 
 boolean ai_index_from_string(
@@ -215,6 +219,8 @@ void ai_index_to_string(
 			break;
 		}
 	}
+
+	return;
 }
 
 void ai_index_platoon_iterator_new(
@@ -283,6 +289,8 @@ void ai_index_platoon_iterator_new(
 	{
 		iterator->encounter_index = NONE;
 	}
+
+	return;
 }
 
 struct platoon_datum *ai_index_platoon_iterator_next(
@@ -361,6 +369,8 @@ void ai_index_squad_iterator_new(
 	{
 		iterator->encounter_index = NONE;
 	}
+
+	return;
 }
 
 struct squad_datum *ai_index_squad_iterator_next(
@@ -443,6 +453,8 @@ void ai_index_actor_iterator_new(
 	{
 		iterator->encounter_index = NONE;
 	}
+
+	return;
 }
 
 struct actor_datum *ai_index_actor_iterator_next(
@@ -624,6 +636,8 @@ void ai_scripting_attach_unit(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_attach_units(
@@ -638,6 +652,8 @@ void ai_scripting_attach_units(
 		ai_scripting_attach_unit(unit_index, ai_index);
 		unit_index = object_list_get_next(object_list_index, &object_list_reference_index);
 	}
+
+	return;
 }
 
 void ai_scripting_detach_unit(
@@ -661,6 +677,8 @@ void ai_scripting_detach_unit(
 			actor_delete(unit->unit.actor_index, FALSE);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_detach_units(
@@ -674,6 +692,8 @@ void ai_scripting_detach_units(
 		ai_scripting_detach_unit(unit_index);
 		unit_index = object_list_get_next(object_list_index, &object_list_reference_index);
 	}
+
+	return;
 }
 
 void ai_scripting_place(
@@ -701,6 +721,8 @@ void ai_scripting_place(
 			platoon_index,
 			squad_index);
 	}
+
+	return;
 }
 
 static void ai_scripting_kill_internal(
@@ -719,6 +741,8 @@ static void ai_scripting_kill_internal(
 			actor_kill(iterator.iterator.index, silent, FALSE);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_kill(
@@ -737,6 +761,8 @@ void ai_scripting_kill(
 	}
 
 	ai_scripting_kill_internal(ai_index, FALSE);
+
+	return;
 }
 
 void ai_scripting_kill_silent(
@@ -755,6 +781,8 @@ void ai_scripting_kill_silent(
 	}
 
 	ai_scripting_kill_internal(ai_index, TRUE);
+
+	return;
 }
 
 void ai_scripting_erase(
@@ -783,6 +811,8 @@ void ai_scripting_erase(
 			squad_index,
 			FALSE);
 	}
+
+	return;
 }
 
 void ai_scripting_erase_all(
@@ -797,6 +827,8 @@ void ai_scripting_erase_all(
 	}
 
 	ai_erase(NONE, NONE, NONE, FALSE);
+
+	return;
 }
 
 void ai_scripting_deselect(
@@ -806,6 +838,8 @@ void ai_scripting_deselect(
 	{
 		ai_debug_select_actor(NONE, NONE);
 	}
+
+	return;
 }
 
 void ai_scripting_select(
@@ -815,6 +849,8 @@ void ai_scripting_select(
 	{
 		ai_debug_select_encounter(ai_index == NONE ? NONE : AI_INDEX_GET_ENCOUNTER_INDEX(ai_index));
 	}
+
+	return;
 }
 
 void ai_scripting_spawn_actor(
@@ -865,6 +901,8 @@ void ai_scripting_spawn_actor(
 			encounter_spawn_actor(encounter_index, squad_index);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_set_respawn(
@@ -888,6 +926,8 @@ void ai_scripting_set_respawn(
 	{
 		encounter_set_respawn(AI_INDEX_GET_ENCOUNTER_INDEX(ai_index), respawn);
 	}
+
+	return;
 }
 
 void ai_scripting_set_deaf(
@@ -911,6 +951,8 @@ void ai_scripting_set_deaf(
 	{
 		encounter_set_deaf(AI_INDEX_GET_ENCOUNTER_INDEX(ai_index), deaf);
 	}
+
+	return;
 }
 
 void ai_scripting_set_blind(
@@ -934,6 +976,8 @@ void ai_scripting_set_blind(
 	{
 		encounter_set_blind(AI_INDEX_GET_ENCOUNTER_INDEX(ai_index), blind);
 	}
+
+	return;
 }
 
 void ai_scripting_magically_see_encounter(
@@ -974,6 +1018,8 @@ void ai_scripting_magically_see_encounter(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_magically_see_players(
@@ -1003,6 +1049,8 @@ void ai_scripting_magically_see_players(
 			ai_scripting_magically_see_unit(ai_index, player->unit_index);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_magically_see_unit(
@@ -1046,6 +1094,8 @@ void ai_scripting_magically_see_unit(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_magically_see_units(
@@ -1060,6 +1110,8 @@ void ai_scripting_magically_see_units(
 		ai_scripting_magically_see_unit(ai_index, unit_index);
 		unit_index = object_list_get_next(object_list_index, &object_list_reference_index);
 	}
+
+	return;
 }
 
 void ai_scripting_timer_start(
@@ -1089,6 +1141,8 @@ void ai_scripting_timer_start(
 			squad->delay_timer_started = TRUE;
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_timer_expire(
@@ -1118,6 +1172,8 @@ void ai_scripting_timer_expire(
 			encounter_squad_timer_expire(iterator.encounter_index, (short)iterator.squad_index);
 		}
 	}
+
+	return;
 }
 
 static long ai_scripting_count_internal(
@@ -1353,6 +1409,8 @@ void ai_scripting_attack(
 			platoon->defending = FALSE;
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_defend(
@@ -1382,12 +1440,16 @@ void ai_scripting_defend(
 			platoon->defending = TRUE;
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_retreat(
 	long ai_index)
 {
 	ai_scripting_maneuver(ai_index);
+
+	return;
 }
 
 void ai_scripting_maneuver(
@@ -1417,6 +1479,8 @@ void ai_scripting_maneuver(
 			platoon->maneuvering = TRUE;
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_maneuver_enable(
@@ -1448,6 +1512,8 @@ void ai_scripting_maneuver_enable(
 			platoon->maneuver_disable = !enabled;
 		}
 	}
+
+	return;
 }
 
 static short ai_scripting_migrate_find_target_squad(
@@ -1902,6 +1968,8 @@ static void ai_scripting_migrate_internal(
 			encounters_update_dirty_status();
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_migrate(
@@ -1924,6 +1992,8 @@ void ai_scripting_migrate(
 	}
 
 	ai_scripting_migrate_internal(source_index, target_index, FALSE, FALSE);
+
+	return;
 }
 
 static void ai_scripting_migrate_by_unit_internal(
@@ -1969,6 +2039,8 @@ static void ai_scripting_migrate_by_unit_internal(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_migrate_by_unit(
@@ -2022,6 +2094,8 @@ void ai_scripting_migrate_by_unit(
 		ai_update_team_status();
 		encounters_update_dirty_status();
 	}
+
+	return;
 }
 
 void ai_scripting_migrate_and_speak(
@@ -2064,6 +2138,8 @@ void ai_scripting_migrate_and_speak(
 	}
 
 	ai_scripting_migrate_internal(source_index, target_index, TRUE, advancing);
+
+	return;
 }
 
 void ai_scripting_allegiance(
@@ -2121,6 +2197,8 @@ void ai_scripting_allegiance(
 			incident_decay_time,
 			allegiance_requires_communication);
 	}
+
+	return;
 }
 
 void ai_scripting_allegiance_remove(
@@ -2141,6 +2219,8 @@ void ai_scripting_allegiance_remove(
 	{
 		game_allegiance_remove(team1_index, team2_index);
 	}
+
+	return;
 }
 
 boolean ai_scripting_allegiance_broken(
@@ -2244,6 +2324,8 @@ static void ai_scripting_go_to_vehicle_internal(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_go_to_vehicle(
@@ -2266,6 +2348,8 @@ void ai_scripting_go_to_vehicle(
 	}
 
 	ai_scripting_go_to_vehicle_internal(ai_index, unit_index, seat_substring_name, FALSE);
+
+	return;
 }
 
 void ai_scripting_go_to_vehicle_override(
@@ -2288,6 +2372,8 @@ void ai_scripting_go_to_vehicle_override(
 	}
 
 	ai_scripting_go_to_vehicle_internal(ai_index, unit_index, seat_substring_name, TRUE);
+
+	return;
 }
 
 short ai_scripting_going_to_vehicle(
@@ -2337,6 +2423,8 @@ void ai_scripting_exit_vehicle(
 			unit_try_and_exit_seat(actor->meta.unit_index);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_braindead(
@@ -2367,6 +2455,8 @@ void ai_scripting_braindead(
 			actor_braindead(iterator.iterator.index, braindead);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_braindead_by_unit(
@@ -2422,6 +2512,8 @@ void ai_scripting_braindead_by_unit(
 
 		object_index = object_list_get_next(object_list_index, &object_list_reference_index);
 	}
+
+	return;
 }
 
 void ai_scripting_ignore(
@@ -2451,6 +2543,8 @@ void ai_scripting_ignore(
 
 		object_index = object_list_get_next(object_list_index, &object_list_reference_index);
 	}
+
+	return;
 }
 
 void ai_scripting_prefer_target(
@@ -2480,6 +2574,8 @@ void ai_scripting_prefer_target(
 
 		object_index = object_list_get_next(object_list_index, &object_list_reference_index);
 	}
+
+	return;
 }
 
 static void ai_scripting_teleport_starting_location_private(
@@ -2533,6 +2629,8 @@ static void ai_scripting_teleport_starting_location_private(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_teleport_starting_location_if_unsupported(
@@ -2551,6 +2649,8 @@ void ai_scripting_teleport_starting_location_if_unsupported(
 	}
 
 	ai_scripting_teleport_starting_location_private(ai_index, TRUE);
+
+	return;
 }
 
 void ai_scripting_teleport_starting_location(
@@ -2569,6 +2669,8 @@ void ai_scripting_teleport_starting_location(
 	}
 
 	ai_scripting_teleport_starting_location_private(ai_index, FALSE);
+
+	return;
 }
 
 void ai_scripting_renew(
@@ -2620,6 +2722,8 @@ void ai_scripting_renew(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_try_to_fight_nothing(
@@ -2646,6 +2750,8 @@ void ai_scripting_try_to_fight_nothing(
 	{
 		actor->external_orders.desired_target_type = _desired_target_none;
 	}
+
+	return;
 }
 
 void ai_scripting_try_to_fight(
@@ -2677,6 +2783,8 @@ void ai_scripting_try_to_fight(
 		actor->external_orders.desired_target_type = _desired_target_ai;
 		actor->external_orders.desired_target_ai_index = target_ai_index;
 	}
+
+	return;
 }
 
 void ai_scripting_try_to_fight_player(
@@ -2703,6 +2811,8 @@ void ai_scripting_try_to_fight_player(
 	{
 		actor->external_orders.desired_target_type = _desired_target_player;
 	}
+
+	return;
 }
 
 void ai_scripting_allow_charge(
@@ -2731,6 +2841,8 @@ void ai_scripting_allow_charge(
 	{
 		actor->external_orders.disable_charging = !allow_charge;
 	}
+
+	return;
 }
 
 void ai_scripting_command_list(
@@ -2764,6 +2876,8 @@ void ai_scripting_command_list(
 			actor_action_change(iterator.iterator.index, _actor_action_obey, &new_state_data);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_command_list_by_unit(
@@ -2797,6 +2911,8 @@ void ai_scripting_command_list_by_unit(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_command_list_advance(
@@ -2822,6 +2938,8 @@ void ai_scripting_command_list_advance(
 	{
 		action_obey_advance_command_list(iterator.iterator.index);
 	}
+
+	return;
 }
 
 void ai_scripting_command_list_advance_by_unit(
@@ -2851,6 +2969,8 @@ void ai_scripting_command_list_advance_by_unit(
 			}
 		}
 	}
+
+	return;
 }
 
 static short ai_scripting_command_list_status_internal(
@@ -3011,6 +3131,8 @@ void ai_scripting_free(
 
 		encounters_update_dirty_status();
 	}
+
+	return;
 }
 
 void ai_scripting_free_units(
@@ -3052,6 +3174,8 @@ void ai_scripting_free_units(
 	{
 		encounters_update_dirty_status();
 	}
+
+	return;
 }
 
 void ai_scripting_attach_free(
@@ -3102,6 +3226,8 @@ void ai_scripting_attach_free(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_force_active(
@@ -3133,6 +3259,8 @@ void ai_scripting_force_active(
 			encounter->force_active = active;
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_force_active_by_unit(
@@ -3179,6 +3307,8 @@ void ai_scripting_force_active_by_unit(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_set_return_state(
@@ -3218,6 +3348,8 @@ void ai_scripting_set_return_state(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_set_current_state(
@@ -3248,6 +3380,8 @@ void ai_scripting_set_current_state(
 			actor_action_set_default_state(iterator.iterator.index, current_state);
 		}
 	}
+
+	return;
 }
 
 static short ai_scripting_assess_status(
@@ -3322,6 +3456,7 @@ short ai_scripting_status(
 void ai_scripting_reconnect(
 	void)
 {
+	return;
 }
 
 void ai_scripting_playfight(
@@ -3347,6 +3482,8 @@ void ai_scripting_playfight(
 
 		encounter->playfighting = playfight;
 	}
+
+	return;
 }
 
 void ai_scripting_vehicle_encounter(
@@ -3446,6 +3583,8 @@ void ai_scripting_vehicle_encounter(
 		unit->unit.fake_encounter_index = encounter_index;
 		unit->unit.fake_squad_index = squad_index;
 	}
+
+	return;
 }
 
 struct ai_vehicle_enterable *ai_scripting_find_vehicle_enterable(
@@ -3510,6 +3649,8 @@ void ai_scripting_vehicle_enterable_distance(
 			enterable->radius = distance;
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_vehicle_enterable_team(
@@ -3534,6 +3675,8 @@ void ai_scripting_vehicle_enterable_team(
 			SET_FLAG(enterable->team_bitmask, team_index, TRUE);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_vehicle_enterable_actor_type(
@@ -3558,6 +3701,8 @@ void ai_scripting_vehicle_enterable_actor_type(
 			SET_FLAG(enterable->actor_type_bitmask, actor_type, TRUE);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_vehicle_enterable_actors(
@@ -3595,6 +3740,8 @@ void ai_scripting_vehicle_enterable_actors(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_vehicle_enterable_disable(
@@ -3627,6 +3774,8 @@ void ai_scripting_vehicle_enterable_disable(
 			}
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_look_at_object(
@@ -3658,6 +3807,8 @@ void ai_scripting_look_at_object(
 				&direction);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_stop_looking(
@@ -3680,6 +3831,8 @@ void ai_scripting_stop_looking(
 			actor_look_secondary_stop(unit->unit.actor_index);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_automatic_migration_target(
@@ -3711,6 +3864,8 @@ void ai_scripting_automatic_migration_target(
 			squad->automatic_migration_target = enable;
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_follow_target_disable(
@@ -3734,6 +3889,8 @@ void ai_scripting_follow_target_disable(
 
 		encounter->follow_target_type = _follow_target_none;
 	}
+
+	return;
 }
 
 void ai_scripting_follow_target_players(
@@ -3757,6 +3914,8 @@ void ai_scripting_follow_target_players(
 
 		encounter->follow_target_type = _follow_target_players;
 	}
+
+	return;
 }
 
 void ai_scripting_follow_target_unit(
@@ -3789,6 +3948,8 @@ void ai_scripting_follow_target_unit(
 			encounter->follow_target_unit_index = unit_index;
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_follow_target_ai(
@@ -3824,6 +3985,8 @@ void ai_scripting_follow_target_ai(
 			encounter->follow_target_ai_index = target_ai_index;
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_follow_distance(
@@ -3849,6 +4012,8 @@ void ai_scripting_follow_distance(
 
 		encounter->follow_target_distance = follow_target_distance;
 	}
+
+	return;
 }
 
 boolean ai_scripting_conversation(
@@ -3905,6 +4070,8 @@ void ai_scripting_conversation_stop(
 	}
 
 	ai_conversation_stop(conversation_index);
+
+	return;
 }
 
 void ai_scripting_conversation_advance(
@@ -3933,6 +4100,8 @@ void ai_scripting_conversation_advance(
 	}
 
 	ai_conversation_advance(conversation_index);
+
+	return;
 }
 
 short ai_scripting_conversation_line(
@@ -3976,6 +4145,8 @@ void ai_scripting_link_activation(
 				MAXIMUM_ACTIVATION_LINK_INDICES_PER_ENCOUNTER);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_berserk(
@@ -4006,6 +4177,8 @@ void ai_scripting_berserk(
 			actor_berserk(iterator.iterator.index, berserk);
 		}
 	}
+
+	return;
 }
 
 void ai_scripting_set_team(
@@ -4026,6 +4199,8 @@ void ai_scripting_set_team(
 	}
 
 	ai_update_team_status();
+
+	return;
 }
 
 void ai_scripting_allow_dormant(
@@ -4054,6 +4229,8 @@ void ai_scripting_allow_dormant(
 	{
 		squad->disable_dormant = !allow_dormant;
 	}
+
+	return;
 }
 
 /* ---------- private code */
