@@ -215,6 +215,10 @@ struct path_debug_storage
 
 /* ---------- prototypes/PATH.C */
 
+void paths_initialize(void);
+void paths_dispose(void);
+void paths_initialize_for_new_map(void);
+void paths_dispose_from_old_map(void);
 void path_input_new(struct path_input *input, real pathfinding_radius, boolean ignore_broken_surfaces, long source_object_index);
 void path_input_set_start(struct path_input *input, real_point3d const *start_point, long start_surface_index);
 void path_input_set_attractor(struct path_input *input, real_point3d const *attractor_point, real radius, long object_index, real weight);

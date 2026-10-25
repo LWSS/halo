@@ -143,6 +143,33 @@ enum
 	NUMBER_OF_CONVERSATION_ADDRESS_TYPES,
 };
 
+enum
+{
+	_actor_default_state_none = 0,
+	_actor_default_state_asleep,
+	_actor_default_state_alert,
+	_actor_default_state_moving_repeat_position,
+	_actor_default_state_moving_loop,
+	_actor_default_state_moving_loop_back_and_forth,
+	_actor_default_state_moving_loop_randomly,
+	_actor_default_state_moving_randomly,
+	_actor_default_state_guarding,
+	_actor_default_state_guarding_at_guard_point,
+	_actor_default_state_searching,
+	_actor_default_state_fleeing,
+	NUMBER_OF_ACTOR_DEFAULT_STATES,
+};
+
+enum
+{
+	_squad_major_upgrade_normal = 0,
+	_squad_major_upgrade_few,
+	_squad_major_upgrade_many,
+	_squad_major_upgrade_none,
+	_squad_major_upgrade_all,
+	NUMBER_OF_SQUAD_MAJOR_UPGRADE_TYPES,
+};
+
 #define MAXIMUM_CONVERSATIONS_PER_MAP 128
 #define MAXIMUM_PARTICIPANTS_PER_CONVERSATION 8
 #define MAXIMUM_DIALOGUE_VARIANTS_PER_CONVERSATION_PARTICIPANT 6
@@ -152,6 +179,11 @@ enum
 #define ai_conversation_definition_get(index) TAG_BLOCK_GET_ELEMENT(&global_scenario_get()->ai_conversations, (index), struct ai_conversation) /* fake name */
 
 /* ---------- structures */
+
+struct actor_palette_entry
+{
+	struct tag_reference reference;
+};
 
 struct actor_starting_location_definition
 {
@@ -324,7 +356,14 @@ struct ai_conversation
 
 /* ---------- prototypes/AI_SCENARIO_DEFINITIONS.C */
 
+short choose_random_array_element(void const *array, short element_size, short element_count, short weight_field_offset, unsigned long const *used_bit_vector);
+long scenario_get_encounter_by_name(struct scenario const *scenario, char const *encounter_name);
+long encounter_definition_get_squad_by_name(struct encounter_definition const *encounter, char const *squad_name);
+long encounter_definition_get_platoon_by_name(struct encounter_definition const *encounter, char const *platoon_name);
+
 /* ---------- globals */
+
+extern char const *global_ai_default_state_names[NUMBER_OF_ACTOR_DEFAULT_STATES];
 
 /* ---------- public code */
 

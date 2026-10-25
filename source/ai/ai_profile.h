@@ -43,9 +43,18 @@ enum
 	NUMBER_OF_AI_METERS,
 };
 
+enum
+{
+	_ai_profile_render_spray_none = 0,
+	_ai_profile_render_spray_actions,
+	_ai_profile_render_spray_activation,
+	NUMBER_OF_AI_PROFILE_RENDER_SPRAY_MODES,
+};
+
 /* ---------- macros */
 
 #define AI_METER_HISTORY_TICKS 60
+#define AI_PROFILE_STRING_LENGTH 2048 /* fake name */
 
 /* ---------- structures */
 
@@ -78,10 +87,19 @@ struct ai_profile_state
 
 /* ---------- prototypes/AI_PROFILE.C */
 
-void ai_profile_change_render_spray(void);
+void ai_profile_initialize(void);
+void ai_profile_dispose(void);
+void ai_profile_initialize_for_new_map(void);
+void ai_profile_dispose_from_old_map(void);
+void ai_profile_update(void);
+void ai_profile_display(char *string);
+short ai_profile_change_render_spray(void);
+void ai_profile_render(void);
 
 /* ---------- globals */
 
+extern char profilestring[AI_PROFILE_STRING_LENGTH];
+extern short global_ai_profile_string_position;
 extern struct ai_profile_state ai_profile;
 
 /* ---------- public code */

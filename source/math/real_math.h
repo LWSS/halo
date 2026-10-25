@@ -387,6 +387,7 @@ void vectors3d_from_euler_angles3d(real_vector3d *forward, real_vector3d *up, re
 real vector_to_line_distance_squared3d(real_point3d const *point, real_vector3d const *vector, real_point3d const *base, real_vector3d const *height);
 boolean pill_test_vector3d(real_point3d const *base, real height, real width, real_point3d const *point, real_vector3d const *vector, real *t_reference, real_vector3d *normal);
 boolean fast_vector_intersects_sphere(real_point3d const *point, real_vector3d const *vector, real_point3d const *center, real radius);
+boolean vector_intersects_pill3d(real_point3d const *point, real_vector3d const *vector, real_point3d const *base, real_vector3d const *height, real width);
 real fast_vector_intersection_with_sphere(real_point3d const *point, real_vector3d const *vector, real_point3d const *center, real radius);
 boolean point_in_triangle2d(real_point2d const *point, real_point2d const *p0, real_point2d const *p1, real_point2d const *p2, real *s, real *t);
 boolean point_in_triangle3d(real_point3d const *point, real_point3d const *p0, real_point3d const *p1, real_point3d const *p2, real *s, real *t);
