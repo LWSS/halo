@@ -80,7 +80,7 @@ enum
 enum
 {
 	_netgame_starting_equipment_flag_no_grenades_bit = 0,
-	_netgame_starting_equipment_flag_plasma_grenades_bit,
+	_netgame_starting_equipment_flag_plasma_greandes_bit,
 	NUMBER_OF_NETGAME_STARTING_EQUIPMENT_FLAGS
 };
 

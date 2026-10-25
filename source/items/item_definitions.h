@@ -33,7 +33,7 @@ enum
 /* ---------- macros */
 
 #define item_definition_get(index) ((struct item_definition *)tag_get(ITEM_DEFINITION_TAG, index))
-#define item_collection_definition_get(index) ((struct item_collection_definition *)tag_get(ITEM_COLLECTION_DEFINITION_TAG, index))
+#define item_collection_definition_get(index) ((struct item_collection_definition *)tag_get(ITEM_COLLECTION_DEFINITION_TAG, index)) /* fake name */
 
 /* ---------- structures */
 

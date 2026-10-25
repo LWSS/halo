@@ -373,9 +373,9 @@ enum
 
 enum
 {
-	_unit_add_weapon_normal = 0,	/* fake name */
-	_unit_add_weapon_ready,	/* fake name */
-	_unit_add_weapon_replace_all	/* fake name */
+	_unit_add_weapon_normally = 0,
+	_unit_add_weapon_as_current_weapon,
+	_unit_add_weapon_as_only_weapon
 };
 
 /* ---------- macros */
