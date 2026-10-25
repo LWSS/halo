@@ -422,10 +422,8 @@ void shader_texture_animation_evaluate(
 
 	if (r_value != 0.0f)
 	{
-		real angle = DEGREES_TO_RADIANS(r_value);
-
-		cosine_angle = cosine(angle);
-		sine_angle = sine(angle);
+		cosine_angle = cosine(r_value * (_pi / 180.f));
+		sine_angle = sine(r_value * (_pi / 180.f));
 	}
 	else
 	{

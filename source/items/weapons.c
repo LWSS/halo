@@ -31,6 +31,10 @@ WEAPONS.C
 #include "unit_definitions.h"
 #include "units.h"
 
+/* ---------- macros */
+
+#define SECONDS_PER_TICK (1.f/TICKS_PER_SECOND) /* fake name */
+
 /* ---------- prototypes */
 
 static struct weapon_trigger *weapon_trigger_get(struct weapon_datum *weapon, short trigger_index);

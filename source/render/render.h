@@ -22,10 +22,44 @@ enum
 
 enum
 {
+	_render_screen_flash_type_none = 0,
+	_render_screen_flash_type_lighten,
+	_render_screen_flash_type_darken,
+	_render_screen_flash_type_max,
+	_render_screen_flash_type_min,
+	_render_screen_flash_type_invert,
+	_render_screen_flash_type_tint,
+	NUMBER_OF_RENDER_SCREEN_FLASH_TYPES,
+};
+
+enum
+{
 	_build_sprite_normal = 0,
 	_build_sprite_parallel,
 	_build_sprite_perpendicular,
 	NUMBER_OF_BUILD_SPRITE_ORIENTATIONS,
+};
+
+enum
+{
+	_build_sprite_viewer_space_bit = 0,
+	_build_sprite_u_mirror_bit,
+	_build_sprite_v_mirror_bit,
+	NUMBER_OF_BUILD_SPRITE_FLAGS,
+};
+
+enum
+{
+	_build_sprite_rotational_viewer_space_bit = 0,
+	_build_sprite_rotational_sideways_rotation_animates_bit,
+	NUMBER_OF_BUILD_SPRITE_ROTATIONAL_FLAGS,
+};
+
+enum
+{
+	_build_sprites_screen_space_bit = 0,
+	_build_sprites_first_person_bit,
+	NUMBER_OF_BUILD_SPRITES_FLAGS,
 };
 
 /* ---------- macros */
@@ -151,6 +185,7 @@ struct rendered_cluster *rendered_cluster_get(short rendered_cluster_index);
 void build_sprites_begin(struct build_sprite_data *data, short maximum_sprite_count, long bitmap_group_index, struct shader_effect const *shader, unsigned long flags);
 void build_sprites_end(struct build_sprite_data *data);
 void build_sprite(struct build_sprite_data *data, short mode, short sequence_index, short sprite_index, real_point3d const *untransformed_origin, real_vector3d const *untransformed_direction, real rotation, real scale, real_argb_color const *color, real fade, unsigned long flags);
+void build_sprite_rotational(struct build_sprite_data *data, unsigned long flags, short first_sequence_index, short sprite_index, real_point3d const *untransformed_origin, real_vector3d const *untransformed_axis_of_rotation, real rotation, real scale, real_argb_color const *color, real fade);
 
 /* ---------- prototypes/RENDER_OBJECTS.C */
 
@@ -163,6 +198,10 @@ void render_objects_dispose(void);
 
 extern struct render_globals render;
 extern boolean debug_render_freeze;
+extern boolean render_contrails_enabled;
+extern boolean render_particles_enabled;
+extern boolean render_particle_systems_enabled;
+extern boolean render_weather_particle_systems_enabled;
 
 /* ---------- public code */
 

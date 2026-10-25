@@ -55,6 +55,10 @@ enum
 	NUMBER_OF_EFFECT_MARKERS,
 };
 
+/* ---------- macros */
+
+#define SECONDS_PER_TICK (1.f/TICKS_PER_SECOND) /* fake name */
+
 /* ---------- prototypes */
 
 static void projectile_set_action(long projectile_index, short action);
@@ -84,7 +88,7 @@ static char const *effect_marker_names[NUMBER_OF_EFFECT_MARKERS] =
 	"gravity"
 };
 
-static real const seconds_per_tick = SECONDS_PER_TICK;
+static real const seconds_per_tick = 1.f / TICKS_PER_SECOND;
 
 /* ---------- public code */
 

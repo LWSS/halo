@@ -20,6 +20,8 @@ PHYSICS.C
 
 /* ---------- macros */
 
+#define SECONDS_PER_TICK (1.f/TICKS_PER_SECOND) /* fake name */
+
 /* ---------- structures */
 
 /* ---------- prototypes */
@@ -64,33 +66,6 @@ __inline real pin_fraction(
 	}
 
 	return fraction;
-}
-
-void render_debug_physics(
-	struct physics_instance *instance)
-{
-	struct object_datum *object = object_get(instance->object_index);
-	struct object_definition *object_definition = object_definition_get(object->definition_index);
-	real_point3d center_of_mass;
-	short mass_point_index;
-
-	matrix4x3_transform_point(&instance->world_matrix, &instance->physics->center_of_mass, &center_of_mass);
-	render_debug_vectors(TRUE, &center_of_mass, &instance->world_matrix.forward, &instance->world_matrix.up, object_definition->object.bounding_radius);
-
-	for (mass_point_index = 0; mass_point_index < instance->physics->mass_points.count; mass_point_index++)
-	{
-		struct mass_point_definition const *mass_point_definition = TAG_BLOCK_GET_ELEMENT(&instance->physics->mass_points, mass_point_index, struct mass_point_definition);
-		real_point3d position;
-		real_vector3d forward, up;
-
-		matrix4x3_transform_point(&instance->world_matrix, &mass_point_definition->position, &position);
-		matrix4x3_transform_normal(&instance->world_matrix, &mass_point_definition->forward, &forward);
-		matrix4x3_transform_normal(&instance->world_matrix, &mass_point_definition->up, &up);
-		render_debug_sphere(TRUE, &position, mass_point_definition->radius, global_real_argb_white);
-		render_debug_vectors(TRUE, &position, &forward, &up, mass_point_definition->radius*0.5f);
-	}
-
-	return;
 }
 
 boolean physics_instance_new(
@@ -258,6 +233,115 @@ void physics_update(
 		}
 		physics_update_new(&instance, powered_mass_points, mass_points, &total_force, &total_torque);
 		physics_compute_unit_collisions(object_index);
+	}
+
+	return;
+}
+
+/* ---------- private code */
+
+static short get_material_type(
+	long object_index,
+	short material_index)
+{
+	short material_type;
+
+	if (material_index != NONE)
+	{
+		if (object_index != NONE)
+		{
+			struct object_datum *object = object_get(object_index);
+			struct object_definition *definition = object_definition_get(object->definition_index);
+			struct collision_model *model = collision_model_definition_get(definition->object.collision_model.index);
+			struct damage_material *material = TAG_BLOCK_GET_ELEMENT(&model->resistance.materials, material_index, struct damage_material);
+
+			material_type = material->type;
+		}
+		else
+		{
+			struct structure_collision_material *material = TAG_BLOCK_GET_ELEMENT(&global_structure_bsp_get()->collision_materials, material_index, struct structure_collision_material);
+
+			material_type = material->runtime_physics_material_type;
+		}
+	}
+	else
+	{
+		return NONE;
+	}
+
+	return material_type;
+}
+
+static void compute_ground_plane(
+	long object_index,
+	struct mass_point_datum *mass_point,
+	struct mass_point_definition const *mass_point_definition)
+{
+	struct collision_feature_list features;
+	struct collision_plane collision;
+
+	mass_point->ground_plane = depths_of_hell;
+	mass_point->ground_material_type = NONE;
+	mass_point->ground_depth = mass_point_definition->radius-plane3d_distance_to_point(&mass_point->ground_plane, &mass_point->position);
+
+	if (collision_get_features_in_sphere(_collision_test_for_vehicles_flags, &mass_point->position, mass_point_definition->radius, 0.f, mass_point_definition->radius, object_index, &features) &&
+		collision_features_test_point(&features, &mass_point->position, &collision))
+	{
+		mass_point->ground_plane = collision.plane;
+		mass_point->ground_depth = collision.t;
+		mass_point->ground_material_type = get_material_type(collision.object_index, collision.material_index);
+		SET_FLAG(mass_point->flags, _point_on_volatile_surface_bit, TEST_FLAG(collision.flags, _collision_surface_breakable_bit) ||
+			(collision.object_index != NONE && !TEST_FLAG(_object_mask_scenery, object_get_type(collision.object_index))));
+
+		if (collision.object_index != NONE)
+		{
+			object_deplete_shield(collision.object_index);
+		}
+	}
+
+	match_assert("c:\\halo\\SOURCE\\physics\\physics.c", 338, mass_point->ground_material_type==NONE || (mass_point->ground_material_type>=0 && mass_point->ground_material_type<NUMBER_OF_MATERIAL_TYPES));
+	return;
+}
+
+static void friction_evaluate(
+	short type,
+	real parallel_scale,
+	real perpendicular_scale,
+	struct friction_datum *friction,
+	real_vector3d *forward,
+	real_vector3d *up)
+{
+	if (type==_friction_type_point)
+	{
+		friction->parallel = friction->friction;
+		set_real_vector3d(&friction->perpendicular, 0.f, 0.f, 0.f);
+	}
+	else
+	{
+		switch (type)
+		{
+		case _friction_type_forward:
+			component_vectors_from_normal3d(&friction->friction, forward, &friction->parallel, &friction->perpendicular);
+			break;
+		case _friction_type_left:
+			{
+				real_vector3d left;
+
+				cross_product3d(up, forward, &left);
+				component_vectors_from_normal3d(&friction->friction, &left, &friction->parallel, &friction->perpendicular);
+			}
+			break;
+		case _friction_type_up:
+			component_vectors_from_normal3d(&friction->friction, up, &friction->parallel, &friction->perpendicular);
+			break;
+		default:
+			match_vassert("c:\\halo\\SOURCE\\physics\\physics.c", 383, FALSE, NULL);
+			break;
+		}
+
+		scale_vector3d(&friction->parallel, parallel_scale, &friction->parallel);
+		scale_vector3d(&friction->perpendicular, perpendicular_scale, &friction->perpendicular);
+		add_vectors3d(&friction->parallel, &friction->perpendicular, &friction->friction);
 	}
 
 	return;
@@ -436,255 +520,6 @@ void physics_compute_new(
 		cross_product3d(&mass_point->radius, &mass_point->force, &mass_point->torque);
 		add_vectors3d(total_force, &mass_point->force, total_force);
 		add_vectors3d(total_torque, &mass_point->torque, total_torque);
-	}
-
-	return;
-}
-
-void physics_update_new(
-	struct physics_instance const *instance,
-	struct powered_mass_point_datum const *powered_mass_points,
-	struct mass_point_datum const *mass_points,
-	real_vector3d const *total_force,
-	real_vector3d const *total_torque)
-{
-	struct vehicle_datum *object = vehicle_get(instance->object_index);
-	real_vector3d linear_acceleration, linear_velocity, angular_acceleration, angular_velocity;
-	real_vector3d forward, up;
-	real_point3d position;
-	short mass_points_at_rest_count;
-	short mass_points_on_ground_count;
-	short mass_points_on_volatile_surface_count;
-	short mass_points_in_water_count;
-	short mass_point_index;
-
-	match_assert("c:\\halo\\SOURCE\\physics\\physics.c", 986, instance->physics->mass>0.0f);
-	scale_vector3d(total_force, 1.f/instance->physics->mass, &linear_acceleration);
-	match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\physics\\physics.c", 990, &linear_acceleration);
-	add_vectors3d(&object->object.translational_velocity, &linear_acceleration, &linear_velocity);
-	match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\physics\\physics.c", 994, &linear_velocity);
-	add_vectors3d((real_vector3d *)&object->object.position, &linear_velocity, (real_vector3d *)&position);
-
-	{
-		real_matrix3x3 rotation;
-		real_matrix3x3 inertial_matrix_inverse;
-
-		matrix3x3_from_forward_and_up(&rotation, &object->object.forward, &object->object.up);
-		matrix3x3_multiply(&rotation, TAG_BLOCK_GET_ELEMENT(&instance->physics->inertial_matrix, _physics_inertial_matrix_inverse, real_matrix3x3), &inertial_matrix_inverse);
-		matrix3x3_multiply(&inertial_matrix_inverse, matrix3x3_transpose(&rotation, &rotation), &inertial_matrix_inverse);
-		matrix3x3_transform_vector(&inertial_matrix_inverse, total_torque, &angular_acceleration);
-	}
-	match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\physics\\physics.c", 1008, &angular_acceleration);
-	add_vectors3d(&object->object.angular_velocity, &angular_acceleration, &angular_velocity);
-	match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\physics\\physics.c", 1012, &angular_velocity);
-	rotate_vectors3d_by_angular_velocity(&object->object.forward, &object->object.up, &angular_velocity, &forward, &up);
-	object->object.translational_velocity = linear_velocity;
-	object->object.angular_velocity = angular_velocity;
-
-	if (debug_physics_disable_penetration_freeze)
-	{
-		object_set_position(instance->object_index, &position, &forward, &up);
-	}
-	else
-	{
-		short iterations = 4;
-		unsigned long stuck_mass_point_flags;
-
-		do
-		{
-			real_matrix4x3 world_matrix;
-			real_point3d negative_center_of_mass;
-			boolean found_collision_valid = FALSE;
-			struct collision_result found_collision;
-			real_vector3d found_collision_vector;
-
-			iterations--;
-			stuck_mass_point_flags = 0;
-			matrix4x3_from_point_and_vectors(&world_matrix, &position, &forward, &up);
-			set_real_point3d(&negative_center_of_mass, -instance->physics->center_of_mass.x, -instance->physics->center_of_mass.y, -instance->physics->center_of_mass.z);
-			matrix4x3_transform_point(&world_matrix, &negative_center_of_mass, &negative_center_of_mass);
-			world_matrix.position = negative_center_of_mass;
-
-			for (mass_point_index = 0; mass_point_index < instance->physics->mass_points.count; mass_point_index++)
-			{
-				struct mass_point_definition const *mass_point_definition = TAG_BLOCK_GET_ELEMENT(&instance->physics->mass_points, mass_point_index, struct mass_point_definition);
-				struct mass_point_datum const *mass_point = &mass_points[mass_point_index];
-				real_point3d new_position;
-				real_vector3d vector;
-				struct collision_result collision;
-
-				matrix4x3_transform_point(&world_matrix, &mass_point_definition->position, &new_position);
-				vector_from_points3d(&mass_point->position, &new_position, &vector);
-				if (collision_test_vector(_collision_test_for_vehicles_flags | FLAG(_collision_test_front_facing_surfaces_bit), &mass_point->position, &vector, instance->object_index, &collision))
-				{
-					SET_FLAG(stuck_mass_point_flags, mass_point_index, TRUE);
-					if (!found_collision_valid || found_collision.t > collision.t)
-					{
-						found_collision_valid = TRUE;
-						found_collision_vector = vector;
-						found_collision = collision;
-					}
-				}
-			}
-
-			if (found_collision_valid)
-			{
-				real normal_distance = dot_product3d(&found_collision_vector, &found_collision.plane.n);
-				real adjustment = normal_distance != 0.f ? 0.0078125f/fabs(normal_distance) : 0.03125f;
-				real t = MAX(found_collision.t-adjustment, 0.f);
-				real normal_velocity = dot_product3d(&linear_velocity, &found_collision.plane.n);
-
-				if (normal_velocity < 0.f)
-				{
-					point_from_line3d((real_point3d *)&linear_velocity, &found_collision.plane.n, normal_velocity*(t-1.f), (real_point3d *)&linear_velocity);
-					object->object.translational_velocity = linear_velocity;
-					add_vectors3d((real_vector3d *)&object->object.position, &linear_velocity, (real_vector3d *)&position);
-				}
-				scale_vector3d(&angular_velocity, t, &angular_velocity);
-				object->object.angular_velocity = angular_velocity;
-				rotate_vectors3d_by_angular_velocity(&object->object.forward, &object->object.up, &angular_velocity, &forward, &up);
-			}
-			else
-			{
-				object_set_position(instance->object_index, &position, &forward, &up);
-				break;
-			}
-		}
-		while (iterations > 0);
-
-		object->vehicle.stuck_mass_point_flags = stuck_mass_point_flags;
-	}
-
-	mass_points_at_rest_count = 0;
-	mass_points_on_ground_count = 0;
-	mass_points_on_volatile_surface_count = 0;
-	mass_points_in_water_count = 0;
-	for (mass_point_index = 0; mass_point_index < instance->physics->mass_points.count; mass_point_index++)
-	{
-		struct mass_point_datum const *mass_point = &mass_points[mass_point_index];
-
-		mass_points_at_rest_count += TEST_FLAG(mass_point->flags, _point_at_rest_bit);
-		mass_points_on_ground_count += TEST_FLAG(mass_point->flags, _point_on_ground_bit);
-		mass_points_on_volatile_surface_count += TEST_FLAG(mass_point->flags, _point_on_volatile_surface_bit);
-		mass_points_in_water_count += TEST_FLAG(mass_point->flags, _point_in_water_bit);
-	}
-
-	SET_FLAG(object->object.flags, _object_at_rest_bit, mass_points_at_rest_count == instance->physics->mass_points.count && mass_points_on_ground_count >= 3 && !mass_points_on_volatile_surface_count &&
-		magnitude_squared3d(&linear_velocity) <= SECONDS_PER_TICK*SECONDS_PER_TICK &&
-		magnitude_squared3d(&angular_velocity) <= (_pi2*SECONDS_PER_TICK)*(_pi2*SECONDS_PER_TICK) &&
-		magnitude_squared3d(&linear_acceleration) <= (0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK)*(0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK) &&
-		magnitude_squared3d(&angular_acceleration) <= (_pi2*SECONDS_PER_TICK*SECONDS_PER_TICK)*(_pi2*SECONDS_PER_TICK*SECONDS_PER_TICK));
-	SET_FLAG(object->object.flags, _object_on_ground_bit, mass_points_on_ground_count > 0);
-	SET_FLAG(object->object.flags, _object_on_media_bit, mass_points_in_water_count > 0);
-	SET_FLAG(object->object.flags, _object_partially_under_media_bit, mass_points_in_water_count > 0);
-	SET_FLAG(object->object.flags, _object_wholly_under_media_bit, mass_points_in_water_count == instance->physics->mass_points.count);
-	return;
-}
-
-/* ---------- private code */
-
-static short get_material_type(
-	long object_index,
-	short material_index)
-{
-	short material_type;
-
-	if (material_index != NONE)
-	{
-		if (object_index != NONE)
-		{
-			struct object_datum *object = object_get(object_index);
-			struct object_definition *definition = object_definition_get(object->definition_index);
-			struct collision_model *model = collision_model_definition_get(definition->object.collision_model.index);
-			struct damage_material *material = TAG_BLOCK_GET_ELEMENT(&model->resistance.materials, material_index, struct damage_material);
-
-			material_type = material->type;
-		}
-		else
-		{
-			struct structure_collision_material *material = TAG_BLOCK_GET_ELEMENT(&global_structure_bsp_get()->collision_materials, material_index, struct structure_collision_material);
-
-			material_type = material->runtime_physics_material_type;
-		}
-	}
-	else
-	{
-		return NONE;
-	}
-
-	return material_type;
-}
-
-static void compute_ground_plane(
-	long object_index,
-	struct mass_point_datum *mass_point,
-	struct mass_point_definition const *mass_point_definition)
-{
-	struct collision_feature_list features;
-	struct collision_plane collision;
-
-	mass_point->ground_plane = depths_of_hell;
-	mass_point->ground_material_type = NONE;
-	mass_point->ground_depth = mass_point_definition->radius-plane3d_distance_to_point(&mass_point->ground_plane, &mass_point->position);
-
-	if (collision_get_features_in_sphere(_collision_test_for_vehicles_flags, &mass_point->position, mass_point_definition->radius, 0.f, mass_point_definition->radius, object_index, &features) &&
-		collision_features_test_point(&features, &mass_point->position, &collision))
-	{
-		mass_point->ground_plane = collision.plane;
-		mass_point->ground_depth = collision.t;
-		mass_point->ground_material_type = get_material_type(collision.object_index, collision.material_index);
-		SET_FLAG(mass_point->flags, _point_on_volatile_surface_bit, TEST_FLAG(collision.flags, _collision_surface_breakable_bit) ||
-			(collision.object_index != NONE && !TEST_FLAG(_object_mask_scenery, object_get_type(collision.object_index))));
-
-		if (collision.object_index != NONE)
-		{
-			object_deplete_shield(collision.object_index);
-		}
-	}
-
-	match_assert("c:\\halo\\SOURCE\\physics\\physics.c", 338, mass_point->ground_material_type==NONE || (mass_point->ground_material_type>=0 && mass_point->ground_material_type<NUMBER_OF_MATERIAL_TYPES));
-	return;
-}
-
-static void friction_evaluate(
-	short type,
-	real parallel_scale,
-	real perpendicular_scale,
-	struct friction_datum *friction,
-	real_vector3d *forward,
-	real_vector3d *up)
-{
-	if (type==_friction_type_point)
-	{
-		friction->parallel = friction->friction;
-		set_real_vector3d(&friction->perpendicular, 0.f, 0.f, 0.f);
-	}
-	else
-	{
-		switch (type)
-		{
-		case _friction_type_forward:
-			component_vectors_from_normal3d(&friction->friction, forward, &friction->parallel, &friction->perpendicular);
-			break;
-		case _friction_type_left:
-			{
-				real_vector3d left;
-
-				cross_product3d(up, forward, &left);
-				component_vectors_from_normal3d(&friction->friction, &left, &friction->parallel, &friction->perpendicular);
-			}
-			break;
-		case _friction_type_up:
-			component_vectors_from_normal3d(&friction->friction, up, &friction->parallel, &friction->perpendicular);
-			break;
-		default:
-			match_vassert("c:\\halo\\SOURCE\\physics\\physics.c", 383, FALSE, NULL);
-			break;
-		}
-
-		scale_vector3d(&friction->parallel, parallel_scale, &friction->parallel);
-		scale_vector3d(&friction->perpendicular, perpendicular_scale, &friction->perpendicular);
-		add_vectors3d(&friction->parallel, &friction->perpendicular, &friction->friction);
 	}
 
 	return;
@@ -951,6 +786,146 @@ static void rotate_vectors3d_by_angular_velocity(
 	}
 
 	match_assert_valid_real_vector3d_axes2("c:\\halo\\SOURCE\\physics\\physics.c", 965, rotated_forward, rotated_up);
+	return;
+}
+
+void physics_update_new(
+	struct physics_instance const *instance,
+	struct powered_mass_point_datum const *powered_mass_points,
+	struct mass_point_datum const *mass_points,
+	real_vector3d const *total_force,
+	real_vector3d const *total_torque)
+{
+	struct vehicle_datum *object = vehicle_get(instance->object_index);
+	real_vector3d linear_acceleration, linear_velocity, angular_acceleration, angular_velocity;
+	real_vector3d forward, up;
+	real_point3d position;
+	short mass_points_at_rest_count;
+	short mass_points_on_ground_count;
+	short mass_points_on_volatile_surface_count;
+	short mass_points_in_water_count;
+	short mass_point_index;
+
+	match_assert("c:\\halo\\SOURCE\\physics\\physics.c", 986, instance->physics->mass>0.0f);
+	scale_vector3d(total_force, 1.f/instance->physics->mass, &linear_acceleration);
+	match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\physics\\physics.c", 990, &linear_acceleration);
+	add_vectors3d(&object->object.translational_velocity, &linear_acceleration, &linear_velocity);
+	match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\physics\\physics.c", 994, &linear_velocity);
+	add_vectors3d((real_vector3d *)&object->object.position, &linear_velocity, (real_vector3d *)&position);
+
+	{
+		real_matrix3x3 rotation;
+		real_matrix3x3 inertial_matrix_inverse;
+
+		matrix3x3_from_forward_and_up(&rotation, &object->object.forward, &object->object.up);
+		matrix3x3_multiply(&rotation, TAG_BLOCK_GET_ELEMENT(&instance->physics->inertial_matrix, _physics_inertial_matrix_inverse, real_matrix3x3), &inertial_matrix_inverse);
+		matrix3x3_multiply(&inertial_matrix_inverse, matrix3x3_transpose(&rotation, &rotation), &inertial_matrix_inverse);
+		matrix3x3_transform_vector(&inertial_matrix_inverse, total_torque, &angular_acceleration);
+	}
+	match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\physics\\physics.c", 1008, &angular_acceleration);
+	add_vectors3d(&object->object.angular_velocity, &angular_acceleration, &angular_velocity);
+	match_assert_valid_real_vector3d("c:\\halo\\SOURCE\\physics\\physics.c", 1012, &angular_velocity);
+	rotate_vectors3d_by_angular_velocity(&object->object.forward, &object->object.up, &angular_velocity, &forward, &up);
+	object->object.translational_velocity = linear_velocity;
+	object->object.angular_velocity = angular_velocity;
+
+	if (debug_physics_disable_penetration_freeze)
+	{
+		object_set_position(instance->object_index, &position, &forward, &up);
+	}
+	else
+	{
+		short iterations = 4;
+		unsigned long stuck_mass_point_flags;
+
+		do
+		{
+			real_matrix4x3 world_matrix;
+			real_point3d negative_center_of_mass;
+			boolean found_collision_valid = FALSE;
+			struct collision_result found_collision;
+			real_vector3d found_collision_vector;
+
+			iterations--;
+			stuck_mass_point_flags = 0;
+			matrix4x3_from_point_and_vectors(&world_matrix, &position, &forward, &up);
+			set_real_point3d(&negative_center_of_mass, -instance->physics->center_of_mass.x, -instance->physics->center_of_mass.y, -instance->physics->center_of_mass.z);
+			matrix4x3_transform_point(&world_matrix, &negative_center_of_mass, &negative_center_of_mass);
+			world_matrix.position = negative_center_of_mass;
+
+			for (mass_point_index = 0; mass_point_index < instance->physics->mass_points.count; mass_point_index++)
+			{
+				struct mass_point_definition const *mass_point_definition = TAG_BLOCK_GET_ELEMENT(&instance->physics->mass_points, mass_point_index, struct mass_point_definition);
+				struct mass_point_datum const *mass_point = &mass_points[mass_point_index];
+				real_point3d new_position;
+				real_vector3d vector;
+				struct collision_result collision;
+
+				matrix4x3_transform_point(&world_matrix, &mass_point_definition->position, &new_position);
+				vector_from_points3d(&mass_point->position, &new_position, &vector);
+				if (collision_test_vector(_collision_test_for_vehicles_flags | FLAG(_collision_test_front_facing_surfaces_bit), &mass_point->position, &vector, instance->object_index, &collision))
+				{
+					SET_FLAG(stuck_mass_point_flags, mass_point_index, TRUE);
+					if (!found_collision_valid || found_collision.t > collision.t)
+					{
+						found_collision_valid = TRUE;
+						found_collision_vector = vector;
+						found_collision = collision;
+					}
+				}
+			}
+
+			if (found_collision_valid)
+			{
+				real normal_distance = dot_product3d(&found_collision_vector, &found_collision.plane.n);
+				real adjustment = normal_distance != 0.f ? 0.0078125f/fabs(normal_distance) : 0.03125f;
+				real t = MAX(found_collision.t-adjustment, 0.f);
+				real normal_velocity = dot_product3d(&linear_velocity, &found_collision.plane.n);
+
+				if (normal_velocity < 0.f)
+				{
+					point_from_line3d((real_point3d *)&linear_velocity, &found_collision.plane.n, normal_velocity*(t-1.f), (real_point3d *)&linear_velocity);
+					object->object.translational_velocity = linear_velocity;
+					add_vectors3d((real_vector3d *)&object->object.position, &linear_velocity, (real_vector3d *)&position);
+				}
+				scale_vector3d(&angular_velocity, t, &angular_velocity);
+				object->object.angular_velocity = angular_velocity;
+				rotate_vectors3d_by_angular_velocity(&object->object.forward, &object->object.up, &angular_velocity, &forward, &up);
+			}
+			else
+			{
+				object_set_position(instance->object_index, &position, &forward, &up);
+				break;
+			}
+		}
+		while (iterations > 0);
+
+		object->vehicle.stuck_mass_point_flags = stuck_mass_point_flags;
+	}
+
+	mass_points_at_rest_count = 0;
+	mass_points_on_ground_count = 0;
+	mass_points_on_volatile_surface_count = 0;
+	mass_points_in_water_count = 0;
+	for (mass_point_index = 0; mass_point_index < instance->physics->mass_points.count; mass_point_index++)
+	{
+		struct mass_point_datum const *mass_point = &mass_points[mass_point_index];
+
+		mass_points_at_rest_count += TEST_FLAG(mass_point->flags, _point_at_rest_bit);
+		mass_points_on_ground_count += TEST_FLAG(mass_point->flags, _point_on_ground_bit);
+		mass_points_on_volatile_surface_count += TEST_FLAG(mass_point->flags, _point_on_volatile_surface_bit);
+		mass_points_in_water_count += TEST_FLAG(mass_point->flags, _point_in_water_bit);
+	}
+
+	SET_FLAG(object->object.flags, _object_at_rest_bit, mass_points_at_rest_count == instance->physics->mass_points.count && mass_points_on_ground_count >= 3 && !mass_points_on_volatile_surface_count &&
+		magnitude_squared3d(&linear_velocity) <= SECONDS_PER_TICK*SECONDS_PER_TICK &&
+		magnitude_squared3d(&angular_velocity) <= (_pi2*SECONDS_PER_TICK)*(_pi2*SECONDS_PER_TICK) &&
+		magnitude_squared3d(&linear_acceleration) <= (0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK)*(0.5f*SECONDS_PER_TICK*SECONDS_PER_TICK) &&
+		magnitude_squared3d(&angular_acceleration) <= (_pi2*SECONDS_PER_TICK*SECONDS_PER_TICK)*(_pi2*SECONDS_PER_TICK*SECONDS_PER_TICK));
+	SET_FLAG(object->object.flags, _object_on_ground_bit, mass_points_on_ground_count > 0);
+	SET_FLAG(object->object.flags, _object_on_media_bit, mass_points_in_water_count > 0);
+	SET_FLAG(object->object.flags, _object_partially_under_media_bit, mass_points_in_water_count > 0);
+	SET_FLAG(object->object.flags, _object_wholly_under_media_bit, mass_points_in_water_count == instance->physics->mass_points.count);
 	return;
 }
 
@@ -1245,5 +1220,32 @@ static void physics_update_old(
 	SET_FLAG(object->object.flags, _object_partially_under_media_bit, mass_points_in_water_count > 0);
 	SET_FLAG(object->object.flags, _object_wholly_under_media_bit, mass_points_in_water_count == physics->mass_points.count);
 	match_assert_valid_real_vector3d_axes2("c:\\halo\\SOURCE\\physics\\physics.c", 1595, &object->object.forward, &object->object.up);
+	return;
+}
+
+void render_debug_physics(
+	struct physics_instance *instance)
+{
+	struct object_datum *object = object_get(instance->object_index);
+	struct object_definition *object_definition = object_definition_get(object->definition_index);
+	real_point3d center_of_mass;
+	short mass_point_index;
+
+	matrix4x3_transform_point(&instance->world_matrix, &instance->physics->center_of_mass, &center_of_mass);
+	render_debug_vectors(TRUE, &center_of_mass, &instance->world_matrix.forward, &instance->world_matrix.up, object_definition->object.bounding_radius);
+
+	for (mass_point_index = 0; mass_point_index < instance->physics->mass_points.count; mass_point_index++)
+	{
+		struct mass_point_definition const *mass_point_definition = TAG_BLOCK_GET_ELEMENT(&instance->physics->mass_points, mass_point_index, struct mass_point_definition);
+		real_point3d position;
+		real_vector3d forward, up;
+
+		matrix4x3_transform_point(&instance->world_matrix, &mass_point_definition->position, &position);
+		matrix4x3_transform_normal(&instance->world_matrix, &mass_point_definition->forward, &forward);
+		matrix4x3_transform_normal(&instance->world_matrix, &mass_point_definition->up, &up);
+		render_debug_sphere(TRUE, &position, mass_point_definition->radius, global_real_argb_white);
+		render_debug_vectors(TRUE, &position, &forward, &up, mass_point_definition->radius*0.5f);
+	}
+
 	return;
 }

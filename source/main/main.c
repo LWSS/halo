@@ -62,6 +62,10 @@ MAIN.C
 #include "game_engine.h"
 #include "cache_files.h"
 
+/* ---------- macros */
+
+#define SECONDS_PER_TICK (1.f/TICKS_PER_SECOND) /* fake name */
+
 /* ---------- structures */
 
 struct _main_globals
