@@ -41,7 +41,7 @@ enum
 struct contrail_datum
 {
 	short identifier;
-	unsigned short flags;
+	word flags;
 	long definition_index;
 	long object_index;
 	short attachment_index;
@@ -61,7 +61,7 @@ struct contrail_datum
 struct contrail_point_datum
 {
 	short identifier;
-	unsigned char flags;
+	byte flags;
 	char state_index;
 	real time;
 	real delta;

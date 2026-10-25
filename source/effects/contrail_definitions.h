@@ -92,15 +92,15 @@ struct contrail_point_state
 
 struct contrail_definition
 {
-	unsigned short flags;
-	unsigned short scale_flags;
+	word flags;
+	word scale_flags;
 	real point_generation_rate;
 	real point_velocity_lower_bound;
 	real point_velocity_upper_bound;
 	real point_velocity_cone_angle;
 	real point_inherited_velocity_fraction;
 	short render_type;
-	unsigned short pad;
+	word pad;
 	real texture_repeats_u;
 	real texture_repeats_v;
 	real texture_animation_u;
