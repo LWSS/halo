@@ -91,6 +91,16 @@ enum
 	NUMBER_OF_AI_CONVERSATION_STATUSES, /* fake name */
 };
 
+enum
+{
+	_comm_hostility_none = 0,
+	_comm_hostility_self,
+	_comm_hostility_friend,
+	_comm_hostility_enemy,
+	_comm_hostility_traitor,
+	NUMBER_OF_AI_COMMUNICATION_HOSTILITIES,
+};
+
 /* ---------- macros */
 
 #define conversation_get(index) ((struct conversation_datum *)datum_get(conversation_data, (index))) /* fake name */

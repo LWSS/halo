@@ -240,11 +240,32 @@ enum
 	NUMBER_OF_ACTOR_AIMING_OBSTRUCTION_TYPES,
 };
 
+enum
+{
+	_swarm_component_attacking_in_melee_bit = 0,
+	_swarm_component_attached_to_unit_bit,
+	_swarm_component_wander_bit,
+	_swarm_component_obey_bit,
+	_swarm_component_obey_desire_jump_bit,
+	NUMBER_OF_SWARM_COMPONENT_FLAGS,
+};
+
+enum
+{
+	_desired_target_none = 0,
+	_desired_target_ai,
+	_desired_target_player,
+	NUMBER_OF_DESIRED_TARGET_TYPES,
+};
+
 #define MAXIMUM_NUMBER_OF_ACTORS 256
 #define MAXIMUM_NUMBER_OF_ACTOR_PATHS 32
+#define MAXIMUM_NUMBER_OF_SWARMS 32 /* fake name */
+#define MAXIMUM_NUMBER_OF_SWARM_COMPONENTS 256 /* fake name */
 
 #define MAXIMUM_UNIT_INDICES_PER_SWARM 16
 #define MAXIMUM_COMPONENT_INDICES_PER_SWARM 16
+#define MAXIMUM_NUMBER_OF_UNITS_PER_SWARM 16
 
 #define MAXIMUM_NUMBER_OF_AVOIDANCE_OBJECTS 1024
 
@@ -255,6 +276,8 @@ enum
 
 #define swarm_get(index)			((struct swarm_datum *)datum_get(swarm_data, (index)))
 #define swarm_try_and_get(index)	((struct swarm_datum *)datum_try_and_get(swarm_data, (index)))
+
+#define swarm_component_get(index)	((struct swarm_component_datum *)datum_get(swarm_component_data, (index)))
 
 /* ---------- structures */
 
@@ -793,6 +816,33 @@ struct swarm_datum
 	long component_indices[MAXIMUM_COMPONENT_INDICES_PER_SWARM];
 };
 
+struct swarm_wander_control
+{
+	byte pause_ticks;
+	byte move_ticks;
+	real_vector3d vector;
+	real angle;
+};
+
+struct swarm_component_datum
+{
+	short identifier;
+	short flags;
+	real_point3d position;
+	long surface_index;
+	long combat_target_prop_index;
+	byte attached_to_unit_ticks;
+	byte ground_ticks;
+	byte attack_delay_ticks;
+	byte pad;
+
+	union
+	{
+		struct swarm_wander_control wander;
+		struct obey_individual_simple_control obey;
+	};
+};
+
 struct vehicle_avoidance_cylinder
 {
 	long object_index;
@@ -1018,6 +1068,31 @@ struct firing_position_evaluation_context
 
 /* ---------- prototypes/ACTORS.C */
 
+void actors_initialize(void);
+void actors_dispose(void);
+void actors_initialize_for_new_map(void);
+void actors_dispose_from_old_map(void);
+void actors_update(void);
+void actors_freeze(void);
+void actors_move_randomly(void);
+void actors_handle_spatial_effect(long object_index, short effect_type, real_point3d const *position, short volume, short count);
+void actors_handle_unit_effect(long owner_unit_index, short effect_type, short volume);
+long actor_place(long actor_variant_definition_index, long encounter_index, long squad_index, struct actor_starting_location_definition *starting_location, boolean upgrade_major, short variant_number);
+void actor_erase(long actor_index, boolean immediate);
+void actor_swarm_detach_from_unit(long actor_index, long unit_index);
+void actor_swarm_unit_died(long actor_index, long unit_index);
+void actor_switch_props(long actor_index, long prop_index, long replacement_prop_index);
+void actor_flush_structure_indices(long actor_index);
+void actor_handle_damage(long actor_index, long aggressor_unit_index, real damage_fraction, real_vector3d *damage_velocity);
+long actor_create_for_unit(boolean swarm, long unit_index, long actor_variant_definition_index, long encounter_index, short squad_index, boolean allow_addition_to_other_squads, long disallow_actor_index, boolean initially_braindead, short initial_state, short default_state, short initial_command_list_index, char noncombat_sequence_id);
+void actor_delete(long actor_index, boolean died);
+void actor_kill(long actor_index, boolean silent, boolean delayed);
+void actor_braindead(long actor_index, boolean braindead);
+void actor_set_team(long actor_index, short team_index);
+void actor_change_encounter(long actor_index, long encounter_index, short squad_index);
+void actor_flush_position_indices(long actor_index);
+void actor_handle_unit_effect(long actor_index, long prop_index, short effect_type);
+
 real_argb_color const *actor_activation_debug_color(long actor_index);
 
 boolean actor_in_combat(long actor_index);
@@ -1038,11 +1113,14 @@ long actor_aim_grenade(long actor_index, real_point3d const *origin, real_vector
 /* ---------- prototypes/ACTOR_LOOKING.C */
 
 boolean actor_look_secondary(long actor_index, short type, short priority, struct direction_specification *direction);
+void actor_look_secondary_stop(long actor_index);
 void actor_looking_test_validity(long actor_index, real_vector3d *test_vector, boolean *valid_aiming, boolean *valid_looking);
 
 /* ---------- prototypes/ACTOR_MOVING.C */
 
+void actor_move_initialize(void);
 boolean actor_move_animation_busy(long actor_index);
+boolean actor_move_halt(long actor_index);
 
 void actor_move_transform_avoidance_vector(struct vector_avoidance_data *avoidance_data, real_vector3d const *avoidance_vector, real_vector3d *direction_vector);
 void actor_move_get_avoidance_direction(struct vector_avoidance_data *avoidance_data, real direction, real_vector3d *direction_vector);
@@ -1061,9 +1139,19 @@ short actor_visibility_at_point(long actor_index, struct actor_position_data *se
 short actor_audibility_at_point(long actor_index, struct actor_position_data *sense_position, real_point3d const *position, struct location const *location, short sound_volume, real perception_factor, short line_of_sight);
 void actor_perception_find_sense_position(long actor_index, real_point3d const *position, long prop_index, struct actor_position_data *sense_position);
 
+void actor_berserk(long actor_index, boolean berserk);
+boolean actor_compute_prop_unopposable(long actor_index, long prop_index);
+real actor_compute_prop_target_weight(long actor_index, long prop_index);
+
+/* ---------- prototypes/ACTOR_STIMULUS.C */
+
+void actor_stimulus_maneuvering(long actor_index, boolean advancing, boolean flee);
+void actor_stimulus_vehicle_eviction(long actor_index);
+
 /* ---------- globals */
 
 extern struct data_array *swarm_data;
+extern struct data_array *swarm_component_data;
 extern struct data_array *actor_data;
 
 /* ---------- public code */

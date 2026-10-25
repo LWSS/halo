@@ -648,6 +648,11 @@ boolean unit_drop_current_weapon(long unit_index, boolean immediate);
 
 boolean unit_throw_grenade_begin(long unit_index, real_vector2d const *alignment_vector);
 
+void unit_try_and_exit_seat(long object_index);
+boolean unit_enter_seat(long unit_index, long parent_unit_index, short seat_index);
+void unit_add_grenade_type_to_inventory(long unit_index, short grenade_type, short grenade_count);
+short vehicle_scripting_find_available_seats(long unit_index, char const *seat_substring_name, short seat_desire_type, short *seat_indices, short seat_max_indices);
+
 
 /* ---------- prototypes/UNIT_DIALOGUE.C */
 

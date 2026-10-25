@@ -140,6 +140,8 @@ void ai_find_inactive_encounters(unsigned char *working_memory, short working_me
 boolean ai_release_inactive_encounters(char *result_description, unsigned char *more_to_release, unsigned char *working_memory, short working_memory_size);
 
 boolean ai_test_line_of_fire(long actor_index, long ignore_unit_index, real_point3d const *origin, real_vector3d const *vector, long *prop_index_reference);
+short ai_test_line_of_sight(real_point3d const *p0, short p0_cluster_index, real_point3d const *p1, short p1_cluster_index, short mode, boolean test_line_of_fire, long ignore_object_index, boolean ignore_vehicles);
+boolean ai_test_ballistic_line_of_fire(long actor_index, real_point3d const *origin, real arc_time, real_vector3d const *arc_initial_velocity, real arc_acceleration, long ignore_object_index, boolean ignore_vehicles);
 boolean ai_try_vehicle_eviction(long actor_index, long requesting_unit_index, boolean actually_evict);
 long ai_get_responsible_unit(long object_index, boolean responsible_for_weapon_fire);
 
@@ -150,9 +152,11 @@ void ai_update_team_status(void);
 boolean ai_adjust_damage(long actor_index, struct damage_data *damage_data, real *damage);
 void ai_handle_death(long unit_index, long owner_object_index, short damage_category);
 boolean ai_handle_killing_spree(long unit_index, short killing_spree_count);
+void ai_handle_bump(long biped_index, long object_index);
 void ai_handle_damage(long unit_index, long shooter_object_index, short damage_category, float fraction, union real_vector3d *damage_velocity, boolean delayed);
 void ai_create_mounted_weapons_for_unit(long unit_index);
 void ai_handle_deleted_object(long deleted_object_index);
+void ai_handle_editing(long encounter_index);
 boolean ai_enemies_can_see_player(void);
 boolean ai_enemies_attacking_player(void);
 void ai_handle_unit_effect(long owner_unit_index, short effect_type, short volume);
@@ -166,6 +170,8 @@ void ai_reconnect_to_structure_bsp(void);
 short ai_get_race_from_team_index(short team_index);
 
 /* ---------- globals */
+
+extern struct enum_definition ai_sound_volume_enum;
 
 /* ---------- public code */
 

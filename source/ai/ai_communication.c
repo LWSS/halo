@@ -49,16 +49,6 @@ enum
 
 enum
 {
-	_comm_hostility_none = 0,
-	_comm_hostility_self,
-	_comm_hostility_friend,
-	_comm_hostility_enemy,
-	_comm_hostility_traitor,
-	NUMBER_OF_AI_COMMUNICATION_HOSTILITIES,
-};
-
-enum
-{
 	_comm_enemy_never = 0,
 	_comm_enemy_dead,
 	_comm_enemy_lost,

@@ -382,6 +382,9 @@ struct pursuit_location *actor_get_pursuit_location(long actor_index);
 real_argb_color *actor_action_debug_color(long actor_index);
 short actor_action_class(long actor_index);
 
+boolean actor_action_set_default_state(long actor_index, short override_state);
+boolean actor_action_try_to_enter_vehicle(long actor_index, long vehicle_index, char const *seat_substring_name, short seat_desire_type, short precomputed_seat_count, short *precomputed_seat_indices);
+
 /* ---------- prototypes/ACTION_CONVERSE.C */
 
 boolean action_converse_setup(long actor_index, long conversation_index, struct converse_state_data *state_data);
@@ -389,6 +392,9 @@ boolean action_converse_setup(long actor_index, long conversation_index, struct 
 /* ---------- prototypes/ACTION_OBEY.C */
 
 void action_obey_describe_command(struct scenario *scenario, struct ai_command_definition *command, char *string, long string_size);
+boolean action_obey_command_list_setup(long actor_index, short command_list_index, struct obey_state_data *state_data);
+void action_obey_advance_command_list(long actor_index);
+void action_obey_flush_command_indices(long actor_index);
 
 /* ---------- globals */
 

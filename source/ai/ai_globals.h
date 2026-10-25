@@ -21,6 +21,8 @@ enum
 /* ---------- macros */
 
 #define MAXIMUM_ENTERABLE_VEHICLES 32
+#define NUMBER_OF_CACHED_SPATIAL_EFFECTS 32
+#define MAXIMUM_NUMBER_OF_MOUNTED_WEAPON_UNITS 8
 
 /* ---------- structures */
 
@@ -70,12 +72,12 @@ struct ai_globals
 	struct recent_conversation recent_conversations[16];
 	short spatial_effects_first_index;
 	short spatial_effects_last_index;
-	struct ai_spatial_effect spatial_effects[32];
+	struct ai_spatial_effect spatial_effects[NUMBER_OF_CACHED_SPATIAL_EFFECTS];
 	boolean grenades_enabled;
 	short enterable_vehicle_count;
 	struct ai_vehicle_enterable enterable_vehicles[MAXIMUM_ENTERABLE_VEHICLES];
 	short mounted_weapon_unit_count;
-	long mounted_weapon_unit_indices[8];
+	long mounted_weapon_unit_indices[MAXIMUM_NUMBER_OF_MOUNTED_WEAPON_UNITS];
 };
 
 /* ---------- prototypes/EXAMPLE.C */

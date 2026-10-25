@@ -166,6 +166,10 @@ boolean game_team_is_enemy(short our_team, short other_team);
 boolean game_team_is_ally(short our_team, short other_team);
 short game_allegiance_get_incidents(short our_team_index, short other_team_index, short *incident_threshold);
 boolean game_allegiance_incident(short aggressor_team_index, short victim_team_index, short type, boolean *notify_immediately);
+void game_allegiance_create(short team1_index, boolean team1_suspicious, short team2_index, boolean team2_suspicious, short incident_threshold, short incident_decay_time, boolean allegiance_requires_communication);
+boolean game_allegiance_remove(short team1_index, short team2_index);
+void game_allegiance_provoke(short aggressor_team_index, short victim_team_index);
+void game_allegiance_notify_change(short aggressor_team_index, short victim_team_index);
 
 /* ---------- prototypes/GAME_STATISTICS.C */
 

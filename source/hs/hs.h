@@ -18,6 +18,7 @@ header included in hcex build.
 
 void hs_runtime_dispose_from_old_map(void);
 void hs_runtime_initialize_for_new_map(void);
+char const *hs_runtime_get_executing_thread_name(void);
 
 boolean hs_compile_and_evaluate(const char *expression);
 
