@@ -3261,7 +3261,7 @@ real get_blink_alpha(
 {
 	long period = 2700;
 	long time = system_milliseconds() % period;
-	real angle = (real)(time * 3.14159265358979 * (1.f / period));
+	real angle = (real)(time * 3.14159265358979 * (1.f / period)); // M_PI?
 	real alpha = (real)sin(angle);
 
 	return alpha;
