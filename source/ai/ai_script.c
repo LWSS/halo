@@ -2241,28 +2241,25 @@ static int ai_scripting_vehicle_candidate_qsort(
 	void const *p1,
 	void const *p2)
 {
-	int result;
 	struct ai_script_vehicle_candidate const *candidate1 = p1;
 	struct ai_script_vehicle_candidate const *candidate2 = p2;
 
 	if (candidate1->already_entering_vehicle != candidate2->already_entering_vehicle)
 	{
-		result = candidate1->already_entering_vehicle ? 1 : -1;
+		return candidate1->already_entering_vehicle ? 1 : -1;
 	}
 	else if (candidate1->dist_sq < candidate2->dist_sq)
 	{
-		result = -1;
+		return -1;
 	}
 	else if (candidate1->dist_sq > candidate2->dist_sq)
 	{
-		result = 1;
+		return 1;
 	}
 	else
 	{
-		result = 0;
+		return 0;
 	}
-
-	return result;
 }
 
 static void ai_scripting_go_to_vehicle_internal(

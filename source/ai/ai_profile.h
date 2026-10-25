@@ -45,9 +45,9 @@ enum
 
 enum
 {
-	_ai_profile_render_spray_none = 0, /* fake name */
-	_ai_profile_render_spray_actions, /* fake name */
-	_ai_profile_render_spray_activation_status, /* fake name */
+	_ai_profile_render_spray_none = 0,
+	_ai_profile_render_spray_actions,
+	_ai_profile_render_spray_activation,
 	NUMBER_OF_AI_PROFILE_RENDER_SPRAY_MODES,
 };
 

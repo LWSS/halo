@@ -260,7 +260,7 @@ enum
 
 #define MAXIMUM_NUMBER_OF_ACTORS 256
 #define MAXIMUM_NUMBER_OF_ACTOR_PATHS 32
-#define MAXIMUM_NUMBER_OF_SWARMS 32 /* fake name */
+#define MAXIMUM_NUMBER_OF_ACTIVE_SWARMS 32
 #define MAXIMUM_NUMBER_OF_SWARM_COMPONENTS 256 /* fake name */
 
 #define MAXIMUM_UNIT_INDICES_PER_SWARM 16
@@ -277,7 +277,7 @@ enum
 #define swarm_get(index)			((struct swarm_datum *)datum_get(swarm_data, (index)))
 #define swarm_try_and_get(index)	((struct swarm_datum *)datum_try_and_get(swarm_data, (index)))
 
-#define swarm_component_get(index)	((struct swarm_component_datum *)datum_get(swarm_component_data, (index)))
+#define swarm_component_get(index)	((struct swarm_component_datum *)datum_get(swarm_component_data, (index))) /* fake name */
 
 /* ---------- structures */
 

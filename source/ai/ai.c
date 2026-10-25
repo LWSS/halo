@@ -438,32 +438,29 @@ static int compare_releasable_inactive_encounters(
 	void const *p1,
 	void const *p2)
 {
-	int result;
 	struct potentially_releasable_encounter const *releasable1 = (struct potentially_releasable_encounter const *)p1;
 	struct potentially_releasable_encounter const *releasable2 = (struct potentially_releasable_encounter const *)p2;
 
 	if (releasable1->last_active_time > releasable2->last_active_time)
 	{
-		result = 1;
+		return 1;
 	}
 	else if (releasable2->last_active_time > releasable1->last_active_time)
 	{
-		result = -1;
+		return -1;
 	}
 	else if (releasable1->encounterless_actor > releasable2->encounterless_actor)
 	{
-		result = -1;
+		return -1;
 	}
 	else if (releasable1->encounterless_actor < releasable2->encounterless_actor)
 	{
-		result = 1;
+		return 1;
 	}
 	else
 	{
-		result = 0;
+		return 0;
 	}
-
-	return result;
 }
 
 void ai_find_inactive_encounters(
@@ -820,7 +817,10 @@ short ai_test_line_of_sight(
 		{
 			occluded = TRUE;
 		}
-		else if (mode)
+		else if (!mode)
+		{
+		}
+		else
 		{
 			real_vector3d perpendicular;
 
@@ -1505,10 +1505,12 @@ void ai_create_mounted_weapons_for_unit(
 		}
 		else
 		{
+			struct unit_datum *unit = unit_get(unit_index);
+
 			error(
 				_error_silent,
 				"WARNING: cannot create mounted weapons for %s, exceeded MAXIMUM_NUMBER_OF_MOUNTED_WEAPON_UNITS",
-				tag_name_strip_path(tag_get_name(unit_get(unit_index)->definition_index)));
+				tag_name_strip_path(tag_get_name(unit->definition_index)));
 		}
 	}
 
@@ -1742,8 +1744,13 @@ void ai_handle_unit_effect(
 			struct unit_datum *unit = unit_get(owner_unit_index);
 			long current_time = game_time_get();
 
-			if ((game_connection() != _game_connection_local || !ai_debug.ignore_player || unit->unit.player_index == NONE) &&
-				(effect_type > unit->unit.last_unit_effect_type || current_time > unit->unit.game_time_at_last_unit_effect + TICKS_PER_SECOND))
+			if (game_connection() == _game_connection_local && ai_debug.ignore_player && unit->unit.player_index != NONE)
+			{
+			}
+			else if (effect_type <= unit->unit.last_unit_effect_type && current_time <= unit->unit.game_time_at_last_unit_effect + TICKS_PER_SECOND)
+			{
+			}
+			else
 			{
 				unit->unit.last_unit_effect_type = effect_type;
 				unit->unit.game_time_at_last_unit_effect = current_time;

@@ -24,10 +24,10 @@ AI_PROFILE.C
 
 /* ---------- structures */
 
-struct ai_meter_definition /* fake name */
+struct ai_meter_definition
 {
 	short meter_id;
-	short (*count)(void);
+	short (*value_callback)(void);
 };
 
 /* ---------- prototypes */
@@ -121,9 +121,9 @@ void ai_profile_update(
 
 		match_assert("c:\\halo\\SOURCE\\ai\\ai_profile.c", 140, definition->meter_id == index);
 
-		if (definition->count)
+		if (definition->value_callback)
 		{
-			meter->current_count = definition->count();
+			meter->current_count = definition->value_callback();
 		}
 
 		meter->last_count = meter->current_count;
@@ -333,7 +333,7 @@ static void ai_profile_show_swarms(
 		"swarms %d/%d/%d|tcomponents %d/%d",
 		ai_profile.meters[_ai_meter_swarm_actor].last_count,
 		ai_profile.meters[_ai_meter_swarm].last_count,
-		MAXIMUM_NUMBER_OF_SWARMS,
+		MAXIMUM_NUMBER_OF_ACTIVE_SWARMS,
 		ai_profile.meters[_ai_meter_swarm_component].last_count,
 		MAXIMUM_NUMBER_OF_SWARM_COMPONENTS);
 	ai_profile_string(profilestring, NUMBEROF(tabs), tabs, global_real_argb_white);
@@ -409,7 +409,7 @@ static void ai_profile_render_spray(
 
 		switch (ai_profile.render_spray_mode)
 		{
-		case _ai_profile_render_spray_activation_status:
+		case _ai_profile_render_spray_activation:
 			active_only = FALSE;
 			break;
 		}
@@ -428,7 +428,7 @@ static void ai_profile_render_spray(
 				color = actor_action_debug_color(iterator.index);
 				break;
 
-			case _ai_profile_render_spray_activation_status:
+			case _ai_profile_render_spray_activation:
 				color = actor_activation_debug_color(iterator.index);
 				break;
 			}

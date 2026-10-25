@@ -19,7 +19,6 @@ enum
 	_ai_index_encounter = 0,
 	_ai_index_platoon,
 	_ai_index_squad,
-	NUMBER_OF_AI_INDEX_TYPES, /* fake name */
 };
 
 /* ---------- macros */
