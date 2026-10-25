@@ -764,12 +764,12 @@ static long adjust_score_for_ranking(
 
 	if (player->statistics.deaths < global_variant.universal_variant.lives)
 	{
-		flags = 0x40000000;
+		flags = FLAG(30);
 	}
 
 	if (!player->quit_out_of_game)
 	{
-		flags |= 0x20000000;
+		SET_FLAG(flags, 29, TRUE);
 	}
 
 	return flags | score;
@@ -939,7 +939,7 @@ static void game_engine_generate_title_string(
 
 			multiplayer_game_text_get_string(format, _string_n_lives);
 			usnprintf(n_limited_lives_string, NUMBEROF(n_limited_lives_string), format, lives_remaining);
-			n_limited_lives_string[NUMBEROF(n_limited_lives_string) - 1] = 0;
+			n_limited_lives_string[NUMBEROF(n_limited_lives_string) - 1] = '\0';
 			lives_string = n_limited_lives_string;
 			break;
 		}
@@ -954,11 +954,11 @@ static void game_engine_generate_title_string(
 
 		switch (win)
 		{
-		case -1:
+		case NONE:
 			multiplayer_game_text_get_string(string, _string_game_ends_in_a_draw);
 			ustrncpy(title_string, string, MAXIMUM_TITLE_STRING_LENGTH);
 			break;
-		case 0:
+		case FALSE:
 			if (teams)
 			{
 				multiplayer_game_text_get_string(string, _string_your_team_lost);
@@ -970,7 +970,7 @@ static void game_engine_generate_title_string(
 				ustrncpy(title_string, string, MAXIMUM_TITLE_STRING_LENGTH);
 			}
 			break;
-		case 1:
+		case TRUE:
 			if (teams)
 			{
 				multiplayer_game_text_get_string(string, _string_your_team_won);
@@ -1034,7 +1034,7 @@ static void game_engine_generate_title_string(
 		}
 	}
 
-	title_string[MAXIMUM_TITLE_STRING_LENGTH - 1] = 0;
+	title_string[MAXIMUM_TITLE_STRING_LENGTH - 1] = '\0';
 
 	return;
 }
@@ -1222,8 +1222,8 @@ void game_engine_post_rasterize_post_game(
 
 			rect.x0 = 0;
 			rect.y0 = 0;
-			rect.x1 = 640;
-			rect.y1 = 480;
+			rect.x1 = RASTERIZER_TARGET_RENDER_PRIMARY_WIDTH;
+			rect.y1 = RASTERIZER_TARGET_RENDER_PRIMARY_HEIGHT;
 
 			if (bitmap_group_try_and_get_bitmap(hud_globals_definition->carnage_report_bitmap.index, 0))
 			{
@@ -1262,7 +1262,7 @@ void game_engine_post_rasterize_post_game(
 
 				game_engine->get_team_score_string(team_index, custom_buffer);
 				usnprintf(buffer, NUMBEROF(buffer), team_string[team_index], custom_buffer);
-				buffer[NUMBEROF(buffer) - 1] = 0;
+				buffer[NUMBEROF(buffer) - 1] = '\0';
 				drawline(buffer, index + 4, 0);
 			}
 		}
@@ -1283,7 +1283,7 @@ void game_engine_post_rasterize_post_game(
 			fields[2],
 			fields[3],
 			fields[4]);
-		buffer[NUMBEROF(buffer) - 1] = 0;
+		buffer[NUMBEROF(buffer) - 1] = '\0';
 		draw_string_set_tab_stops(tab_stops, NUMBEROF(tab_stops));
 		drawline(buffer, 7, 0);
 		player_count = select_players_to_display(NONE, statistic_buffer, _postgame_statistic_ranking, 12);
@@ -1305,7 +1305,7 @@ void game_engine_post_rasterize_post_game(
 
 			draw_string_set_tab_stops(tab_stops, NUMBEROF(tab_stops));
 			usnprintf(buffer, NUMBEROF(buffer), L" \t%s", get_place_string(&statistic_buffer[index]));
-			buffer[NUMBEROF(buffer) - 1] = 0;
+			buffer[NUMBEROF(buffer) - 1] = '\0';
 			drawline(buffer, line, 0);
 			draw_string_set_color(&normal_color);
 
@@ -1325,7 +1325,7 @@ void game_engine_post_rasterize_post_game(
 			}
 
 			usnprintf(buffer, NUMBEROF(buffer), L" \t \t%s", player->name);
-			buffer[NUMBEROF(buffer) - 1] = 0;
+			buffer[NUMBEROF(buffer) - 1] = '\0';
 			drawline(buffer, line, 0);
 			draw_string_set_color(&normal_color);
 
@@ -1336,7 +1336,7 @@ void game_engine_post_rasterize_post_game(
 
 			game_engine->get_score_string(player_index, custom_buffer);
 			usnprintf(buffer, NUMBEROF(buffer), L" \t \t \t%s", custom_buffer);
-			buffer[NUMBEROF(buffer) - 1] = 0;
+			buffer[NUMBEROF(buffer) - 1] = '\0';
 			drawline(buffer, line, 0);
 			draw_string_set_color(&normal_color);
 
@@ -1346,7 +1346,7 @@ void game_engine_post_rasterize_post_game(
 			}
 
 			usnprintf(buffer, NUMBEROF(buffer), L" \t \t \t \t%d", player->statistics.kills[0]);
-			buffer[NUMBEROF(buffer) - 1] = 0;
+			buffer[NUMBEROF(buffer) - 1] = '\0';
 			drawline(buffer, line, 0);
 			draw_string_set_color(&normal_color);
 
@@ -1356,7 +1356,7 @@ void game_engine_post_rasterize_post_game(
 			}
 
 			usnprintf(buffer, NUMBEROF(buffer), L" \t \t \t \t \t%d", player->statistics.assists[0]);
-			buffer[NUMBEROF(buffer) - 1] = 0;
+			buffer[NUMBEROF(buffer) - 1] = '\0';
 			drawline(buffer, line, 0);
 			draw_string_set_color(&normal_color);
 
@@ -1366,7 +1366,7 @@ void game_engine_post_rasterize_post_game(
 			}
 
 			usnprintf(buffer, NUMBEROF(buffer), L" \t \t \t \t \t \t%d", player->statistics.deaths);
-			buffer[NUMBEROF(buffer) - 1] = 0;
+			buffer[NUMBEROF(buffer) - 1] = '\0';
 			drawline(buffer, line, 0);
 			draw_string_set_tab_stops(tab_stops, NUMBEROF(tab_stops));
 		}
@@ -1377,7 +1377,7 @@ void game_engine_post_rasterize_post_game(
 			real_argb_color options_color = normal_color;
 
 			options_color.alpha = game_engine_globals.post_game_options_fade;
-			bounds.y0 = 410;
+			bounds.y0 = RASTERIZER_TARGET_RENDER_PRIMARY_HEIGHT - 70;
 			bounds.x0 = 70;
 			offset_rectangle2d(&bounds, (short)-render.camera.viewport_bounds.x0, (short)-render.camera.viewport_bounds.y0);
 			draw_string_set_tab_stops(NULL, 0);
@@ -1385,13 +1385,13 @@ void game_engine_post_rasterize_post_game(
 
 			if (global_network_game_server_get())
 			{
-				bounds.x0 = 380;
+				bounds.x0 = RASTERIZER_TARGET_RENDER_PRIMARY_WIDTH - 260;
 				multiplayer_game_text_get_string(string, _string_server_post_game_stats_footer);
 				draw_string_and_hack_in_icons(&bounds, NULL, NULL, 0, string, FALSE);
 			}
 			else
 			{
-				bounds.x0 = 520;
+				bounds.x0 = RASTERIZER_TARGET_RENDER_PRIMARY_WIDTH - 120;
 				multiplayer_game_text_get_string(string, _string_client_post_game_stats_footer);
 				draw_string_and_hack_in_icons(&bounds, NULL, NULL, 0, string, FALSE);
 			}
@@ -1531,7 +1531,7 @@ static void internal_rasterize_target_name(
 		}
 
 		ustrncpy(buffer, display_player->name, 11);
-		buffer[11] = 0;
+		buffer[11] = '\0';
 		game_engine_rasterize_message(buffer, linear_to_non_linear_alpha(display_count * 0.1f) * 0.5f);
 	}
 
@@ -1729,7 +1729,7 @@ static boolean internal_rasterize_score(
 		break;
 	}
 
-	buffer[buffer_size - 1] = 0;
+	buffer[buffer_size - 1] = '\0';
 
 	return result;
 }
@@ -1953,6 +1953,7 @@ static long random_item(
 	long permutation_index;
 	struct item_collection_definition *item_collection = item_collection_definition_get(item_collection_index);
 	long permutation_count = item_collection->permutations.count;
+	long item_index = NONE;
 	long random_value = random_range(0, (short)item_collection_get_total(item_collection));
 	struct item_permutation_definition *permutations = (struct item_permutation_definition *)item_collection->permutations.address;
 
@@ -1962,11 +1963,12 @@ static long random_item(
 
 		if (random_value < 0)
 		{
-			return permutations[permutation_index].item.index;
+			item_index = permutations[permutation_index].item.index;
+			break;
 		}
 	}
 
-	return NONE;
+	return item_index;
 }
 
 static long game_engine_get_type(
@@ -2085,7 +2087,7 @@ static void game_engine_update_item_spawn(
 void game_engine_load_stage(
 	char const *map_name)
 {
-	if (!map_name || csstrcmp(global_stage.map_name, map_name))
+	if (!map_name || strcmp(global_stage.map_name, map_name))
 	{
 		main_set_multiplayer_map_name(global_stage.map_name);
 	}
@@ -2121,8 +2123,8 @@ boolean game_engine_get_current_stage(
 	match_assert("c:\\halo\\SOURCE\\game\\game_engine.c", 2328, variant && map_name);
 
 	memcpy(variant, &global_stage.game_variant, sizeof(*variant));
-	csstrncpy(map_name, global_stage.map_name, sizeof(global_stage.map_name) - 1);
-	map_name[sizeof(global_stage.map_name) - 1] = 0;
+	strncpy(map_name, global_stage.map_name, sizeof(global_stage.map_name) - 1);
+	map_name[sizeof(global_stage.map_name) - 1] = '\0';
 
 	return TRUE;
 }
@@ -2495,9 +2497,9 @@ void game_engine_player_killed(
 				game_show_score_extended(killing_player_index, killing_message, dead_player_index);
 			}
 
-			// the loop is what gets both game_show_score_extended() calls above inlined
 			message = NONE;
-		} while (message != NONE);
+		}
+		while (message != NONE);
 	}
 
 	return;
@@ -2538,7 +2540,7 @@ static void multiplayer_message(
 
 		if (multiplayer_message_internal(player_index, message, message_data, buffer, NUMBEROF(buffer)))
 		{
-			buffer[NUMBEROF(buffer) - 1] = 0;
+			buffer[NUMBEROF(buffer) - 1] = '\0';
 			hud_print_message(player->local_player_index, buffer);
 		}
 	}
@@ -3236,9 +3238,9 @@ void game_engine_nonplayer_post_rasterize(
 
 			game_engine_post_rasterize_post_game();
 			window.x0 = 0;
-			window.x1 = 640;
+			window.x1 = RASTERIZER_TARGET_RENDER_PRIMARY_WIDTH;
 			window.y0 = 0;
-			window.y1 = 480;
+			window.y1 = RASTERIZER_TARGET_RENDER_PRIMARY_HEIGHT;
 
 			for (local_player_index = 0; local_player_index < MAXIMUM_NUMBER_OF_LOCAL_PLAYERS; local_player_index++)
 			{
@@ -3652,59 +3654,59 @@ struct game_variant game_engine_get_variant_by_name(
 
 	memset(&result, 0, sizeof(result));
 
-	if (!csstrcmp(name, "race"))
+	if (!strcmp(name, "race"))
 	{
 		result = build_game_variant_race();
 	}
-	else if (!csstrcmp(name, "team_race"))
+	else if (!strcmp(name, "team_race"))
 	{
 		result = build_game_variant_team_race();
 	}
-	else if (!csstrcmp(name, "rally"))
+	else if (!strcmp(name, "rally"))
 	{
 		result = build_game_variant_rally();
 	}
-	else if (!csstrcmp(name, "slayer"))
+	else if (!strcmp(name, "slayer"))
 	{
 		result = build_game_variant_slayer();
 	}
-	else if (!csstrcmp(name, "team_slayer"))
+	else if (!strcmp(name, "team_slayer"))
 	{
 		result = build_game_variant_team_slayer();
 	}
-	else if (!csstrcmp(name, "elimination"))
+	else if (!strcmp(name, "elimination"))
 	{
 		result = build_game_variant_elimination();
 	}
-	else if (!csstrcmp(name, "stalker"))
+	else if (!strcmp(name, "stalker"))
 	{
 		result = build_game_variant_stalker();
 	}
-	else if (!csstrcmp(name, "team_oddball"))
+	else if (!strcmp(name, "team_oddball"))
 	{
 		result = build_game_variant_team_oddball();
 	}
-	else if (!csstrcmp(name, "accumulation"))
+	else if (!strcmp(name, "accumulation"))
 	{
 		result = build_game_variant_accumulation();
 	}
-	else if (!csstrcmp(name, "oddball"))
+	else if (!strcmp(name, "oddball"))
 	{
 		result = build_game_variant_oddball();
 	}
-	else if (!csstrcmp(name, "ctf"))
+	else if (!strcmp(name, "ctf"))
 	{
 		result = build_game_variant_ctf();
 	}
-	else if (!csstrcmp(name, "ironctf"))
+	else if (!strcmp(name, "ironctf"))
 	{
 		result = build_game_variant_iron_ctf();
 	}
-	else if (!csstrcmp(name, "king"))
+	else if (!strcmp(name, "king"))
 	{
 		result = build_game_variant_king();
 	}
-	else if (!csstrcmp(name, "team_king"))
+	else if (!strcmp(name, "team_king"))
 	{
 		result = build_game_variant_team_king();
 	}
@@ -4360,13 +4362,13 @@ struct game_engine_place game_engine_get_place(
 
 			if (different_group && get_score_type == _get_score_team)
 			{
-				if (team_mask & FLAG(other_player->team_index))
+				if (TEST_FLAG(team_mask, other_player->team_index))
 				{
 					different_group = FALSE;
 				}
 				else
 				{
-					team_mask |= FLAG(other_player->team_index);
+					SET_FLAG(team_mask, other_player->team_index, TRUE);
 				}
 			}
 
@@ -4720,7 +4722,7 @@ void game_engine_playlist_next(
 	if (map_name && *map_name)
 	{
 		strncpy(global_stage.map_name, map_name, NUMBEROF(global_stage.map_name) - 1);
-		global_stage.map_name[NUMBEROF(global_stage.map_name) - 1] = 0;
+		global_stage.map_name[NUMBEROF(global_stage.map_name) - 1] = '\0';
 	}
 
 	if (player_ui_game_variant_specified(&user_selected_variant))
@@ -5932,7 +5934,7 @@ void game_engine_variant_cleanup(
 {
 	struct game_variant old_variant = *variant;
 
-	variant->human_readable_game_description[NUMBEROF(variant->human_readable_game_description) - 1] = 0;
+	variant->human_readable_game_description[NUMBEROF(variant->human_readable_game_description) - 1] = '\0';
 	variant->game_engine_index = PIN(variant->game_engine_index, FIRST_USABLE_GAME_ENGINE_INDEX, LAST_USABLE_GAME_ENGINE_INDEX);
 	variant->universal_variant.teams = variant->universal_variant.teams ? TRUE : FALSE;
 	variant->universal_variant.odd_man_out = variant->universal_variant.odd_man_out ? TRUE : FALSE;
