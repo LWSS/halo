@@ -163,6 +163,15 @@ enum
 
 #define shader_definition_get(index) ((struct shader *)tag_get(SHADER_DEFINITION_TAG, (index))) /* fake name */
 
+#define shader_effect_get(shader) ((struct shader_effect *)shader_get_and_verify_type((shader), _shader_type_effect)) /* fake name */
+#define shader_decal_get(shader) ((struct shader_decal *)shader_get_and_verify_type((shader), _shader_type_decal)) /* fake name */
+#define shader_environment_get(shader) ((struct shader_environment *)shader_get_and_verify_type((shader), _shader_type_environment)) /* fake name */
+#define shader_model_get(shader) ((struct shader_model *)shader_get_and_verify_type((shader), _shader_type_model)) /* fake name */
+#define shader_transparent_generic_get(shader) ((struct shader_transparent_generic *)shader_get_and_verify_type((shader), _shader_type_transparent_generic)) /* fake name */
+#define shader_transparent_chicago_get(shader) ((struct shader_transparent_chicago *)shader_get_and_verify_type((shader), _shader_type_transparent_chicago)) /* fake name */
+#define shader_transparent_glass_get(shader) ((struct shader_transparent_glass *)shader_get_and_verify_type((shader), _shader_type_transparent_glass)) /* fake name */
+#define shader_transparent_meter_get(shader) ((struct shader_transparent_meter *)shader_get_and_verify_type((shader), _shader_type_transparent_meter)) /* fake name */
+
 /* ---------- structures */
 
 struct shader_radiosity_properties
