@@ -763,8 +763,7 @@ void hud_draw_static_element(
 
 		scale = hud_globals_get_scale(TEST_FLAG(draw_flags, _hud_draw_in_multiplayer_bit) && !TEST_FLAG(static_element->placement.multiplayer_scaling_flags, _hud_dont_scale_offset_bit));
 		is_interface_bitmap = bitmap_group->type == _bitmap_group_type_interface_bitmaps;
-		hud_draw_bitmap_with_meter(
-			NULL,
+		hud_draw_bitmap(
 			bitmap,
 			placement,
 			&static_element->placement,
@@ -882,8 +881,7 @@ void hud_draw_weapon_overlays(
 			{
 				if (_texture_cache_bitmap_get_hardware_format(source_bitmap, FALSE, TRUE))
 				{
-					hud_draw_bitmap_with_meter(
-						NULL,
+					hud_draw_bitmap(
 						source_bitmap,
 						placement,
 						&item->placement,

@@ -729,6 +729,35 @@ void lights_preprocess_scene(
 	return;
 }
 
+void lights_queue_lens_flare(
+	long definition_index,
+	real_point3d const *position,
+	real_vector3d const *direction,
+	real_vector3d const *up,
+	real_rgb_color const *color,
+	real scale)
+{
+	if (lights_globals.queued_lens_flare_count < MAXIMUM_QUEUED_LENS_FLARES &&
+		(color->red != 0.f || color->green != 0.f || color->blue != 0.f))
+	{
+		struct rasterizer_lens_flare_submit_parameters *lens_flare_parameters =
+			&lights_globals.queued_lens_flares[lights_globals.queued_lens_flare_count];
+
+		lens_flare_parameters->compressed_light_color = real_a_rgb_color_to_pixel32(1.f, color);
+		lens_flare_parameters->compressed_light_scale = compress_real_to_int8(scale);
+		lens_flare_parameters->definition = lens_flare_definition_get(definition_index);
+		lens_flare_parameters->position = *position;
+		lens_flare_parameters->compressed_direction = compress_real_vector3d_to_int32_clamp(direction);
+		lens_flare_parameters->compressed_up = compress_real_vector3d_to_int32_clamp(up);
+		lens_flare_parameters->compressed_window_index = (byte)render.window_index;
+		lens_flare_parameters->light_index = NONE;
+		lens_flare_parameters->light_identifier = NONE;
+		lens_flare_parameters->lens_flare_index = lights_globals.queued_lens_flare_count++;
+	}
+
+	return;
+}
+
 static short light_build_cluster_array(
 	long light_index,
 	short maximum_count,
@@ -1864,37 +1893,6 @@ static void render_debug_light(
 		color.green *= 0.8f;
 		color.blue *= 0.8f;
 		render_debug_sphere(TRUE, &light->position, radius, &color);
-	}
-
-	return;
-}
-
-/* ---------- public code */
-
-void lights_queue_lens_flare(
-	long definition_index,
-	real_point3d const *position,
-	real_vector3d const *direction,
-	real_vector3d const *up,
-	real_rgb_color const *color,
-	real scale)
-{
-	if (lights_globals.queued_lens_flare_count < MAXIMUM_QUEUED_LENS_FLARES &&
-		(color->red != 0.f || color->green != 0.f || color->blue != 0.f))
-	{
-		struct rasterizer_lens_flare_submit_parameters *lens_flare_parameters =
-			&lights_globals.queued_lens_flares[lights_globals.queued_lens_flare_count];
-
-		lens_flare_parameters->compressed_light_color = real_a_rgb_color_to_pixel32(1.f, color);
-		lens_flare_parameters->compressed_light_scale = compress_real_to_int8(scale);
-		lens_flare_parameters->definition = lens_flare_definition_get(definition_index);
-		lens_flare_parameters->position = *position;
-		lens_flare_parameters->compressed_direction = compress_real_vector3d_to_int32_clamp(direction);
-		lens_flare_parameters->compressed_up = compress_real_vector3d_to_int32_clamp(up);
-		lens_flare_parameters->compressed_window_index = (byte)render.window_index;
-		lens_flare_parameters->light_index = NONE;
-		lens_flare_parameters->light_identifier = NONE;
-		lens_flare_parameters->lens_flare_index = lights_globals.queued_lens_flare_count++;
 	}
 
 	return;

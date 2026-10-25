@@ -53,8 +53,43 @@ static real const seconds_per_tick = 1.f / TICKS_PER_SECOND;
 
 /* ---------- public code */
 
+static struct observer *observer_get(
+	short local_player_index)
+{
+	match_assert("c:\\halo\\SOURCE\\camera\\observer.c", 114, local_player_index>=0 && local_player_index<MAXIMUM_NUMBER_OF_LOCAL_PLAYERS);
+
+	return &observer_globals.local_players[local_player_index];
+}
+
 void observer_initialize(void)
 {
+	return;
+}
+
+static void observer_clear(
+	struct observer *observer)
+{
+	observer->forward = *global_forward3d;
+	observer->up = *global_up3d;
+	observer->field_of_view = DEGREES_TO_RADIANS(ORBITING_CAMERA_FIELD_OF_VIEW);
+	observer->result.position = *global_origin3d;
+	observer->result.location.cluster_index = NONE;
+	observer->result.location.leaf_index = NONE;
+	observer->result.velocity = *global_zero_vector3d;
+	observer->result.forward = *global_forward3d;
+	observer->result.up = *global_up3d;
+	observer->result.field_of_view = DEGREES_TO_RADIANS(ORBITING_CAMERA_FIELD_OF_VIEW);
+
+	memset(&observer->last_command, 0, sizeof(observer->last_command));
+	observer->last_command.forward = observer->forward;
+	observer->last_command.up = observer->up;
+	observer->last_command.field_of_view = observer->field_of_view;
+
+	observer->trailer_signature = OBSERVER_SIGNATURE;
+	observer->header_signature = OBSERVER_SIGNATURE;
+	observer->updated_for_frame = TRUE;
+	observer->first_command = FALSE;
+
 	return;
 }
 
@@ -218,50 +253,7 @@ void observer_reconnect_to_structure_bsp(void)
 	return;
 }
 
-void observer_obsolete_position(
-	short local_player_index)
-{
-	observer_clear(observer_get(local_player_index));
-
-	return;
-}
-
 /* ---------- private code */
-
-static struct observer *observer_get(
-	short local_player_index)
-{
-	match_assert("c:\\halo\\SOURCE\\camera\\observer.c", 114, local_player_index>=0 && local_player_index<MAXIMUM_NUMBER_OF_LOCAL_PLAYERS);
-
-	return &observer_globals.local_players[local_player_index];
-}
-
-static void observer_clear(
-	struct observer *observer)
-{
-	observer->forward = *global_forward3d;
-	observer->up = *global_up3d;
-	observer->field_of_view = DEGREES_TO_RADIANS(ORBITING_CAMERA_FIELD_OF_VIEW);
-	observer->result.position = *global_origin3d;
-	observer->result.location.cluster_index = NONE;
-	observer->result.location.leaf_index = NONE;
-	observer->result.velocity = *global_zero_vector3d;
-	observer->result.forward = *global_forward3d;
-	observer->result.up = *global_up3d;
-	observer->result.field_of_view = DEGREES_TO_RADIANS(ORBITING_CAMERA_FIELD_OF_VIEW);
-
-	memset(&observer->last_command, 0, sizeof(observer->last_command));
-	observer->last_command.forward = observer->forward;
-	observer->last_command.up = observer->up;
-	observer->last_command.field_of_view = observer->field_of_view;
-
-	observer->trailer_signature = OBSERVER_SIGNATURE;
-	observer->header_signature = OBSERVER_SIGNATURE;
-	observer->updated_for_frame = TRUE;
-	observer->first_command = FALSE;
-
-	return;
-}
 
 static void observer_update_command(
 	short local_player_index)
@@ -940,4 +932,14 @@ static boolean observer_collision_test_differential(
 	point_from_line3d(destination, differential_basis, differential, &destination_plus_d);
 
 	return observer_collision_test_with_t(origin, &destination_plus_d, t, ignore_media);
+}
+
+/* ---------- public code */
+
+void observer_obsolete_position(
+	short local_player_index)
+{
+	observer_clear(observer_get(local_player_index));
+
+	return;
 }
