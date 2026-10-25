@@ -653,7 +653,6 @@ boolean unit_enter_seat(long unit_index, long parent_unit_index, short seat_inde
 void unit_add_grenade_type_to_inventory(long unit_index, short grenade_type, short grenade_count);
 short vehicle_scripting_find_available_seats(long unit_index, char const *seat_substring_name, short seat_desire_type, short *seat_indices, short seat_max_indices);
 
-
 /* ---------- prototypes/UNIT_DIALOGUE.C */
 
 short unit_test_speech(long unit_index, short priority, boolean allow_recursive_lookup, boolean allow_queue, long *unit_last_speech_time, short *vocalization_type_reference, long *sound_definition_index_reference);

@@ -136,7 +136,7 @@ boolean ai_index_from_string(
 		{
 			char encounter_namebuf[TAG_STRING_LENGTH+1];
 
-			csstrncpy(encounter_namebuf, ai_string, separator - ai_string);
+			strncpy(encounter_namebuf, ai_string, separator - ai_string);
 			encounter_namebuf[separator - ai_string] = 0;
 			encounter_index = scenario_get_encounter_by_name(scenario, encounter_namebuf);
 
@@ -180,7 +180,7 @@ void ai_index_to_string(
 {
 	if (ai_index == NONE)
 	{
-		csstrncpy(buffer, "none", bufsize);
+		strncpy(buffer, "none", bufsize);
 	}
 	else
 	{
@@ -215,7 +215,7 @@ void ai_index_to_string(
 			break;
 		}
 		default:
-			csstrncpy(buffer, "<error>", bufsize);
+			strncpy(buffer, "<error>", bufsize);
 			break;
 		}
 	}
@@ -2241,25 +2241,28 @@ static int ai_scripting_vehicle_candidate_qsort(
 	void const *p1,
 	void const *p2)
 {
+	int result;
 	struct ai_script_vehicle_candidate const *candidate1 = p1;
 	struct ai_script_vehicle_candidate const *candidate2 = p2;
 
 	if (candidate1->already_entering_vehicle != candidate2->already_entering_vehicle)
 	{
-		return candidate1->already_entering_vehicle ? 1 : -1;
+		result = candidate1->already_entering_vehicle ? 1 : -1;
 	}
-
-	if (candidate1->dist_sq < candidate2->dist_sq)
+	else if (candidate1->dist_sq < candidate2->dist_sq)
 	{
-		return -1;
+		result = -1;
 	}
-
-	if (candidate1->dist_sq > candidate2->dist_sq)
+	else if (candidate1->dist_sq > candidate2->dist_sq)
 	{
-		return 1;
+		result = 1;
+	}
+	else
+	{
+		result = 0;
 	}
 
-	return 0;
+	return result;
 }
 
 static void ai_scripting_go_to_vehicle_internal(

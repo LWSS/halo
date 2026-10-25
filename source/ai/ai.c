@@ -438,29 +438,32 @@ static int compare_releasable_inactive_encounters(
 	void const *p1,
 	void const *p2)
 {
+	int result;
 	struct potentially_releasable_encounter const *releasable1 = (struct potentially_releasable_encounter const *)p1;
 	struct potentially_releasable_encounter const *releasable2 = (struct potentially_releasable_encounter const *)p2;
 
 	if (releasable1->last_active_time > releasable2->last_active_time)
 	{
-		return 1;
+		result = 1;
 	}
 	else if (releasable2->last_active_time > releasable1->last_active_time)
 	{
-		return -1;
+		result = -1;
 	}
 	else if (releasable1->encounterless_actor > releasable2->encounterless_actor)
 	{
-		return -1;
+		result = -1;
 	}
 	else if (releasable1->encounterless_actor < releasable2->encounterless_actor)
 	{
-		return 1;
+		result = 1;
 	}
 	else
 	{
-		return 0;
+		result = 0;
 	}
+
+	return result;
 }
 
 void ai_find_inactive_encounters(
@@ -1739,38 +1742,32 @@ void ai_handle_unit_effect(
 			struct unit_datum *unit = unit_get(owner_unit_index);
 			long current_time = game_time_get();
 
-			if (game_connection() == _game_connection_local && ai_debug.ignore_player && unit->unit.player_index != NONE)
+			if ((game_connection() != _game_connection_local || !ai_debug.ignore_player || unit->unit.player_index == NONE) &&
+				(effect_type > unit->unit.last_unit_effect_type || current_time > unit->unit.game_time_at_last_unit_effect + TICKS_PER_SECOND))
 			{
-				return;
-			}
+				unit->unit.last_unit_effect_type = effect_type;
+				unit->unit.game_time_at_last_unit_effect = current_time;
 
-			if (effect_type <= unit->unit.last_unit_effect_type && current_time <= unit->unit.game_time_at_last_unit_effect + TICKS_PER_SECOND)
-			{
-				return;
-			}
-
-			unit->unit.last_unit_effect_type = effect_type;
-			unit->unit.game_time_at_last_unit_effect = current_time;
-
-			if (unit->object.type == _object_type_vehicle)
-			{
-				long object_index = unit->object.first_child_object_index;
-
-				while (object_index != NONE)
+				if (unit->object.type == _object_type_vehicle)
 				{
-					struct object_datum *object = object_get(object_index);
+					long object_index = unit->object.first_child_object_index;
 
-					if (object->object.type == _object_type_biped)
+					while (object_index != NONE)
 					{
-						actors_handle_unit_effect(object_index, effect_type, volume);
-					}
+						struct object_datum *object = object_get(object_index);
 
-					object_index = object->object.next_object_index;
+						if (object->object.type == _object_type_biped)
+						{
+							actors_handle_unit_effect(object_index, effect_type, volume);
+						}
+
+						object_index = object->object.next_object_index;
+					}
 				}
-			}
-			else if (unit->object.type == _object_type_biped)
-			{
-				actors_handle_unit_effect(owner_unit_index, effect_type, volume);
+				else if (unit->object.type == _object_type_biped)
+				{
+					actors_handle_unit_effect(owner_unit_index, effect_type, volume);
+				}
 			}
 		}
 	}
