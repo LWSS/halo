@@ -2801,26 +2801,6 @@ boolean game_engine_should_spawn_player(
 	return result;
 }
 
-long game_engine_player_get_team_index(
-	long player_index)
-{
-	long team_index = 1;
-
-	match_assert("c:\\halo\\SOURCE\\game\\game_engine.c", 3089, game_engine);
-
-	if (game_engine->game_engine_player_get_team_index)
-	{
-	}
-	else
-	{
-		struct player_datum *player = player_get(player_index);
-
-		team_index = player->local_player_index % 2;
-	}
-
-	return team_index;
-}
-
 long find_netgame_flags(
 	real_point3d const *location,
 	real distance,
@@ -2882,6 +2862,26 @@ long find_netgame_flag(
 	return result;
 }
 
+long game_engine_player_get_team_index(
+	long player_index)
+{
+	long team_index = 1;
+
+	match_assert("c:\\halo\\SOURCE\\game\\game_engine.c", 3089, game_engine);
+
+	if (game_engine->game_engine_player_get_team_index)
+	{
+	}
+	else
+	{
+		struct player_datum *player = player_get(player_index);
+
+		team_index = player->local_player_index % 2;
+	}
+
+	return team_index;
+}
+
 void game_engine_prespawn_player_update(
 	long player_index)
 {
@@ -2900,14 +2900,6 @@ void game_engine_prespawn_player_update(
 	}
 
 	return;
-}
-
-boolean game_engine_running(
-	void)
-{
-	boolean running = game_engine != NULL;
-
-	return running;
 }
 
 static void handle_custom_starting_equipment(
@@ -3053,6 +3045,14 @@ void game_engine_postspawn_player_update(
 	}
 
 	return;
+}
+
+boolean game_engine_running(
+	void)
+{
+	boolean running = game_engine != NULL;
+
+	return running;
 }
 
 real game_engine_get_damage_multiplier(
@@ -3262,7 +3262,7 @@ real get_blink_alpha(
 	long period = 2700;
 	long time = system_milliseconds() % period;
 	real angle = (real)(time * 3.14159265358979 * (1.f / period));
-	real alpha = sine(angle);
+	real alpha = (real)sin(angle);
 
 	return alpha;
 }
