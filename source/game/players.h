@@ -192,6 +192,14 @@ void update_server_start(void);
 
 void update_queues_reset_and_fill_with_lies(void);
 
+/* ---------- prototypes/PLAYER_RUMBLE.C */
+
+void rumble_player_set_scripted_values(real left, real right);
+void rumble_player_set_scale(real scale);
+void rumble_player_impulse(short local_player_index, struct vibrate_definition const *vibrate, real scale, real time_scale);
+void rumble_player_clear(short local_player_index);
+void rumble_player_continuous(short local_player_index, real left, real right);
+
 /* ---------- globals */
 
 extern struct data_array *player_data;

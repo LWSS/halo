@@ -1019,7 +1019,7 @@ static void particle_system_render(
 								FLAG(_build_sprite_viewer_space_bit));
 						}
 
-						sprite_data.shader->effect.secondary_map_radius = state_definition->variables.radius;
+						((struct shader_effect *)sprite_data.shader)->effect.secondary_map_radius = state_definition->variables.radius;
 						build_sprites_end(&sprite_data);
 					}
 
@@ -1079,7 +1079,7 @@ static void particle_system_render(
 								FLAG(_build_sprite_viewer_space_bit));
 						}
 
-						sprite_data.shader->effect.secondary_map_radius = state_definition->variables.radius;
+						((struct shader_effect *)sprite_data.shader)->effect.secondary_map_radius = state_definition->variables.radius;
 						build_sprites_end(&sprite_data);
 					}
 				}

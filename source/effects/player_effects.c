@@ -21,7 +21,6 @@ PLAYER_EFFECTS.C
 #include "network_server_message_handler.h"
 #include "network_server_manager.h"
 #include "damage_effect_definitions.h"
-#include "player_rumble.h"
 #include "damage.h"
 
 /* ---------- constants */
