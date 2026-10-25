@@ -59,8 +59,7 @@ enum
 {
 	_build_sprites_screen_space_bit = 0,
 	_build_sprites_first_person_bit,
-	_build_sprites_valid_bit,
-	NUMBER_OF_BUILD_SPRITES_INTERNAL_FLAGS,
+	NUMBER_OF_BUILD_SPRITES_FLAGS,
 };
 
 /* ---------- macros */

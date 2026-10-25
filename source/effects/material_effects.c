@@ -74,11 +74,11 @@ void material_effect_new_from_point(
 
 	if (effect_index < definition->effects.count)
 	{
-		struct material_effect const *effect = TAG_BLOCK_GET_ELEMENT(&definition->effects, effect_index, struct material_effect);
-		real const contact_point_cast_height = 0.15f;
 		real_point3d contact_point_cast_origin;
 		real_vector3d contact_point_cast;
 		struct collision_result collision;
+		struct material_effect const *effect = TAG_BLOCK_GET_ELEMENT(&definition->effects, effect_index, struct material_effect);
+		real const contact_point_cast_height = 0.15f;
 
 		contact_point_cast_origin = *origin;
 		contact_point_cast_origin.z += contact_point_cast_height;
@@ -128,8 +128,8 @@ void material_effect_new(
 
 		if (material_index != NONE && material_index < effect->materials.count)
 		{
-			struct material_effect_material const *material = TAG_BLOCK_GET_ELEMENT(&effect->materials, material_index, struct material_effect_material);
 			real_point3d offset_origin;
+			struct material_effect_material const *material = TAG_BLOCK_GET_ELEMENT(&effect->materials, material_index, struct material_effect_material);
 
 			point_from_line3d(origin, normal, 0.01f, &offset_origin);
 

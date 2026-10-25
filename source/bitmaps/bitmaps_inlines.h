@@ -147,8 +147,8 @@ __inline pixel32 real_a_rgb_color_to_pixel32(
 	real alpha,
 	real_rgb_color const *color)
 {
-	real scale = 255.f;
 	pixel32 result;
+	real scale = 255.f;
 
 	match_assert("..\\bitmaps\\bitmaps_inlines.h", 243, alpha>=0.0f && alpha<=1.0f);
 	match_assert_valid_real_rgb_color("..\\bitmaps\\bitmaps_inlines.h", 244, color);

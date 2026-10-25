@@ -1085,7 +1085,6 @@ void decal_new_from_collision(
 	short forced_sequence_index,
 	struct decal_editor_geometry *editor_geometry)
 {
-	struct collision_bsp const *bsp = global_collision_bsp_get();
 	struct decal_definition const *definition;
 	long surface_queue[MAXIMUM_DECAL_SURFACE_QUEUE_SIZE];
 	short surface_queue_read_index;
@@ -1102,6 +1101,7 @@ void decal_new_from_collision(
 	short sprite_index;
 	short bitmap_index;
 	struct bitmap_group const *bitmap_group;
+	struct collision_bsp const *bsp = global_collision_bsp_get();
 	boolean geometry_inherited = FALSE;
 
 	match_assert("c:\\halo\\SOURCE\\effects\\decals.c", 2033, collision);
@@ -1331,13 +1331,13 @@ void decal_new_from_collision(
 
 		if (decal_wrap_parameters[definition->type].wrap)
 		{
-			short remaining_deviant_surface_count = deviant_surface_count;
 			long deviant_surface_bunch[MAXIMUM_DECAL_SURFACE_QUEUE_SIZE];
+			short remaining_deviant_surface_count = deviant_surface_count;
 
 			while (remaining_deviant_surface_count > 0)
 			{
-				short deviant_surface_bunch_size = 0;
 				short deviant_surface_index;
+				short deviant_surface_bunch_size = 0;
 
 				for (deviant_surface_index = 0; !deviant_surface_bunch_size && deviant_surface_index < deviant_surface_count; deviant_surface_index++)
 				{
@@ -1509,11 +1509,11 @@ void decal_new_from_collision(
 
 		if (decal_geometry.decal_surface_count > 0 && decal_geometry.decal_vertex_count > 0)
 		{
-			real_vector3d offset = { 0.f, 0.f, 0.f };
-			short decal_quad_count = 0;
 			short decal_surface_index;
 			long cache_size;
 			long cache_index;
+			real_vector3d offset = { 0.f, 0.f, 0.f };
+			short decal_quad_count = 0;
 
 			if (up_bounds.x1 - up_bounds.x0 <= DECAL_WRAP_BOUNDS_TOLERANCE &&
 				up_bounds.y1 - up_bounds.y0 <= DECAL_WRAP_BOUNDS_TOLERANCE &&
